@@ -1,0 +1,7 @@
+apiVersion: knappek.com/v1alpha1
+kind: MongoDBAtlasProject
+metadata:
+  name: example-mongodbatlasproject
+spec:
+  # Add fields here
+  size: 3
