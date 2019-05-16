@@ -1,7 +1,9 @@
 apiVersion: knappek.com/v1alpha1
 kind: MongoDBAtlasProject
 metadata:
-  name: example-mongodbatlasproject
+  name: example-project
 spec:
   # Add fields here
-  size: 3
+  orgId: xxxxxx
+  username: andy.knapp.ak@gmail.com
+  apiKey: xxxxxx
