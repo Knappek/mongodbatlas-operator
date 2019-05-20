@@ -22,6 +22,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 * A running Kubernetes cluster, for example Minikube
 * A MongoDB Atlas Account
+* [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
 ## Getting Started
 
@@ -54,6 +55,14 @@ and finally deploy your first MongoDB Atlas Project
 
 ```shell
 kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
+```
+
+## Cleanup
+
+```shell
+kubectl delete mongodbatlasproject example-project
+kubectl delete -f deploy/
+kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml
 ```
 
 ## Developers Build Guide
