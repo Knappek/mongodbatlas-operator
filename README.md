@@ -18,12 +18,12 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 * Manage [Backups](https://docs.atlas.mongodb.com/backup-cluster/)
 * Implement creating a Backup before deleting a project/cluster
 
-## Requirements
+## Prerequisites
 
 * A running Kubernetes cluster, for example Minikube
 * A MongoDB Atlas Account
 
-## Usage
+## Getting Started
 
 This example creates a MongoDB Atlas project:
 
@@ -58,7 +58,7 @@ kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
 
 ## Developers Build Guide
 
-### Initialize Operator
+**Initialize Operator**
 
 Run this once:
 
@@ -66,14 +66,14 @@ Run this once:
 make init-example-project
 ```
 
-### Run Operator locally
+**Run Operator locally**
 
 ```shell
 export KUBECONFIG=/path/to/config
 make dev
 ```
 
-### Run Operator in Kubernetes Cluster
+**Run Operator in Kubernetes Cluster**
 
 ```shell
 make deploy DOCKERHUB_USERNAME=<your-github-user>
