@@ -7,7 +7,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 **Currently it supports**:
 
-* Create MongoDB Atlas Project
+* Create/Delete MongoDB Atlas Project
 
 **Coming soon**:
 
