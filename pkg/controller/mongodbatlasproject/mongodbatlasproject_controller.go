@@ -10,7 +10,10 @@ import (
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -99,28 +102,47 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 }
 
 func newMongoDBAtlasProject(cr *knappekv1alpha1.MongoDBAtlasProject) error {
-	// create MongoDB Atlas client
-	config := utils.Config{
-		AtlasUsername: cr.Spec.Username,
-		AtlasAPIKey:   cr.Spec.APIKey,
+	// creates the in-cluster config
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		panic(err.Error())
 	}
-	client := config.NewClient()
+	// creates the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
+	}
+	orgID, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.OrgID.SecretName, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("Error fetching OrgID secret %v: %s", cr.Spec.OrgID.SecretName, err)
+	}
+	apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("Error fetching APIKey secret %v: %s", cr.Spec.APIKey.SecretName, err)
+	}
+
+	// create MongoDB Atlas client
+	atlasConfig := utils.Config{
+		AtlasUsername: cr.Spec.Username,
+		AtlasAPIKey:   string(apiKey.Data[cr.Spec.APIKey.Key]),
+	}
+	atlasClient := atlasConfig.NewClient()
 
 	params := ma.Project{
-		OrgID: cr.Spec.OrgID,
+		OrgID: string(orgID.Data[cr.Spec.OrgID.Key]),
 		Name:  cr.Name,
 	}
 	// check if project already exists
-	_, _, err := client.Projects.GetByName(cr.Name)
+	_, _, err = atlasClient.Projects.GetByName(cr.Name)
 	if err != nil {
-		p, _, err := client.Projects.Create(&params)
+		p, _, err := atlasClient.Projects.Create(&params)
 		if err != nil {
 			return fmt.Errorf("Error creating MongoDB Atlas Project %v: %s", cr.Name, err)
 		}
 
 		cr.Status.ID = p.ID
 
-		p, resp, err := client.Projects.Get(cr.Status.ID)
+		p, resp, err := atlasClient.Projects.Get(cr.Status.ID)
 		if err != nil {
 			if resp.StatusCode == 404 {
 				cr.Status.ID = ""

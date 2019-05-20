@@ -1,5 +1,5 @@
 BINARY = mongodbatlas-operator
-COMMIT=$(shell git rev-parse --short HEAD)
+COMMIT=$shell git rev-parse --short HEAD()
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 BUILD_DATE=$(shell date +%FT%T%z)
 
@@ -9,11 +9,15 @@ GITHUB_USERNAME=knappek
 dev:
 	operator-sdk up local
 	
-build: 
+docker-build: 
 	operator-sdk build knappek/mongodbatlas-operator
 
-docker-push: build
+docker-push: docker-build
 	docker push $(GITHUB_USERNAME)/$(BINARY):$(VERSION)
+
+deploy: docker-push
+	kubectl delete deployment mongodbatlas-operator
+	kubectl apply -f deploy/operator.yaml
 
 init-example-project:
 	kubectl create -f deploy/service_account.yaml

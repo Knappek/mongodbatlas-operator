@@ -4,6 +4,10 @@ metadata:
   name: example-project
 spec:
   # Add fields here
-  orgId: xxxxxx
   username: andy.knapp.ak@gmail.com
-  apiKey: xxxxxx
+  orgId:
+    secretName: "example-monogdb-atlas-project"
+    key: "orgId"
+  apiKey:
+    secretName: "example-monogdb-atlas-project"
+    key: "apiKey"
