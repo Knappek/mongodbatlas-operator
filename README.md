@@ -15,7 +15,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 * Create/Update MongoDB Database Users
 * Create/Update MongoDB Atlas Users
 * Create/Update MongoDB Atlas Alerts
-* Manage [Continuous Backups](LINK) 
+* Manage [Continuous Backups](LINK)
 
 ## Requirements
 
