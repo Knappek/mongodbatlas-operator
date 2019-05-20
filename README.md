@@ -42,3 +42,29 @@ and finally deploy your first MongoDB Atlas Project
 ```shell
 kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
 ```
+
+## Developers Build Guide
+
+### Initialize Operator
+
+Run this once:
+
+```shell
+make init-example-project
+```
+
+### Run Operator locally
+
+```shell
+make dev
+```
+
+### Run Operator in Kubernetes Cluster
+
+```shell
+make deploy DOCKERHUB_USERNAME=<your-github-user>
+```
+
+## Contributing
+
+TODO

@@ -4,16 +4,19 @@ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 BUILD_DATE=$(shell date +%FT%T%z)
 
 VERSION?=latest
-GITHUB_USERNAME=knappek
+DOCKERHUB_USERNAME=knappek
 
-dev:
+dev: generate-k8s
 	operator-sdk up local
 	
-docker-build: 
+generate-k8s:
+	operator-sdk generate k8s
+
+docker-build: generate-k8s	
 	operator-sdk build knappek/mongodbatlas-operator
 
 docker-push: docker-build
-	docker push $(GITHUB_USERNAME)/$(BINARY):$(VERSION)
+	docker push $(DOCKERHUB_USERNAME)/$(BINARY):$(VERSION)
 
 deploy: docker-push
 	kubectl delete deployment mongodbatlas-operator
