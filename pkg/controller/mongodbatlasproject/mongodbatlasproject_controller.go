@@ -3,10 +3,13 @@ package mongodbatlasproject
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"os"
 	"time"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	utils "github.com/Knappek/mongodbatlas-operator/pkg/utils"
+	"github.com/go-logr/logr"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -14,6 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -73,8 +77,8 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	reqLogger.Info("Reconciling MongoDBAtlasProject")
 
 	// Fetch the MongoDBAtlasProject instance
-	instance := &knappekv1alpha1.MongoDBAtlasProject{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
+	atlasProject := &knappekv1alpha1.MongoDBAtlasProject{}
+	err := r.client.Get(context.TODO(), request.NamespacedName, atlasProject)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
@@ -87,12 +91,36 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	}
 
 	// Creates a new MongoDB Atlas Project
-	err = newMongoDBAtlasProject(instance)
+	err = createMongoDBAtlasProject(reqLogger, atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	err = r.client.Status().Update(context.TODO(), instance)
+	// Check if the APP CR was marked to be deleted
+	isAtlasProjectToBeDeleted := atlasProject.GetDeletionTimestamp() != nil
+	if isAtlasProjectToBeDeleted {
+		// TODO(user): Add the cleanup steps that the operator needs to do before the CR can be deleted
+		err := deleteMongoDBAtlasProject(reqLogger, atlasProject)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		// Update finalizer to allow delete CR
+		atlasProject.SetFinalizers(nil)
+
+		// Update CR
+		err = r.client.Update(context.TODO(), atlasProject)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		return reconcile.Result{}, nil
+	}
+
+	// Add finalizer for this CR
+	if err := r.addFinalizer(reqLogger, atlasProject); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	err = r.client.Status().Update(context.TODO(), atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -101,14 +129,8 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 }
 
-func newMongoDBAtlasProject(cr *knappekv1alpha1.MongoDBAtlasProject) error {
-	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		panic(err.Error())
-	}
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
+func createMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasProject) error {
+	clientset, err := getKubernetesClient()
 	if err != nil {
 		panic(err.Error())
 	}
@@ -139,26 +161,91 @@ func newMongoDBAtlasProject(cr *knappekv1alpha1.MongoDBAtlasProject) error {
 		if err != nil {
 			return fmt.Errorf("Error creating MongoDB Atlas Project %v: %s", cr.Name, err)
 		}
-
 		cr.Status.ID = p.ID
-
-		p, resp, err := atlasClient.Projects.Get(cr.Status.ID)
-		if err != nil {
-			if resp.StatusCode == 404 {
-				cr.Status.ID = ""
-				return fmt.Errorf("(%v) MongoDB Project %s not found: %s", resp.StatusCode, cr.Status.ID, err)
-			}
-			return fmt.Errorf("Error reading MongoDB Project %s: %s", cr.Status.ID, err)
-		}
-
+		// p, resp, err := atlasClient.Projects.Get(cr.Status.ID)
+		// if err != nil {
+		// 	if resp.StatusCode == 404 {
+		// 		cr.Status.ID = ""
+		// 		return fmt.Errorf("(%v) MongoDB Project %s not found: %s", resp.StatusCode, cr.Status.ID, err)
+		// 	}
+		// 	return fmt.Errorf("Error reading MongoDB Project %s: %s", cr.Status.ID, err)
+		// }
 		cr.Status.OrgID = p.OrgID
 		cr.Status.Name = p.Name
 		cr.Status.Status = p.Created
 		cr.Status.ClusterCount = p.ClusterCount
+		reqLogger.Info("MongoDB Atlas Project %s created. Project ID: %s", p.Name, p.ID)
 
 		return nil
 	}
-	// project already exists, try to update it
+	// project already exists
 	return nil
+}
 
+func deleteMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasProject) error {
+	clientset, err := getKubernetesClient()
+	if err != nil {
+		panic(err.Error())
+	}
+	apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("Error fetching APIKey secret %v: %s", cr.Spec.APIKey.SecretName, err)
+	}
+
+	// create MongoDB Atlas client
+	atlasConfig := utils.Config{
+		AtlasUsername: cr.Spec.Username,
+		AtlasAPIKey:   string(apiKey.Data[cr.Spec.APIKey.Key]),
+	}
+	atlasClient := atlasConfig.NewClient()
+
+	atlasProjectID := cr.Status.ID
+	// check if project exists
+	_, _, err = atlasClient.Projects.Get(atlasProjectID)
+	if err != nil {
+		// project does not exist, skip doing something
+		reqLogger.Info("MongoDB Atlas Project %s (ID: %%s) does not exist. Just remove the Custom Resource.", cr.Status.Name, atlasProjectID)
+		return nil
+	}
+	// project exists and can be deleted
+	var resp *http.Response
+	resp, err = atlasClient.Projects.Delete(atlasProjectID)
+	if err != nil {
+		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, cr.Status.ID, err)
+	}
+	return nil
+}
+
+//addFinalizer will add this attribute to the Memcached CR
+func (r *ReconcileMongoDBAtlasProject) addFinalizer(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasProject) error {
+	if len(cr.GetFinalizers()) < 1 && cr.GetDeletionTimestamp() == nil {
+		reqLogger.Info("Adding Finalizer for the MongoDB Atlas Project")
+		cr.SetFinalizers([]string{"finalizer.knappek.com"})
+
+		// Update CR
+		err := r.client.Update(context.TODO(), cr)
+		if err != nil {
+			reqLogger.Error(err, "Failed to update MongoDB Atlas Project with finalizer")
+			return err
+		}
+	}
+	return nil
+}
+
+func getKubernetesClient() (*kubernetes.Clientset, error) {
+	var config *rest.Config
+	var err error
+	kubeconfig := os.Getenv("KUBECONFIG")
+	if kubeconfig == "" {
+		// creates the in-cluster config
+		config, err = rest.InClusterConfig()
+	} else {
+		// creates out-of-cluster config
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+	}
+	if err != nil {
+		panic(err.Error())
+	}
+	// creates the clientset
+	return kubernetes.NewForConfig(config)
 }

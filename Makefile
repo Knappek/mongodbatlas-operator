@@ -19,7 +19,7 @@ docker-push: docker-build
 	docker push $(DOCKERHUB_USERNAME)/$(BINARY):$(VERSION)
 
 deploy: docker-push
-	kubectl delete deployment mongodbatlas-operator
+	kubectl delete deployment mongodbatlas-operator || true
 	kubectl apply -f deploy/operator.yaml
 
 init-example-project:

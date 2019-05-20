@@ -68,6 +68,7 @@ make init-example-project
 ### Run Operator locally
 
 ```shell
+export KUBECONFIG=/path/to/config
 make dev
 ```
 
