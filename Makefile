@@ -26,7 +26,7 @@ init-example-project:
 	kubectl create -f deploy/service_account.yaml
 	kubectl create -f deploy/role.yaml
 	kubectl create -f deploy/role_binding.yaml
-	kubectl create -f deploy/crds/mongodbatlas_v1alpha1_mongodbatlasproject_crd.yaml
+	kubectl create -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml
 
 deploy-example-project:
 	kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
