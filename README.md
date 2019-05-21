@@ -90,4 +90,4 @@ make deploy DOCKERHUB_USERNAME=<your-github-user>
 
 ## Contributing
 
-TODO
+Read through the [Contributing Guidelines and Code of Conduct](./CONTRIBUTING.md).
