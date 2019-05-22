@@ -162,14 +162,6 @@ func createMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoD
 			return fmt.Errorf("Error creating MongoDB Atlas Project %v: %s", cr.Name, err)
 		}
 		cr.Status.ID = p.ID
-		// p, resp, err := atlasClient.Projects.Get(cr.Status.ID)
-		// if err != nil {
-		// 	if resp.StatusCode == 404 {
-		// 		cr.Status.ID = ""
-		// 		return fmt.Errorf("(%v) MongoDB Project %s not found: %s", resp.StatusCode, cr.Status.ID, err)
-		// 	}
-		// 	return fmt.Errorf("Error reading MongoDB Project %s: %s", cr.Status.ID, err)
-		// }
 		cr.Status.OrgID = p.OrgID
 		cr.Status.Name = p.Name
 		cr.Status.Status = p.Created
@@ -198,20 +190,33 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoD
 		AtlasAPIKey:   string(apiKey.Data[cr.Spec.APIKey.Key]),
 	}
 	atlasClient := atlasConfig.NewClient()
+	var p *ma.Project
+	var resp *http.Response
 
 	atlasProjectID := cr.Status.ID
+	if atlasProjectID == "" {
+		reqLogger.Info("MongoDBAtlasProject CustomResource %s has empty .status.id. Searching Project by name and try to delete Project afterwards", cr.Name)
+		p, resp, err = atlasClient.Projects.GetByName(cr.Name)
+		if err != nil {
+			if resp.StatusCode == 404 {
+				reqLogger.Info("MongoDBAtlasProject CustomResource %s does not exist in Atlas. Deleting CR.")
+				return nil
+			}
+			return fmt.Errorf("Error getting MongoDB Project by Name %s: %s", cr.Name, err)
+		}
+		atlasProjectID = p.ID
+	}
 	// check if project exists
 	_, _, err = atlasClient.Projects.Get(atlasProjectID)
 	if err != nil {
 		// project does not exist, skip doing something
-		reqLogger.Info("MongoDB Atlas Project %s (ID: %%s) does not exist. Just remove the Custom Resource.", cr.Status.Name, atlasProjectID)
+		reqLogger.Info("MongoDB Atlas Project %s (ID: %s) does not exist in Atlas. Just remove the Custom Resource.", cr.Name, atlasProjectID)
 		return nil
 	}
 	// project exists and can be deleted
-	var resp *http.Response
 	resp, err = atlasClient.Projects.Delete(atlasProjectID)
 	if err != nil {
-		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, cr.Status.ID, err)
+		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, atlasProjectID, err)
 	}
 	return nil
 }
