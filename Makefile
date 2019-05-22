@@ -33,3 +33,8 @@ deploy-example-project:
 
 delete-example-project:
 	kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
+
+cleanup:
+	kubectl delete mongodbatlasproject example-project || true
+	kubectl delete -f deploy/ || true
+	kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml || trueg
