@@ -104,7 +104,7 @@ make deploy DOCKERHUB_USERNAME=<your-github-user>
 
 **Run Operator Scorecard Tests**
 
-This will run the [Operator Scorecard tests](https://github.com/operator-framework/operator-sdk/blob/master/doc/test-framework/scorecard.md).
+This will run the [Operator Scorecard tests](https://github.com/operator-framework/operator-sdk/blob/master/doc/test-framework/scorecard.md):
 
 ```shell
 make test
