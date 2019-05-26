@@ -1,0 +1,115 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[{"apiVersion":"knappek.com/v1alpha1","kind":"MongoDBAtlasProject","metadata":{"name":"example-project"},"spec":{"apiKey":{"key":"apiKey","secretName":"example-monogdb-atlas-project"},"orgId":{"key":"orgId","secretName":"example-monogdb-atlas-project"},"username":"andy.knapp.ak@gmail.com"}}]'
+    capabilities: Basic Install
+  name: mongodbatlas-operator.v0.1.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: MongoDBAtlasProject
+      name: mongodbatlasprojects.knappek.com
+      version: v1alpha1
+  description: Placeholder description
+  displayName: Mongodbatlas Operator
+  install:
+    spec:
+      deployments:
+      - name: mongodbatlas-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: mongodbatlas-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                name: mongodbatlas-operator
+            spec:
+              containers:
+              - command:
+                - mongodbatlas-operator
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: mongodbatlas-operator
+                image: knappek/mongodbatlas-operator:latest
+                imagePullPolicy: Always
+                name: mongodbatlas-operator
+                resources: {}
+              serviceAccountName: mongodbatlas-operator
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - '*'
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - apps
+          resourceNames:
+          - mongodbatlas-operator
+          resources:
+          - deployments/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - knappek.com
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        serviceAccountName: mongodbatlas-operator
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  maturity: alpha
+  provider: {}
+  version: 0.1.0
