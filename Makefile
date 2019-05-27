@@ -23,7 +23,7 @@ deploy-operator: docker-push
 	kubectl delete deployment mongodbatlas-operator || true
 	kubectl apply -f deploy/operator.yaml
 
-init-example-project:
+init-example-project: cleanup
 	kubectl create -f deploy/service_account.yaml
 	kubectl create -f deploy/role.yaml
 	kubectl create -f deploy/role_binding.yaml

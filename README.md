@@ -49,6 +49,25 @@ kubectl create secret generic example-monogdb-atlas-project \
     --from-literal=orgId=yyyyyyyyyy
 ```
 
+Instead of having the MongoDB Atlas Organisation ID in a secret, you can also put it in a configmap
+
+```shell
+ kubectl create configmap example-monogdb-atlas-project \
+    --from-literal=orgId=yyyyyyyyyy
+ ```
+
+and reference it in the [CR](./deploy/crds/mongodbatlasproject_cr.yaml) accordingly using
+
+```yaml
+[...]
+orgId:
+valueFrom:
+    configMapKeyRef:
+    name: "example-monogdb-atlas-project"
+    key: "orgId"
+[...]
+```
+
 Deploy the MongoDB Atlas Project Operator:
 
 ```shell

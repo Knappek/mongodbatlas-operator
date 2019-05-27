@@ -8,11 +8,11 @@ import (
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	config "github.com/Knappek/mongodbatlas-operator/pkg/config"
+	util "github.com/Knappek/mongodbatlas-operator/pkg/util"
 	"github.com/go-logr/logr"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -86,7 +86,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{}, err
 	}
 
-	// Creates a new MongoDB Atlas Project with the name defined in atlasProject iff it does not yet exist 
+	// Creates a new MongoDB Atlas Project with the name defined in atlasProject iff it does not yet exist
 	err = createMongoDBAtlasProject(reqLogger, atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
@@ -131,24 +131,26 @@ func createMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoD
 	if err != nil {
 		panic(err.Error())
 	}
-	orgID, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.OrgID.SecretName, metav1.GetOptions{})
+	// orgID, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.OrgID.SecretName, metav1.GetOptions{})
+	orgID, err := util.GetOrgID(clientset, cr)
 	if err != nil {
-		return fmt.Errorf("Error fetching OrgID secret %v: %s", cr.Spec.OrgID.SecretName, err)
+		return err
 	}
-	apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
+	// apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
+	apiKey, err := util.GetAPIKey(clientset, cr)
 	if err != nil {
-		return fmt.Errorf("Error fetching APIKey secret %v: %s", cr.Spec.APIKey.SecretName, err)
+		return err
 	}
 
 	// create MongoDB Atlas client
 	atlasConfig := config.Config{
 		AtlasUsername: cr.Spec.Username,
-		AtlasAPIKey:   string(apiKey.Data[cr.Spec.APIKey.Key]),
+		AtlasAPIKey:   apiKey,
 	}
 	atlasClient := atlasConfig.NewMongoDBAtlasClient()
 
 	params := ma.Project{
-		OrgID: string(orgID.Data[cr.Spec.OrgID.Key]),
+		OrgID: orgID,
 		Name:  cr.Name,
 	}
 	// check if project already exists
@@ -174,15 +176,16 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoD
 	if err != nil {
 		panic(err.Error())
 	}
-	apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
+	// apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
+	apiKey, err := util.GetAPIKey(clientset, cr)
 	if err != nil {
-		return fmt.Errorf("Error fetching APIKey secret %v: %s", cr.Spec.APIKey.SecretName, err)
+		return err
 	}
 
 	// create MongoDB Atlas client
 	atlasConfig := config.Config{
 		AtlasUsername: cr.Spec.Username,
-		AtlasAPIKey:   string(apiKey.Data[cr.Spec.APIKey.Key]),
+		AtlasAPIKey:   apiKey,
 	}
 	atlasClient := atlasConfig.NewMongoDBAtlasClient()
 	var p *ma.Project

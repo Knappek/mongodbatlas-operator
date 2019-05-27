@@ -6,8 +6,12 @@ spec:
   # Add fields here
   username: andy.knapp.ak@gmail.com
   orgId:
-    secretName: "example-monogdb-atlas-project"
-    key: "orgId"
+    valueFrom:
+      secretKeyRef:
+        name: "example-monogdb-atlas-project"
+        key: "orgId"
   apiKey:
-    secretName: "example-monogdb-atlas-project"
-    key: "apiKey"
+    valueFrom:
+      secretKeyRef:
+        name: "example-monogdb-atlas-project"
+        key: "apiKey"

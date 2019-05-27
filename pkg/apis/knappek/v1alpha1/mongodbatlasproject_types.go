@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -34,9 +35,9 @@ type MongoDBAtlasProjectSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	OrgID    MongoDBAtlasSecret `json:"orgId"`
-	Username string             `json:"username"`
-	APIKey   MongoDBAtlasSecret `json:"apiKey"`
+	OrgID    OrgID  `json:"orgId"`
+	Username string `json:"username"`
+	APIKey   APIKey `json:"apiKey"`
 }
 
 // MongoDBAtlasProjectStatus defines the observed state of MongoDBAtlasProject
@@ -52,10 +53,28 @@ type MongoDBAtlasProjectStatus struct {
 	ClusterCount int    `json:"clusterCount"`
 }
 
-// MongoDBAtlasSecret refers to Kubernetes secret objects required to interact with the MongoDB Atlas API
-type MongoDBAtlasSecret struct {
-	SecretName string `json:"secretName"`
-	Key        string `json:"key"`
+// APIKey defines the MongoDBAtlas API Key reference
+type APIKey struct {
+	ValueFrom *APIKeySource `json:"valueFrom"`
+}
+
+// APIKeySource defines the MongoDBAtlas API Key reference Kubernetes source
+type APIKeySource struct {
+	// Selects a key of a secret in the CR's namespace
+	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef"`
+}
+
+// OrgID defines the MongoDBAtlas OrgID/groupID reference
+type OrgID struct {
+	ValueFrom *OrgIDSource `json:"valueFrom"`
+}
+
+// OrgIDSource defines the MongoDBAtlas OrgID/groupID reference Kubernetes source
+type OrgIDSource struct {
+	// Selects a key of a secret in the CR's namespace
+	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
+	// Selects a key of a ConfigMap.
+	ConfigMapKeyRef *corev1.ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
 }
 
 func init() {

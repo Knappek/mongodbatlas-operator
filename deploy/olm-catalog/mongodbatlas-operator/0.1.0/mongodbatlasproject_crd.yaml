@@ -37,19 +37,38 @@ spec:
               description: 'orgId is the MongoDB Atlas Organisation ID (also known as 
               groupID. More info: LINK'
               properties:
-                secretName:
-                  type: string  
-                key:
-                  type: string
+                valueFrom:
+                  properties:
+                    secretKeyRef:
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                      type: object
+                    configMapKeyRef:
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                      type: object
+                  type: object
               type: object
             apiKey:
               description: 'apiKey is the API Key of a MongoDB Atlas User Account 
               which is used together with username to authenticate to the MongoDB Atlas API: More info: LINK'
               properties:
-                secretName:
-                  type: string  
-                key:
-                  type: string
+                valueFrom:
+                  properties:
+                    secretKeyRef:
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                      type: object
+                  type: object
               type: object
           required:
           - username
