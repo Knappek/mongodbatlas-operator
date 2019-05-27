@@ -1,0 +1,17 @@
+apiVersion: knappek.com/v1alpha1
+kind: MongoDBAtlasProject
+metadata:
+  name: example-project
+spec:
+  # Add fields here
+  username: andy.knapp.ak@gmail.com
+  orgId:
+    valueFrom:
+      secretKeyRef:
+        name: "example-monogdb-atlas-project"
+        key: "orgId"
+  apiKey:
+    valueFrom:
+      secretKeyRef:
+        name: "example-monogdb-atlas-project"
+        key: "apiKey"

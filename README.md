@@ -38,7 +38,7 @@ First, create the MongoDB Atlas project CRD and some RBAC:
 kubectl create -f deploy/service_account.yaml
 kubectl create -f deploy/role.yaml
 kubectl create -f deploy/role_binding.yaml
-kubectl create -f deploy/crds/mongodbatlas_v1alpha1_mongodbatlasproject_crd.yaml
+kubectl create -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml
 ```
 
 Create a Kubernetes secret containing your MongoDB Atlas OrgID and the API Key
@@ -56,7 +56,7 @@ Instead of having the MongoDB Atlas Organisation ID in a secret, you can also pu
     --from-literal=orgId=yyyyyyyyyy
  ```
 
-and reference it in the [CR](./deploy/crds/mongodbatlasproject_cr.yaml) accordingly using
+and reference it in the [CR](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly using
 
 ```yaml
 [...]
