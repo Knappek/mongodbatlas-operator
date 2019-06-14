@@ -29,7 +29,7 @@ spec:
           type: object
         spec:
           properties:
-            apiKey:
+            privateKey:
               properties:
                 valueFrom:
                   properties:
@@ -43,29 +43,13 @@ spec:
               - valueFrom
               type: object
             orgId:
-              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-                Important: Run "operator-sdk generate k8s" to regenerate code after
-                modifying this file Add custom validation using kubebuilder tags:
-                https://book.kubebuilder.io/beyond_basics/generating_crd.html'
-              properties:
-                valueFrom:
-                  properties:
-                    configMapKeyRef:
-                      description: Selects a key of a ConfigMap.
-                      type: object
-                    secretKeyRef:
-                      description: Selects a key of a secret in the CR's namespace
-                      type: object
-                  type: object
-              required:
-              - valueFrom
-              type: object
-            username:
+              type: string
+            publicKey:
               type: string
           required:
           - orgId
-          - username
-          - apiKey
+          - publicKey
+          - privateKey
           type: object
         status:
           properties:
@@ -82,13 +66,13 @@ spec:
               type: string
             orgId:
               type: string
-            status:
+            created:
               type: string
           required:
           - id
           - orgId
           - name
-          - status
+          - created
           - clusterCount
           type: object
   version: v1alpha1

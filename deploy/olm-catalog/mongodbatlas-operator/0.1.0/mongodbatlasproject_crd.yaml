@@ -29,35 +29,17 @@ spec:
           type: object
         spec:
           properties:
-            username:
-              description: 'username is the username of an associated MongoDB Atlas Account. 
-              It is used together with the apiKey to authenticate to the MongoDB Atlas API: More info: LINK'
+            publicKey:
+              description: 'publicKey is the publicKey of the Programmatic API Key of an associated MongoDB Atlas Account. 
+              It is used together with the privateKey to authenticate to the MongoDB Atlas API'
               type: string
             orgId:
               description: 'orgId is the MongoDB Atlas Organisation ID (also known as 
-              groupID. More info: LINK'
-              properties:
-                valueFrom:
-                  properties:
-                    secretKeyRef:
-                      properties:
-                        name:
-                          type: string
-                        key:
-                          type: string
-                      type: object
-                    configMapKeyRef:
-                      properties:
-                        name:
-                          type: string
-                        key:
-                          type: string
-                      type: object
-                  type: object
-              type: object
-            apiKey:
-              description: 'apiKey is the API Key of a MongoDB Atlas User Account 
-              which is used together with username to authenticate to the MongoDB Atlas API: More info: LINK'
+              groupID'
+              type: string
+            privateKey:
+              description: 'privateKey is the Private Key of the Programmatic API Key of a MongoDB Atlas Account 
+              which is used together with publicKey to authenticate to the MongoDB Atlas API'
               properties:
                 valueFrom:
                   properties:
@@ -71,9 +53,9 @@ spec:
                   type: object
               type: object
           required:
-          - username
+          - publicKey
           - orgId
-          - apiKey
+          - privateKey
           type: object
         status:
           properties:

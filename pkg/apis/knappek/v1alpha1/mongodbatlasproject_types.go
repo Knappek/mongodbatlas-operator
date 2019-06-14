@@ -1,7 +1,7 @@
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
+	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -35,9 +35,8 @@ type MongoDBAtlasProjectSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	OrgID    OrgID  `json:"orgId"`
-	Username string `json:"username"`
-	APIKey   APIKey `json:"apiKey"`
+	AuthMongoDBAtlas `json:",inline"`
+	ma.Project       `json:",inline"`
 }
 
 // MongoDBAtlasProjectStatus defines the observed state of MongoDBAtlasProject
@@ -47,34 +46,10 @@ type MongoDBAtlasProjectStatus struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 	ID           string `json:"id"`
-	OrgID        string `json:"orgId"`
 	Name         string `json:"name"`
-	Status       string `json:"status"`
+	OrgID        string `json:"orgId"`
+	Created      string `json:"created"`
 	ClusterCount int    `json:"clusterCount"`
-}
-
-// APIKey defines the MongoDBAtlas API Key reference
-type APIKey struct {
-	ValueFrom *APIKeySource `json:"valueFrom"`
-}
-
-// APIKeySource defines the MongoDBAtlas API Key reference Kubernetes source
-type APIKeySource struct {
-	// Selects a key of a secret in the CR's namespace
-	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef"`
-}
-
-// OrgID defines the MongoDBAtlas OrgID/groupID reference
-type OrgID struct {
-	ValueFrom *OrgIDSource `json:"valueFrom"`
-}
-
-// OrgIDSource defines the MongoDBAtlas OrgID/groupID reference Kubernetes source
-type OrgIDSource struct {
-	// Selects a key of a secret in the CR's namespace
-	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
-	// Selects a key of a ConfigMap.
-	ConfigMapKeyRef *corev1.ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
 }
 
 func init() {

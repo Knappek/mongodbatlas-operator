@@ -12,13 +12,13 @@ import (
 )
 
 type Config struct {
-	AtlasUsername string
-	AtlasAPIKey   string
+	AtlasPublicKey  string
+	AtlasPrivateKey string
 }
 
 // NewMongoDBAtlasClient returns a REST API client for MongoDB Atlas
 func (c *Config) NewMongoDBAtlasClient() *ma.Client {
-	t := dac.NewTransport(c.AtlasUsername, c.AtlasAPIKey)
+	t := dac.NewTransport(c.AtlasPublicKey, c.AtlasPrivateKey)
 	httpClient := &http.Client{Transport: &t}
 	client := ma.NewClient(httpClient)
 	return client

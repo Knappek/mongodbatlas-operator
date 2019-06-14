@@ -2,7 +2,7 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: '[{"apiVersion":"knappek.com/v1alpha1","kind":"MongoDBAtlasProject","metadata":{"name":"example-project"},"spec":{"apiKey":{"valueFrom":{"secretKeyRef":{"key":"apiKey","name":"example-monogdb-atlas-project"}}},"orgId":{"valueFrom":{"secretKeyRef":{"key":"orgId","name":"example-monogdb-atlas-project"}}},"username":"andy.knapp.ak@gmail.com"}}]'
+    alm-examples: '[{"apiVersion":"knappek.com/v1alpha1","kind":"MongoDBAtlasProject","metadata":{"name":"example-project"},"spec":{"orgId":"5c4a2a55553855344780cf5f","privateKey":{"valueFrom":{"secretKeyRef":{"key":"privateKey","name":"example-monogdb-atlas-project"}}},"publicKey":"toppaljd"}}]'
     capabilities: Basic Install
   name: mongodbatlas-operator.v0.1.0
   namespace: placeholder

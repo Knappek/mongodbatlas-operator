@@ -7,13 +7,14 @@ import (
 	"time"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
-	config "github.com/Knappek/mongodbatlas-operator/pkg/config"
-	util "github.com/Knappek/mongodbatlas-operator/pkg/util"
-	"github.com/go-logr/logr"
+	"github.com/Knappek/mongodbatlas-operator/pkg/config"
+	"github.com/Knappek/mongodbatlas-operator/pkg/util"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -86,8 +87,14 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{}, err
 	}
 
+	// get Kubernetes clientset
+	clientset, err := config.GetKubernetesClient()
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// Creates a new MongoDB Atlas Project with the name defined in atlasProject iff it does not yet exist
-	err = createMongoDBAtlasProject(reqLogger, atlasProject)
+	err = createMongoDBAtlasProject(reqLogger, clientset, atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -102,7 +109,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	isMongoDBAtlasProjectToBeDeleted := atlasProject.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasProjectToBeDeleted {
 		// TODO(user): Add the cleanup steps that the operator needs to do before the CR can be deleted
-		err := deleteMongoDBAtlasProject(reqLogger, atlasProject)
+		err := deleteMongoDBAtlasProject(reqLogger, clientset, atlasProject)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -126,31 +133,21 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 }
 
-func createMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasProject) error {
-	clientset, err := config.GetKubernetesClient()
-	if err != nil {
-		panic(err.Error())
-	}
-	// orgID, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.OrgID.SecretName, metav1.GetOptions{})
-	orgID, err := util.GetOrgID(clientset, cr)
-	if err != nil {
-		return err
-	}
-	// apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
-	apiKey, err := util.GetAPIKey(clientset, cr)
+func createMongoDBAtlasProject(reqLogger logr.Logger, cs *kubernetes.Clientset, cr *knappekv1alpha1.MongoDBAtlasProject) error {
+	privateKey, err := util.GetPrivateKey(cs, cr.Spec.PrivateKey, cr.Namespace)
 	if err != nil {
 		return err
 	}
 
 	// create MongoDB Atlas client
 	atlasConfig := config.Config{
-		AtlasUsername: cr.Spec.Username,
-		AtlasAPIKey:   apiKey,
+		AtlasPublicKey:  cr.Spec.PublicKey,
+		AtlasPrivateKey: privateKey,
 	}
 	atlasClient := atlasConfig.NewMongoDBAtlasClient()
 
 	params := ma.Project{
-		OrgID: orgID,
+		OrgID: cr.Spec.OrgID,
 		Name:  cr.Name,
 	}
 	// check if project already exists
@@ -164,28 +161,24 @@ func createMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoD
 	cr.Status.ID = p.ID
 	cr.Status.OrgID = p.OrgID
 	cr.Status.Name = p.Name
-	cr.Status.Status = p.Created
+	cr.Status.Created = p.Created
 	cr.Status.ClusterCount = p.ClusterCount
 	reqLogger.Info("MongoDB Atlas Project created.", "MongoDBAtlasProject.ID", p.ID)
 
 	return nil
 }
 
-func deleteMongoDBAtlasProject(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasProject) error {
-	clientset, err := config.GetKubernetesClient()
-	if err != nil {
-		panic(err.Error())
-	}
-	// apiKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.APIKey.SecretName, metav1.GetOptions{})
-	apiKey, err := util.GetAPIKey(clientset, cr)
+func deleteMongoDBAtlasProject(reqLogger logr.Logger, cs *kubernetes.Clientset, cr *knappekv1alpha1.MongoDBAtlasProject) error {
+	// privateKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.PrivateKey.SecretName, metav1.GetOptions{})
+	privateKey, err := util.GetPrivateKey(cs, cr.Spec.PrivateKey, cr.Namespace)
 	if err != nil {
 		return err
 	}
 
 	// create MongoDB Atlas client
 	atlasConfig := config.Config{
-		AtlasUsername: cr.Spec.Username,
-		AtlasAPIKey:   apiKey,
+		AtlasPublicKey:  cr.Spec.PublicKey,
+		AtlasPrivateKey: privateKey,
 	}
 	atlasClient := atlasConfig.NewMongoDBAtlasClient()
 	var p *ma.Project

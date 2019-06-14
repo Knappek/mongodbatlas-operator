@@ -41,31 +41,11 @@ kubectl create -f deploy/role_binding.yaml
 kubectl create -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml
 ```
 
-Create a Kubernetes secret containing your MongoDB Atlas OrgID and the API Key
+Create a Kubernetes secret containing the Private Key of the [MongoDB Atlas Programmatic API Key](https://docs.atlas.mongodb.com/configure-api-access/#programmatic-api-keys)
 
 ```shell
 kubectl create secret generic example-monogdb-atlas-project \
-    --from-literal=apiKey=xxxxxxxxx \
-    --from-literal=orgId=yyyyyyyyyy
-```
-
-Instead of having the MongoDB Atlas Organisation ID in a secret, you can also put it in a configmap
-
-```shell
- kubectl create configmap example-monogdb-atlas-project \
-    --from-literal=orgId=yyyyyyyyyy
- ```
-
-and reference it in the [CR](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly using
-
-```yaml
-[...]
-orgId:
-valueFrom:
-    configMapKeyRef:
-    name: "example-monogdb-atlas-project"
-    key: "orgId"
-[...]
+    --from-literal=privateKey=xxxxxxxxx
 ```
 
 Deploy the MongoDB Atlas Project Operator:
@@ -74,7 +54,7 @@ Deploy the MongoDB Atlas Project Operator:
 kubectl apply -f deploy/operator.yaml
 ```
 
-and finally deploy your first MongoDB Atlas Project
+Adapt the `publicKey` and `orgId` in [knappek_v1alpha1_mongodbatlasproject_cr.yaml](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly and deploy your first MongoDB Atlas Project
 
 ```shell
 kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
@@ -95,7 +75,7 @@ kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml
 Run this once:
 
 ```shell
-make init-example-project
+make project
 ```
 
 **Run Operator locally**
