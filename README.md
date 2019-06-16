@@ -70,7 +70,7 @@ kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml
 
 ## Developers Build Guide
 
-**Initialize Operator**
+**Create MongoDB Atlas Project CRD**
 
 Run this once:
 
@@ -89,6 +89,18 @@ make dev
 
 ```shell
 make deploy DOCKERHUB_USERNAME=<your-github-user>
+```
+
+**Create MongoDB Atlas Project**
+
+```shell
+make deploy-project
+```
+
+**Delete MongoDB Atlas Project**
+
+```shell
+make delete-project
 ```
 
 **Run Operator Scorecard Tests**
