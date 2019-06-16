@@ -4,8 +4,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-// AuthMongoDBAtlas defines the authentication struct for MongoDB Atlas API
-type AuthMongoDBAtlas struct {
+// MongoDBAtlasAuth defines the authentication struct for MongoDB Atlas API
+type MongoDBAtlasAuth struct {
 	PublicKey  string     `json:"publicKey"`
 	PrivateKey PrivateKey `json:"privateKey"`
 }
