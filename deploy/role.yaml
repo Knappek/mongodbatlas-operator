@@ -50,5 +50,6 @@ rules:
   - knappek.com
   resources:
   - '*'
+  - mongodbatlasclusters
   verbs:
   - '*'

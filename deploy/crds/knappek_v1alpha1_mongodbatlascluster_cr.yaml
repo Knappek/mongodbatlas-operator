@@ -1,0 +1,24 @@
+apiVersion: knappek.com/v1alpha1
+kind: MongoDBAtlasCluster
+metadata:
+  name: example-mongodbatlascluster
+spec:
+  # Add fields here
+  publicKey: "toppaljd"
+  privateKey:
+    valueFrom:
+      secretKeyRef:
+        name: "example-monogdb-atlas-project"
+        key: "privateKey"
+  orgId: "5c4a2a55553855344780cf5f"
+  projectName: "example-project"
+  providerSettings:
+    providerName: "AWS"
+    regionName: "EU_CENTRAL_1"
+    instanceSizeName: "M10"
+    encryptEBSVolume: false
+  numShards: 1
+  autoscaling:
+    diskGBEnabled: false
+  backupEnabled: false
+  providerBackupEnabled: false

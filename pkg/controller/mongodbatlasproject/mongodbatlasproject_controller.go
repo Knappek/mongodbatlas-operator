@@ -90,13 +90,11 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 		panic(err.Error())
 	}
 
-	// get Atlas client
+	// create MongoDB Atlas client
 	privateKey, err := util.GetPrivateKey(k8sClient, atlasProject.Spec.PrivateKey, atlasProject.Namespace)
 	if err != nil {
 		panic(err.Error())
 	}
-
-	// create MongoDB Atlas client
 	atlasConfig := config.Config{
 		AtlasPublicKey:  atlasProject.Spec.PublicKey,
 		AtlasPrivateKey: privateKey,
