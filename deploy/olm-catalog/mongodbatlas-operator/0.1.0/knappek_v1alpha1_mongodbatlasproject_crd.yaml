@@ -29,6 +29,17 @@ spec:
           type: object
         spec:
           properties:
+            clusterCount:
+              format: int64
+              type: integer
+            created:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+            orgId:
+              type: string
             privateKey:
               properties:
                 valueFrom:
@@ -42,12 +53,9 @@ spec:
               required:
               - valueFrom
               type: object
-            orgId:
-              type: string
             publicKey:
               type: string
           required:
-          - orgId
           - publicKey
           - privateKey
           type: object
@@ -56,6 +64,8 @@ spec:
             clusterCount:
               format: int64
               type: integer
+            created:
+              type: string
             id:
               description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
                 of cluster Important: Run "operator-sdk generate k8s" to regenerate
@@ -66,12 +76,10 @@ spec:
               type: string
             orgId:
               type: string
-            created:
-              type: string
           required:
           - id
-          - orgId
           - name
+          - orgId
           - created
           - clusterCount
           type: object

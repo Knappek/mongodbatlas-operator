@@ -3,7 +3,6 @@ package mongodbatlasproject
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
@@ -14,7 +13,6 @@ import (
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -71,7 +69,6 @@ type ReconcileMongoDBAtlasProject struct {
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling MongoDBAtlasProject")
 
 	// Fetch the MongoDBAtlasProject instance
 	atlasProject := &knappekv1alpha1.MongoDBAtlasProject{}
@@ -88,13 +85,26 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	}
 
 	// get Kubernetes clientset
-	clientset, err := config.GetKubernetesClient()
+	k8sClient, err := config.GetKubernetesClient()
 	if err != nil {
 		panic(err.Error())
 	}
 
+	// get Atlas client
+	privateKey, err := util.GetPrivateKey(k8sClient, atlasProject.Spec.PrivateKey, atlasProject.Namespace)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// create MongoDB Atlas client
+	atlasConfig := config.Config{
+		AtlasPublicKey:  atlasProject.Spec.PublicKey,
+		AtlasPrivateKey: privateKey,
+	}
+	atlasClient := atlasConfig.NewMongoDBAtlasClient()
+
 	// Creates a new MongoDB Atlas Project with the name defined in atlasProject iff it does not yet exist
-	err = createMongoDBAtlasProject(reqLogger, clientset, atlasProject)
+	err = createMongoDBAtlasProject(reqLogger, atlasClient, atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -109,7 +119,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	isMongoDBAtlasProjectToBeDeleted := atlasProject.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasProjectToBeDeleted {
 		// TODO(user): Add the cleanup steps that the operator needs to do before the CR can be deleted
-		err := deleteMongoDBAtlasProject(reqLogger, clientset, atlasProject)
+		err := deleteMongoDBAtlasProject(reqLogger, atlasClient, atlasProject)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -133,19 +143,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 }
 
-func createMongoDBAtlasProject(reqLogger logr.Logger, cs *kubernetes.Clientset, cr *knappekv1alpha1.MongoDBAtlasProject) error {
-	privateKey, err := util.GetPrivateKey(cs, cr.Spec.PrivateKey, cr.Namespace)
-	if err != nil {
-		return err
-	}
-
-	// create MongoDB Atlas client
-	atlasConfig := config.Config{
-		AtlasPublicKey:  cr.Spec.PublicKey,
-		AtlasPrivateKey: privateKey,
-	}
-	atlasClient := atlasConfig.NewMongoDBAtlasClient()
-
+func createMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasProject) error {
 	params := ma.Project{
 		OrgID: cr.Spec.OrgID,
 		Name:  cr.Name,
@@ -157,40 +155,25 @@ func createMongoDBAtlasProject(reqLogger logr.Logger, cs *kubernetes.Clientset, 
 		if err != nil {
 			return fmt.Errorf("Error creating MongoDB Atlas Project %v: %s", cr.Name, err)
 		}
+		reqLogger.Info("MongoDB Atlas Project created.", "MongoDBAtlasProject.ID", p.ID)
 	}
 	cr.Status.ID = p.ID
 	cr.Status.OrgID = p.OrgID
 	cr.Status.Name = p.Name
 	cr.Status.Created = p.Created
 	cr.Status.ClusterCount = p.ClusterCount
-	reqLogger.Info("MongoDB Atlas Project created.", "MongoDBAtlasProject.ID", p.ID)
 
 	return nil
 }
 
-func deleteMongoDBAtlasProject(reqLogger logr.Logger, cs *kubernetes.Clientset, cr *knappekv1alpha1.MongoDBAtlasProject) error {
-	// privateKey, err := clientset.CoreV1().Secrets(cr.Namespace).Get(cr.Spec.PrivateKey.SecretName, metav1.GetOptions{})
-	privateKey, err := util.GetPrivateKey(cs, cr.Spec.PrivateKey, cr.Namespace)
-	if err != nil {
-		return err
-	}
-
-	// create MongoDB Atlas client
-	atlasConfig := config.Config{
-		AtlasPublicKey:  cr.Spec.PublicKey,
-		AtlasPrivateKey: privateKey,
-	}
-	atlasClient := atlasConfig.NewMongoDBAtlasClient()
-	var p *ma.Project
-	var resp *http.Response
-
+func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasProject) error {
 	atlasProjectID := cr.Status.ID
 	if atlasProjectID == "" {
 		reqLogger.Info("MongoDBAtlasProject CustomResource has empty Status ID. Searching Project by name and try to delete Project afterwards")
-		p, resp, err = atlasClient.Projects.GetByName(cr.Name)
+		p, resp, err := atlasClient.Projects.GetByName(cr.Name)
 		if err != nil {
 			if resp.StatusCode == 404 {
-				reqLogger.Info("MongoDBAtlasProject CustomResource does not exist in Atlas. Deleting CR.")
+				reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.")
 				return nil
 			}
 			return fmt.Errorf("Error getting MongoDB Project by Name %s: %s", cr.Name, err)
@@ -198,17 +181,18 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, cs *kubernetes.Clientset, 
 		atlasProjectID = p.ID
 	}
 	// check if project exists
-	_, _, err = atlasClient.Projects.Get(atlasProjectID)
+	_, _, err := atlasClient.Projects.Get(atlasProjectID)
 	if err != nil {
 		// project does not exist, skip doing something
-		reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Just remove the Custom Resource.", "MongoDBAtlasProject.ID", atlasProjectID)
+		reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.", "MongoDBAtlasProject.ID", atlasProjectID)
 		return nil
 	}
 	// project exists and can be deleted
-	resp, err = atlasClient.Projects.Delete(atlasProjectID)
+	resp, err := atlasClient.Projects.Delete(atlasProjectID)
 	if err != nil {
 		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, atlasProjectID, err)
 	}
+	reqLogger.Info("MongoDB Atlas Project deleted.", "MongoDBAtlasProject.ID", atlasProjectID)
 	return nil
 }
 

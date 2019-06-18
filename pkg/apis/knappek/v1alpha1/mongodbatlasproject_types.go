@@ -1,7 +1,6 @@
 package v1alpha1
 
 import (
-	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -36,7 +35,7 @@ type MongoDBAtlasProjectSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 	MongoDBAtlasAuth `json:",inline"`
-	ma.Project       `json:",inline"`
+	OrgID            string `json:"orgId,omitempty"`
 }
 
 // MongoDBAtlasProjectStatus defines the observed state of MongoDBAtlasProject
