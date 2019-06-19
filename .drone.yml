@@ -10,10 +10,6 @@ workspace:
   base: /go
   path: src/github.com/Knappek/mongodbatlas-operator
 
-volumes:
-- name: go_bin
-  temp: {}
-
 steps:
 - name: install_operator_sdk
   pull: always
@@ -50,6 +46,11 @@ steps:
     event:
     - push
     - tag
+
+volumes:
+- name: go_bin
+  temp: {}
+
 
 # - name: push_docker
 #   image: plugins/docker
