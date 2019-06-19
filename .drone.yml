@@ -38,11 +38,12 @@ steps:
 
 - name: build_docker
   pull: always
-  image: plugins/docker
+  image: docker:18.09
   volumes:
   - name: go_bin
     path: /go/bin
   commands:
+  - operator-sdk version
   - apk add -U make
   - make docker-build
   when:
