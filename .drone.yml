@@ -34,6 +34,7 @@ steps:
   image: golang:1.12-alpine
   commands:
   - operator-sdk version
+  - ls -la 
   when:
     event:
     - push
