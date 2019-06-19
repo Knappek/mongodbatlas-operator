@@ -33,6 +33,7 @@ steps:
   pull: always
   image: plugins/docker
   commands:
+  - apk add -U make
   - make docker-build
   when:
     event:
