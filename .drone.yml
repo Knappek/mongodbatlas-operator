@@ -38,9 +38,13 @@ steps:
   volumes:
   - name: go_bin
     path: /go/bin
+  environment:
+    GOPATH: /go/
   commands:
   - export PATH=$PATH:/go/bin
-  - operator-sdk version
+  - pwd 
+  - echo $GOPATH
+  - which dep
   - apk add -U make
   - make docker-build
   when:
