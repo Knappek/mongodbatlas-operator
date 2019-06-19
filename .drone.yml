@@ -39,6 +39,7 @@ steps:
   - name: go_bin
     path: /go/bin
   commands:
+  - export PATH=$PATH:/go/bin
   - operator-sdk version
   - apk add -U make
   - make docker-build
