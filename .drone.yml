@@ -13,8 +13,6 @@ workspace:
 volumes:
 - name: go_bin
   temp: {}
-- name: usr_bin
-  temp: {}
 
 steps:
 - name: install_operator_sdk
@@ -23,8 +21,6 @@ steps:
   volumes:
   - name: go_bin
     path: /go/bin
-  - name: usr_bin
-    path: /usr/bin
   commands:
     - apk add -U git make curl
     - mkdir -p $GOPATH/bin
@@ -46,9 +42,8 @@ steps:
   volumes:
   - name: go_bin
     path: /go/bin
-  - name: usr_bin
-    path: /usr/bin
   commands:
+  - apk add -U make
   - make docker-build
   when:
     event:
