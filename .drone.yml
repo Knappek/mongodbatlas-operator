@@ -16,6 +16,7 @@ steps:
   image: golang:1.12-alpine
   commands:
     - apk add -U git make curl
+    - mkdir -p $GOPATH/bin
     - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
     - go get -d github.com/operator-framework/operator-sdk/cmd/operator-sdk # This will download the git repository and not install it
     - cd $GOPATH/src/github.com/operator-framework/operator-sdk
