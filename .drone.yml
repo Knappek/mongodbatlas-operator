@@ -31,9 +31,8 @@ steps:
 
 - name: build_docker
   pull: always
-  image: plugins/docker
+  image: golang:1.12-alpine
   commands:
-  - apk add -U make
   - make docker-build
   when:
     event:
