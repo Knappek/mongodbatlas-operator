@@ -10,10 +10,21 @@ workspace:
   base: /go
   path: src/github.com/Knappek/mongodbatlas-operator
 
+volumes:
+- name: go_bin
+  temp: {}
+- name: usr_bin
+  temp: {}
+
 steps:
 - name: install_operator_sdk
   pull: always
   image: golang:1.12-alpine
+  volumes:
+  - name: go_bin
+    path: /go/bin
+  - name: usr_bin
+    path: /usr/bin
   commands:
     - apk add -U git make curl
     - mkdir -p $GOPATH/bin
@@ -23,23 +34,26 @@ steps:
     - git checkout master
     - make dep
     - make install
-    - which operator-sdk
-    - which make
+    - operator-sdk version
   when:
     event:
     - push
     - tag
 
-# - name: build_docker
-#   pull: always
-#   image: golang:1.12-alpine
-#   commands:
-#   - apk add -U make
-#   - make docker-build
-#   when:
-#     event:
-#     - push
-#     - tag
+- name: build_docker
+  pull: always
+  image: plugins/docker
+  volumes:
+  - name: go_bin
+    path: /go/bin
+  - name: usr_bin
+    path: /usr/bin
+  commands:
+  - make docker-build
+  when:
+    event:
+    - push
+    - tag
 
 # - name: push_docker
 #   image: plugins/docker
