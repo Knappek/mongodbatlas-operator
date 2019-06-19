@@ -28,19 +28,16 @@ steps:
     event:
     - push
     - tag
-    - pull_request
 
-# - name: release
-#   pull: default
-#   image: golang:1.11-alpine
-#   environment:
-#     GO111MODULE: on
-#   commands:
-#   - apk add -U git make
-#   - make release
-#   when:
-#     event:
-#     - tag
+- name: release
+  pull: always
+  image: golang:1.12-alpine
+  commands:
+  - operator-sdk version
+  when:
+    event:
+    - push
+    - tag
 
 # - name: docker
 #   image: plugins/docker
