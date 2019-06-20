@@ -45,6 +45,10 @@ docker-build:
 docker-push: docker-build
 	docker push $(DOCKERHUB_USERNAME)/$(BINARY):$(VERSION)
 
+release:
+	git tag v${VERSION}
+	git push && git push --tags
+
 operator-build:
 	operator-sdk build $(DOCKERHUB_USERNAME)/$(BINARY)
 

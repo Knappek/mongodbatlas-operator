@@ -44,7 +44,7 @@ steps:
   pull: default
   image: plugins/github-release
   settings:
-    files: "build/*"
+    files: "build/_output/mongodbatlas-operator*"
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
