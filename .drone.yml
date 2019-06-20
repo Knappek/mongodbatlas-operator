@@ -14,9 +14,6 @@ steps:
 - name: build
   pull: always
   image: golang:1.12-alpine
-  volumes:
-  - name: go_bin
-    path: /go/bin
   commands:
     - apk add --update alpine-sdk
     - make build
@@ -24,6 +21,7 @@ steps:
     event:
     - push
     - tag
+    - pull_request
 
 - name: docker
   image: plugins/docker
@@ -37,58 +35,19 @@ steps:
     repo: knappek/mongodbatlas-operator
     tag:
     - latest
+    - 0.0.1
   when:
     event:
-    - push
+    - tag
 
-# - name: docker
-#   pull: always
-#   image: docker:18.09
-#   volumes:
-#   - name: go_bin
-#     path: /go/bin
-#   environment:
-#     GOPATH: /go/
-#   commands:
-#   - export PATH=$PATH:/go/bin
-#   - pwd 
-#   - echo $GOPATH
-#   - which dep
-#   - apk add -U make
-#   - make docker-build
-#   when:
-#     event:
-#     - push
-#     - tag
-
-# volumes:
-# - name: go_bin
-#   temp: {}
-
-
-# - name: push_docker
-#   image: plugins/docker
-#   pull: always
-#   settings:
-#     username: knappek
-#     password:
-#       from_secret: DOCKERHUB_PASSWORD
-#     repo: knappek/mongodbatlas-operator
-#     tag:
-#     - latest
-#   when:
-#     event:
-#     - push
-#     - tag
-
-# - name: github
-#   pull: default
-#   image: plugins/github-release
-#   settings:
-#     files: "dist/*"
-#   environment:
-#     GITHUB_TOKEN:
-#       from_secret: github_token
-#   when:
-#     event:
-#     - tag
+- name: release
+  pull: default
+  image: plugins/github-release
+  settings:
+    files: "build/*"
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+  when:
+    event:
+    - tag
