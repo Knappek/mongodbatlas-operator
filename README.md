@@ -154,3 +154,22 @@ To create a controller for the recently created API, run:
 ```shell
 make controller KIND=MongoDBAtlasCluster
 ```
+
+### Create a new Release
+
+> For this you have to have Collaborator permissions.
+
+A new release will
+* create a new release on the Github [release page](https://github.com/Knappek/mongodbatlas-operator/releases) 
+* push a new tagged Docker image to [Dockerhub](https://cloud.docker.com/repository/docker/knappek/mongodbatlas-operator/tags)
+
+In order to do this, follow these steps:
+
+1. Commit your changes (don't push)
+2. Create a new release using Semantic versioning
+
+    ```shell
+    make release VERSION=<major.minor.patch>
+    ```
+
+This will kick the CI pipeline and create a new Github Release with the version tag `v<major.minor.patch>`.
