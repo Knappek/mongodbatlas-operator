@@ -18,7 +18,7 @@ steps:
   - name: go_bin
     path: /go/bin
   commands:
-    - apk add -U make
+    - apk add -U make gcc
     - make build
   when:
     event:
