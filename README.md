@@ -19,6 +19,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 * [Contributing](#contributing)
   * [Create new API](#create-new-api)
   * [Create new Controller for the API](#create-new-controller-for-the-api)
+  * [Create a new Release](#create-a-new-release)
 
 <!-- vim-markdown-toc -->
 
