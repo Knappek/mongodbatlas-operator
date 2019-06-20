@@ -157,7 +157,7 @@ make controller KIND=MongoDBAtlasCluster
 
 ### Create a new Release
 
-> For this you have to have Collaborator permissions.
+> You need to have Collaborator permissions to perform this step
 
 A new release will
 * create a new release on the Github [release page](https://github.com/Knappek/mongodbatlas-operator/releases) 
