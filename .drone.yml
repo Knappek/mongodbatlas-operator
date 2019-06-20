@@ -18,7 +18,7 @@ steps:
   - name: go_bin
     path: /go/bin
   commands:
-    - apk add -U make gcc
+    - apk add --update alpine-sdk
     - make build
   when:
     event:
