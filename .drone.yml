@@ -11,50 +11,59 @@ workspace:
   path: src/github.com/Knappek/mongodbatlas-operator
 
 steps:
-- name: install_operator_sdk
+- name: build
   pull: always
   image: golang:1.12-alpine
   volumes:
   - name: go_bin
     path: /go/bin
   commands:
-    - apk add -U git make curl
-    - mkdir -p $GOPATH/bin
-    - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-    - go get -d github.com/operator-framework/operator-sdk/cmd/operator-sdk # This will download the git repository and not install it
-    - cd $GOPATH/src/github.com/operator-framework/operator-sdk
-    - git checkout master
-    - make dep
-    - make install
-    - operator-sdk version
+    - apk add -U make
+    - make build
   when:
     event:
     - push
     - tag
 
-- name: build_docker
+- name: docker
+  image: plugins/docker
   pull: always
-  image: docker:18.09
-  volumes:
-  - name: go_bin
-    path: /go/bin
-  environment:
-    GOPATH: /go/
-  commands:
-  - export PATH=$PATH:/go/bin
-  - pwd 
-  - echo $GOPATH
-  - which dep
-  - apk add -U make
-  - make docker-build
+  settings:
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    dockerfile: build/Dockerfile
+    repo: knappek/mongodbatlas-operator
+    tag:
+    - latest
   when:
     event:
     - push
-    - tag
 
-volumes:
-- name: go_bin
-  temp: {}
+# - name: docker
+#   pull: always
+#   image: docker:18.09
+#   volumes:
+#   - name: go_bin
+#     path: /go/bin
+#   environment:
+#     GOPATH: /go/
+#   commands:
+#   - export PATH=$PATH:/go/bin
+#   - pwd 
+#   - echo $GOPATH
+#   - which dep
+#   - apk add -U make
+#   - make docker-build
+#   when:
+#     event:
+#     - push
+#     - tag
+
+# volumes:
+# - name: go_bin
+#   temp: {}
 
 
 # - name: push_docker

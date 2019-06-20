@@ -9,6 +9,7 @@ OLM_VERSION?=0.1.0
 API_VERSION?=v1alpha1
 KIND=
 
+GITHUB_USERNAME=Knappek
 DOCKERHUB_USERNAME=knappek
 
 default: cleanup init dev
@@ -34,11 +35,18 @@ api:
 controller:
 	operator-sdk add controller --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
 
-docker-build: generate-k8s	
-	operator-sdk build knappek/mongodbatlas-operator
+.PHONY: build
+build:
+	go build -o $(PWD)/build/_output/bin/$(BINARY) -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} github.com/$(GITHUB_USERNAME)/$(BINARY)/cmd/manager
+
+docker-build:
+	docker build -f build/Dockerfile -t $(DOCKERHUB_USERNAME)/$(BINARY) .
 
 docker-push: docker-build
 	docker push $(DOCKERHUB_USERNAME)/$(BINARY):$(VERSION)
+
+operator-build:
+	operator-sdk build $(DOCKERHUB_USERNAME)/$(BINARY)
 
 deploy-operator: docker-push
 	kubectl delete deployment mongodbatlas-operator || true
