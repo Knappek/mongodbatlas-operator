@@ -95,7 +95,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	if err != nil {
 		panic(err.Error())
 	}
-	atlasConfig := config.Config{
+	atlasConfig := config.AtlasConfig{
 		AtlasPublicKey:  atlasProject.Spec.PublicKey,
 		AtlasPrivateKey: privateKey,
 	}

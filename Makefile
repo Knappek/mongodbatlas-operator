@@ -3,6 +3,7 @@ COMMIT=$shell git rev-parse --short HEAD()
 BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 BUILD_DATE=$(shell date +%FT%T%z)
 CRDS=$(shell echo deploy/crds/*_crd.yaml | sed 's/ / -f /g')
+GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 
 VERSION?=latest
 OLM_VERSION?=0.1.0
@@ -14,7 +15,7 @@ DOCKERHUB_USERNAME=knappek
 
 default: cleanup init dev
 
-init: generate-openapi
+init:
 	kubectl apply -f deploy/service_account.yaml
 	kubectl apply -f deploy/role.yaml
 	kubectl apply -f deploy/role_binding.yaml
@@ -79,3 +80,9 @@ test: cleanup olm-catalog
 	operator-sdk scorecard \
 		--cr-manifest deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml \
 		--csv-path deploy/olm-catalog/mongodbatlas-operator/$(OLM_VERSION)/mongodbatlas-operator.v$(OLM_VERSION).clusterserviceversion.yaml
+
+fmt:
+	gofmt -w $(GOFMT_FILES)
+
+lint:
+	go list ./... | grep -v /vendor/ | xargs -L1 golint -set_exit_status

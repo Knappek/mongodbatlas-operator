@@ -71,7 +71,7 @@ kubectl apply -f deploy/operator.yaml
 
 ### Create a MongoDB Atlas Project
 
-Adapt the `publicKey` and `orgId` in [knappek_v1alpha1_mongodbatlasproject_cr.yaml](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly and deploy your first MongoDB Atlas Project
+Adapt the `publicKey` and `orgID` in [knappek_v1alpha1_mongodbatlasproject_cr.yaml](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly and deploy your first MongoDB Atlas Project
 
 ```shell
 kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml

@@ -11,13 +11,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-type Config struct {
+// AtlasConfig stores Programmatic API Keys for authentication to Atlas API
+type AtlasConfig struct {
 	AtlasPublicKey  string
 	AtlasPrivateKey string
 }
 
 // NewMongoDBAtlasClient returns a REST API client for MongoDB Atlas
-func (c *Config) NewMongoDBAtlasClient() *ma.Client {
+func (c *AtlasConfig) NewMongoDBAtlasClient() *ma.Client {
 	t := dac.NewTransport(c.AtlasPublicKey, c.AtlasPrivateKey)
 	httpClient := &http.Client{Transport: &t}
 	client := ma.NewClient(httpClient)

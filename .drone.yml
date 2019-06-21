@@ -17,6 +17,8 @@ steps:
   commands:
     - apk add --update alpine-sdk
     - make build
+    - make fmt
+    - make lint
   when:
     event:
     - push
