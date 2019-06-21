@@ -10,7 +10,7 @@ spec:
       secretKeyRef:
         name: "example-monogdb-atlas-project"
         key: "privateKey"
-  orgId: "5c4a2a55553855344780cf5f"
+  orgID: "5c4a2a55553855344780cf5f"
   projectName: "example-project"
   providerSettings:
     providerName: "AWS"

@@ -10,8 +10,6 @@ spec:
     plural: mongodbatlasclusters
     singular: mongodbatlascluster
   scope: Namespaced
-  subresources:
-    status: {}
   validation:
     openAPIV3Schema:
       properties:
@@ -28,8 +26,183 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            autoScaling:
+              properties:
+                diskGBEnabled:
+                  type: boolean
+              required:
+              - diskGBEnabled
+              type: object
+            backupEnabled:
+              type: boolean
+            diskSizeGB:
+              format: double
+              type: number
+            mongoDBMajorVersion:
+              type: string
+            mongoDBVersion:
+              type: string
+            numShards:
+              format: int64
+              type: integer
+            privateKey:
+              properties:
+                valueFrom:
+                  properties:
+                    secretKeyRef:
+                      description: Selects a key of a secret in the CR's namespace
+                      type: object
+                  required:
+                  - secretKeyRef
+                  type: object
+              required:
+              - valueFrom
+              type: object
+            projectName:
+              type: string
+            providerBackupEnabled:
+              type: boolean
+            providerSettings:
+              properties:
+                backingProviderName:
+                  type: string
+                diskIOPS:
+                  format: int64
+                  type: integer
+                encryptEBSVolume:
+                  type: boolean
+                instanceSizeName:
+                  type: string
+                providerName:
+                  type: string
+                regionName:
+                  type: string
+              type: object
+            publicKey:
+              type: string
+            replicationFactor:
+              format: int64
+              type: integer
+            replicationSpec:
+              additionalProperties:
+                properties:
+                  analyticsNodes:
+                    format: int64
+                    type: integer
+                  electableNodes:
+                    format: int64
+                    type: integer
+                  priority:
+                    format: int64
+                    type: integer
+                  readOnlyNodes:
+                    format: int64
+                    type: integer
+                required:
+                - priority
+                - electableNodes
+                - readOnlyNodes
+                - analyticsNodes
+                type: object
+              type: object
+          required:
+          - publicKey
+          - privateKey
+          - projectName
+          - backupEnabled
+          - providerBackupEnabled
           type: object
         status:
+          properties:
+            autoScaling:
+              properties:
+                diskGBEnabled:
+                  type: boolean
+              required:
+              - diskGBEnabled
+              type: object
+            backupEnabled:
+              type: boolean
+            diskSizeGB:
+              format: double
+              type: number
+            groupID:
+              type: string
+            id:
+              description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                of cluster Important: Run "operator-sdk generate k8s" to regenerate
+                code after modifying this file Add custom validation using kubebuilder
+                tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html'
+              type: string
+            mongoDBMajorVersion:
+              type: string
+            mongoDBVersion:
+              type: string
+            mongoURI:
+              type: string
+            mongoURIUpdated:
+              type: string
+            mongoURIWithOptions:
+              type: string
+            name:
+              type: string
+            numShards:
+              format: int64
+              type: integer
+            paused:
+              type: boolean
+            providerBackupEnabled:
+              type: boolean
+            providerSettings:
+              properties:
+                backingProviderName:
+                  type: string
+                diskIOPS:
+                  format: int64
+                  type: integer
+                encryptEBSVolume:
+                  type: boolean
+                instanceSizeName:
+                  type: string
+                providerName:
+                  type: string
+                regionName:
+                  type: string
+              type: object
+            replicationFactor:
+              format: int64
+              type: integer
+            replicationSpec:
+              additionalProperties:
+                properties:
+                  analyticsNodes:
+                    format: int64
+                    type: integer
+                  electableNodes:
+                    format: int64
+                    type: integer
+                  priority:
+                    format: int64
+                    type: integer
+                  readOnlyNodes:
+                    format: int64
+                    type: integer
+                required:
+                - priority
+                - electableNodes
+                - readOnlyNodes
+                - analyticsNodes
+                type: object
+              type: object
+            srvAddress:
+              type: string
+            stateName:
+              type: string
+          required:
+          - backupEnabled
+          - providerBackupEnabled
+          - paused
           type: object
   version: v1alpha1
   versions:

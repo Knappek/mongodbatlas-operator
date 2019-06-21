@@ -29,7 +29,7 @@ spec:
           type: object
         spec:
           properties:
-            orgId:
+            orgID:
               type: string
             privateKey:
               properties:
@@ -65,12 +65,12 @@ spec:
               type: string
             name:
               type: string
-            orgId:
+            orgID:
               type: string
           required:
           - id
           - name
-          - orgId
+          - orgID
           - created
           - clusterCount
           type: object

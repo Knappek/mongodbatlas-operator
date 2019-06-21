@@ -35,7 +35,7 @@ type MongoDBAtlasProjectSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 	MongoDBAtlasAuth `json:",inline"`
-	OrgID            string `json:"orgId,omitempty"`
+	OrgID            string `json:"orgID,omitempty"`
 }
 
 // MongoDBAtlasProjectStatus defines the observed state of MongoDBAtlasProject
@@ -46,7 +46,7 @@ type MongoDBAtlasProjectStatus struct {
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 	ID           string `json:"id"`
 	Name         string `json:"name"`
-	OrgID        string `json:"orgId"`
+	OrgID        string `json:"orgID"`
 	Created      string `json:"created"`
 	ClusterCount int    `json:"clusterCount"`
 }

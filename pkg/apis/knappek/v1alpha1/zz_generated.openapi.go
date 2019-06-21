@@ -82,13 +82,99 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref common.Referen
 							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey"),
 						},
 					},
-					"id": {
+					"projectName": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
 						},
 					},
-					"groupId": {
+					"mongoDBVersion": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"mongoDBMajorVersion": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"diskSizeGB": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"number"},
+							Format: "double",
+						},
+					},
+					"backupEnabled": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"providerBackupEnabled": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"replicationFactor": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"replicationSpec": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ReplicationSpec"),
+									},
+								},
+							},
+						},
+					},
+					"numShards": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"autoScaling": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.AutoScaling"),
+						},
+					},
+					"providerSettings": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ProviderSettings"),
+						},
+					},
+				},
+				Required: []string{"publicKey", "privateKey", "projectName", "backupEnabled", "providerBackupEnabled"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.AutoScaling", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ProviderSettings", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ReplicationSpec"},
+	}
+}
+
+func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MongoDBAtlasClusterStatus defines the observed state of MongoDBAtlasCluster",
+				Properties: map[string]spec.Schema{
+					"id": {
+						SchemaProps: spec.SchemaProps{
+							Description: "INSERT ADDITIONAL STATUS FIELD - define observed state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"groupID": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -201,135 +287,7 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref common.Referen
 						},
 					},
 				},
-				Required: []string{"publicKey", "privateKey", "backupEnabled", "providerBackupEnabled", "paused"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.AutoScaling", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ProviderSettings", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ReplicationSpec"},
-	}
-}
-
-func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "MongoDBAtlasClusterStatus defines the observed state of MongoDBAtlasCluster",
-				Properties: map[string]spec.Schema{
-					"id": {
-						SchemaProps: spec.SchemaProps{
-							Description: "INSERT ADDITIONAL STATUS FIELD - define observed state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"groupId": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"mongoDBVersion": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"mongoDBMajorVersion": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"mongoURI": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"mongoURIUpdated": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"mongoURIWithOptions": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"diskSizeGB": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"number"},
-							Format: "double",
-						},
-					},
-					"backupEnabled": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"boolean"},
-							Format: "",
-						},
-					},
-					"providerBackupEnabled": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"boolean"},
-							Format: "",
-						},
-					},
-					"stateName": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"replicationFactor": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"integer"},
-							Format: "int32",
-						},
-					},
-					"replicationSpec": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ReplicationSpec"),
-									},
-								},
-							},
-						},
-					},
-					"numShards": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"integer"},
-							Format: "int32",
-						},
-					},
-					"paused": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"boolean"},
-							Format: "",
-						},
-					},
-					"autoScaling": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.AutoScaling"),
-						},
-					},
-					"providerSettings": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ProviderSettings"),
-						},
-					},
-				},
-				Required: []string{"id", "groupId", "name", "mongoDBVersion", "mongoDBMajorVersion", "mongoURI", "mongoURIUpdated", "mongoURIWithOptions", "diskSizeGB", "backupEnabled", "providerBackupEnabled", "stateName", "replicationFactor", "replicationSpec", "numShards", "paused", "autoScaling", "providerSettings"},
+				Required: []string{"backupEnabled", "providerBackupEnabled", "paused"},
 			},
 		},
 		Dependencies: []string{
@@ -397,34 +355,10 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectSpec(ref common.Referen
 							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey"),
 						},
 					},
-					"id": {
+					"orgID": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"orgId": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"created": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"clusterCount": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"integer"},
-							Format: "int32",
 						},
 					},
 				},
@@ -455,7 +389,7 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectStatus(ref common.Refer
 							Format: "",
 						},
 					},
-					"orgId": {
+					"orgID": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -474,7 +408,7 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectStatus(ref common.Refer
 						},
 					},
 				},
-				Required: []string{"id", "name", "orgId", "created", "clusterCount"},
+				Required: []string{"id", "name", "orgID", "created", "clusterCount"},
 			},
 		},
 		Dependencies: []string{},

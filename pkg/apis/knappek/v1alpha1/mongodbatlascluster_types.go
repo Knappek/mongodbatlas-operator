@@ -55,27 +55,8 @@ type MongoDBAtlasClusterStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	// ID                    string                        `json:"id"`
-	// GroupID               string                        `json:"groupId"`
-	// Name                  string                        `json:"name"`
-	// MongoDBVersion        string                        `json:"mongoDBVersion"`
-	// MongoDBMajorVersion   string                        `json:"mongoDBMajorVersion"`
-	// MongoURI              string                        `json:"mongoURI"`
-	// MongoURIUpdated       string                        `json:"mongoURIUpdated"`
-	// MongoURIWithOptions   string                        `json:"mongoURIWithOptions"`
-	// SrvAddress            string                        `json:"srvAddress,omitempty"`
-	// DiskSizeGB            float64                       `json:"diskSizeGB"`
-	// BackupEnabled         bool                          `json:"backupEnabled"`
-	// ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
-	// StateName             string                        `json:"stateName"`
-	// ReplicationFactor     int                           `json:"replicationFactor"`
-	// ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec"`
-	// NumShards             int                           `json:"numShards"`
-	// Paused                bool                          `json:"paused"`
-	// AutoScaling           ma.AutoScaling                `json:"autoScaling"`
-	// ProviderSettings      ma.ProviderSettings           `json:"providerSettings"`
 	ID                    string                        `json:"id,omitempty"`
-	GroupID               string                        `json:"groupId,omitempty"`
+	GroupID               string                        `json:"groupID,omitempty"`
 	Name                  string                        `json:"name,omitempty"`
 	MongoDBVersion        string                        `json:"mongoDBVersion,omitempty"`
 	MongoDBMajorVersion   string                        `json:"mongoDBMajorVersion,omitempty"`

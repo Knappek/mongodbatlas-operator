@@ -10,8 +10,6 @@ spec:
     plural: mongodbatlasprojects
     singular: mongodbatlasproject
   scope: Namespaced
-  subresources:
-    status: {}
   validation:
     openAPIV3Schema:
       properties:
@@ -29,16 +27,7 @@ spec:
           type: object
         spec:
           properties:
-            clusterCount:
-              format: int64
-              type: integer
-            created:
-              type: string
-            id:
-              type: string
-            name:
-              type: string
-            orgId:
+            orgID:
               type: string
             privateKey:
               properties:
@@ -74,12 +63,12 @@ spec:
               type: string
             name:
               type: string
-            orgId:
+            orgID:
               type: string
           required:
           - id
           - name
-          - orgId
+          - orgID
           - created
           - clusterCount
           type: object

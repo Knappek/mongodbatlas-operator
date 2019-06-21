@@ -5,7 +5,7 @@ metadata:
 spec:
   # Add fields here
   publicKey: "toppaljd"
-  orgId: "5c4a2a55553855344780cf5f"
+  orgID: "5c4a2a55553855344780cf5f"
   privateKey:
     valueFrom:
       secretKeyRef:
