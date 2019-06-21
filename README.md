@@ -160,6 +160,12 @@ To create a controller for the recently created API, run:
 make controller KIND=MongoDBAtlasCluster
 ```
 
+### Create CRDs
+
+```shell
+make generate-openapi
+```
+
 ### Create a new Release
 
 > You need to have Collaborator permissions to perform this step
