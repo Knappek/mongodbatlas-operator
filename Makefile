@@ -6,7 +6,7 @@ CRDS=$(shell echo deploy/crds/*_crd.yaml | sed 's/ / -f /g')
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 
 VERSION?=latest
-OLM_VERSION?=0.1.0
+OLM_VERSION?=0.0.2
 API_VERSION?=v1alpha1
 KIND=
 

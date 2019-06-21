@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[{"apiVersion":"knappek.com/v1alpha1","kind":"MongoDBAtlasCluster","metadata":{"name":"example-mongodbatlascluster"},"spec":{"autoscaling":{"diskGBEnabled":false},"backupEnabled":false,"numShards":1,"orgID":"5c4a2a55553855344780cf5f","privateKey":{"valueFrom":{"secretKeyRef":{"key":"privateKey","name":"example-monogdb-atlas-project"}}},"projectName":"example-project","providerBackupEnabled":false,"providerSettings":{"encryptEBSVolume":false,"instanceSizeName":"M10","providerName":"AWS","regionName":"EU_CENTRAL_1"},"publicKey":"toppaljd"}},{"apiVersion":"knappek.com/v1alpha1","kind":"MongoDBAtlasProject","metadata":{"name":"example-project"},"spec":{"orgID":"5c4a2a55553855344780cf5f","privateKey":{"valueFrom":{"secretKeyRef":{"key":"privateKey","name":"example-monogdb-atlas-project"}}},"publicKey":"toppaljd"}}]'
     capabilities: Basic Install
-  name: mongodbatlas-operator.v0.1.0
+  name: mongodbatlas-operator.v0.0.2
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -116,4 +116,4 @@ spec:
     type: AllNamespaces
   maturity: alpha
   provider: {}
-  version: 0.1.0
+  version: 0.0.2
