@@ -86,6 +86,6 @@ fmt:
 
 lint:
 	@which golint > /dev/null; if [ $$? -ne 0 ]; then \
-		$(GO) get -u golang.org/x/lint/golint; \
+		go get -u golang.org/x/lint/golint; \
 	fi
 	go list ./... | grep -v /vendor/ | xargs -L1 golint -set_exit_status
