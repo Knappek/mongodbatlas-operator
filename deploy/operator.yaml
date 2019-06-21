@@ -16,7 +16,7 @@ spec:
       containers:
         - name: mongodbatlas-operator
           # Replace this with the built image name
-          image: knappek/mongodbatlas-operator:0.0.2
+          image: knappek/mongodbatlas-operator:0.0.1
           command:
           - mongodbatlas-operator
           imagePullPolicy: Always
