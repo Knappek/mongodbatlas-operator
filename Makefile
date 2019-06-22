@@ -74,13 +74,12 @@ cleanup:
 	kubectl delete -f deploy/ >/dev/null 2>&1 || true
 	kubectl delete -f deploy/crds/ >/dev/null 2>&1 || true
 
-olm-catalog:
+csv:
 	operator-sdk olm-catalog gen-csv --csv-version $(OLM_VERSION) --update-crds
 
-test: cleanup olm-catalog
-	operator-sdk scorecard \
+test: cleanup
+	operator-sdk scorecard --olm-tests=false \
 		--cr-manifest deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml \
-		--csv-path deploy/olm-catalog/mongodbatlas-operator/$(OLM_VERSION)/mongodbatlas-operator.v$(OLM_VERSION).clusterserviceversion.yaml
 
 fmt:
 	gofmt -w $(GOFMT_FILES)
