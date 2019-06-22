@@ -37,7 +37,7 @@ steps:
     repo: knappek/mongodbatlas-operator
     tag:
     - latest
-    - 0.0.2
+    - 0.0.3
   when:
     event:
     - tag
