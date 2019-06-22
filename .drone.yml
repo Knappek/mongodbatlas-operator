@@ -25,7 +25,7 @@ steps:
     - tag
     - pull_request
 
-- name: docker
+- name: docker_latest
   image: plugins/docker
   pull: always
   settings:
@@ -37,6 +37,21 @@ steps:
     repo: knappek/mongodbatlas-operator
     tag:
     - latest
+  when:
+    event:
+    - push
+
+- name: docker_release
+  image: plugins/docker
+  pull: always
+  settings:
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    dockerfile: build/Dockerfile
+    repo: knappek/mongodbatlas-operator
+    tag:
     - 0.0.3
   when:
     event:
