@@ -7,7 +7,7 @@ GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
 
 VERSION?=latest
-OLM_VERSION?=0.0.3
+OLM_VERSION?=0.0.4
 API_VERSION?=v1alpha1
 KIND=
 

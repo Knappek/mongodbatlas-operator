@@ -52,7 +52,7 @@ steps:
     dockerfile: build/Dockerfile
     repo: knappek/mongodbatlas-operator
     tag:
-    - 0.0.3
+    - 0.0.4
   when:
     event:
     - tag
