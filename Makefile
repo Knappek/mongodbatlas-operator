@@ -4,6 +4,7 @@ BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 BUILD_DATE=$(shell date +%FT%T%z)
 CRDS=$(shell echo deploy/crds/*_crd.yaml | sed 's/ / -f /g')
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
+GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
 
 VERSION?=latest
 OLM_VERSION?=0.0.3
@@ -38,7 +39,7 @@ controller:
 
 .PHONY: build
 build:
-	go build -o $(PWD)/build/_output/bin/$(BINARY) -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} github.com/$(GITHUB_USERNAME)/$(BINARY)/cmd/manager
+	$(GO) build -o $(PWD)/build/_output/bin/$(BINARY) -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} github.com/$(GITHUB_USERNAME)/$(BINARY)/cmd/manager
 
 docker-build:
 	docker build -f build/Dockerfile -t $(DOCKERHUB_USERNAME)/$(BINARY) .
@@ -86,6 +87,6 @@ fmt:
 
 lint:
 	@which golint > /dev/null; if [ $$? -ne 0 ]; then \
-		go get -u golang.org/x/lint/golint; \
+		$(GO) get -u golang.org/x/lint/golint; \
 	fi
-	 go list ./... | grep -v /vendor/ | xargs golint -set_exit_status
+	 $(GO) list ./... | grep -v /vendor/ | xargs golint -set_exit_status
