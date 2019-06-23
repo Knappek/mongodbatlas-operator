@@ -1,6 +1,6 @@
 # MongoDB Atlas Kubernetes Operator
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/knappek/mongodbatlas-operator.svg?maxAge=604800)](https://hub.docker.com/r/knappek/mongodbatlas-operator)
+[![Docker Pulls](https://img.shields.io/docker/pulls/knappek/mongodbatlas-operator.svg)](https://hub.docker.com/r/knappek/mongodbatlas-operator)
 [![Build Status](https://cloud.drone.io/api/badges/Knappek/mongodbatlas-operator/status.svg)](https://cloud.drone.io/Knappek/mongodbatlas-operator)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Knappek/mongodbatlas-operator)](https://goreportcard.com/report/github.com/Knappek/mongodbatlas-operator)
 
@@ -178,8 +178,9 @@ A new release will
 
 In order to do this, follow these steps:
 
-1. Commit your changes (don't push)
-2. Create a new release using Semantic versioning
+1. Change the version in [.drone.yml](./.drone.yml), [operator.yaml](./deploy/operator.yaml) and in the [Makefile](./Makefile) 
+2. Commit your changes (don't push)
+3. Create a new release using Semantic versioning
 
     ```shell
     make release VERSION=<major.minor.patch>
