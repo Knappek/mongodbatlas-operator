@@ -68,7 +68,7 @@ type ReconcileMongoDBAtlasProject struct {
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "MongoDBAtlasProject.Name", request.Name)
 
 	// Fetch the MongoDBAtlasProject instance
 	atlasProject := &knappekv1alpha1.MongoDBAtlasProject{}
