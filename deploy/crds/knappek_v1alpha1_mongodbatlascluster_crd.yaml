@@ -9,6 +9,11 @@ spec:
     listKind: MongoDBAtlasClusterList
     plural: mongodbatlasclusters
     singular: mongodbatlascluster
+    shortNames:
+    - mac
+    categories:
+    - all
+    - mongodbatlas
   scope: Namespaced
   subresources:
     status: {}
@@ -17,7 +22,7 @@ spec:
       type: string
       description: The MongoDB Atlas Project where the cluster has been deployed
       JSONPath: .spec.projectName
-    - name: MongoDB Version
+    - name: MongoDB_Version
       type: string
       description: The MongoDB version of the cluster
       JSONPath: .status.mongoDBVersion
@@ -25,9 +30,33 @@ spec:
       type: string
       description: The status of the cluster
       JSONPath: .status.stateName
+    - name: Region
+      type: string
+      description: Physical location of your MongoDB cluster
+      JSONPath: .status.providerSettings.regionName
     - name: Age
       type: date
       JSONPath: .metadata.creationTimestamp
+    - name: Provider
+      type: string
+      description: Cloud service provider on which the servers are provisioned
+      JSONPath: .status.providerSettings.providerName
+      priority: 1
+    - name: ContinuousBackups
+      type: boolean
+      description: Set to true to enable Atlas continuous backups for the cluster
+      JSONPath: .status.backupEnabled
+      priority: 1
+    - name: ProviderBackups
+      type: boolean
+      description: Flag indicating if the cluster uses Cloud Provider Snapshots for backups
+      JSONPath: .status.providerBackupEnabled
+      priority: 1
+    - name: SRV_Address
+      type: string
+      description: Connection string (DNS SRV Record) for connecting to the Atlas cluster
+      JSONPath: .status.srvAddress
+      priority: 1
   validation:
     openAPIV3Schema:
       properties:
