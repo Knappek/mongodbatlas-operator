@@ -12,6 +12,22 @@ spec:
   scope: Namespaced
   subresources:
     status: {}
+  additionalPrinterColumns:
+    - name: Project Name
+      type: string
+      description: The MongoDB Atlas Project where the cluster has been deployed
+      JSONPath: .spec.projectName
+    - name: MongoDB Version
+      type: string
+      description: The MongoDB version of the cluster
+      JSONPath: .status.mongoDBVersion
+    - name: Status
+      type: string
+      description: The status of the cluster
+      JSONPath: .status.stateName
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
   validation:
     openAPIV3Schema:
       properties:

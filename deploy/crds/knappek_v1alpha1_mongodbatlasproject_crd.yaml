@@ -12,6 +12,18 @@ spec:
   scope: Namespaced
   subresources:
     status: {}
+  additionalPrinterColumns:
+    - name: OrgID
+      type: string
+      description: The MongoDB Atlas Organization ID
+      JSONPath: .spec.orgID
+    - name: ClusterCount
+      type: integer
+      description: The number of Clusters in the Project
+      JSONPath: .status.clusterCount
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
   validation:
     openAPIV3Schema:
       properties:

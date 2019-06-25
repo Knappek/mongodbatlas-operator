@@ -260,7 +260,6 @@ func updateMongoDBAtlasClusterCRStatus(cr *knappekv1alpha1.MongoDBAtlasCluster, 
 //addFinalizer will add this attribute to the Memcached CR
 func (r *ReconcileMongoDBAtlasCluster) addFinalizer(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasCluster) error {
 	if len(cr.GetFinalizers()) < 1 && cr.GetDeletionTimestamp() == nil {
-		reqLogger.Info("Adding Finalizer for the MongoDB Atlas Cluster")
 		cr.SetFinalizers([]string{"finalizer.knappek.com"})
 
 		// Update CR
