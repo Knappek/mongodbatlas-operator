@@ -87,6 +87,14 @@ Adapt [knappek_v1alpha1_mongodbatlascluster_cr.yaml](./deploy/crds/knappek_v1alp
 kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlascluster_cr.yaml
 ```
 
+### List all MongoDB Atlas resources
+
+You can easily list all MongoDB Atlas related resources with
+
+```shell
+kubectl get mongodbatlas
+```
+
 ## Cleanup
 
 ```shell

@@ -9,6 +9,11 @@ spec:
     listKind: MongoDBAtlasProjectList
     plural: mongodbatlasprojects
     singular: mongodbatlasproject
+    shortNames:
+    - map
+    categories:
+    - all
+    - mongodbatlas
   scope: Namespaced
   subresources:
     status: {}
@@ -24,6 +29,11 @@ spec:
     - name: Age
       type: date
       JSONPath: .metadata.creationTimestamp
+    - name: ProjectID
+      type: string
+      description: The ID of the Project
+      JSONPath: .status.id
+      priority: 1
   validation:
     openAPIV3Schema:
       properties:
