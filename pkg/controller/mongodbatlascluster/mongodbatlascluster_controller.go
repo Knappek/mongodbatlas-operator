@@ -126,30 +126,34 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 	// Check if the MongoDBAtlasCluster CR was marked to be deleted
 	isMongoDBAtlasClusterToBeDeleted := atlasCluster.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasClusterToBeDeleted {
+		groupID := atlasProject.Status.ID
 		// check if Delete request has already been sent to the MongoDB Atlas API
 		if atlasCluster.Status.StateName != "DELETING" && atlasCluster.Status.StateName != "DELETED" {
 			err := deleteMongoDBAtlasCluster(reqLogger, atlasClient, atlasCluster)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
+			reqLogger.Info("Wait until Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
 		}
 
 		// wait until cluster has been deleted successfully
-		groupID := atlasProject.Status.ID
-		c, _, err := atlasClient.Clusters.Get(groupID, atlasCluster.Name)
+		c, resp, err := atlasClient.Clusters.Get(groupID, atlasCluster.Name)
 		if err != nil {
-			reqLogger.Info("MongoDB Atlas Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
-			// Update finalizer to allow delete CR
-			atlasCluster.SetFinalizers(nil)
+			if resp.StatusCode == 404 {
+				reqLogger.Info("MongoDB Atlas Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
+				// Update finalizer to allow delete CR
+				atlasCluster.SetFinalizers(nil)
 
-			// Update CR
-			err = r.client.Update(context.TODO(), atlasCluster)
-			if err != nil {
-				return reconcile.Result{}, err
+				// Update CR
+				err = r.client.Update(context.TODO(), atlasCluster)
+				if err != nil {
+					return reconcile.Result{}, err
+				}
+
+				// MongoDB Atlas Cluster successfully deleted
+				return reconcile.Result{}, nil
 			}
-
-			// MongoDB Atlas Cluster successfully deleted
-			return reconcile.Result{}, nil
+			return reconcile.Result{}, err
 		}
 		// if err == nil, cluster still exists. Update status of CR
 		updateMongoDBAtlasClusterCRStatus(atlasCluster, c)
@@ -157,7 +161,6 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		reqLogger.Info("Wait until Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
 		return reconcile.Result{RequeueAfter: time.Second * 20}, nil
 	}
 
