@@ -20,6 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 var log = logf.Log.WithName("controller_mongodbatlascluster")
@@ -93,10 +94,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 
 	projectName := atlasCluster.Spec.ProjectName
 	atlasProject := &knappekv1alpha1.MongoDBAtlasProject{}
-	atlasProjectNamespacedName := struct {
-		Namespace string
-		Name      string
-	}{
+	atlasProjectNamespacedName := types.NamespacedName{
 		Name:      projectName,
 		Namespace: atlasCluster.Namespace,
 	}

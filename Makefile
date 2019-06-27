@@ -6,6 +6,8 @@ CRDS=$(shell echo deploy/crds/*_crd.yaml | sed 's/ / -f /g')
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
 
+ORGANIZATION_ID?=5c4a2a55553855344780cf5f
+
 VERSION?=latest
 OLM_VERSION?=0.0.4
 API_VERSION?=v1alpha1
@@ -76,6 +78,11 @@ cleanup:
 
 csv:
 	operator-sdk olm-catalog gen-csv --csv-version $(OLM_VERSION) --update-crds
+
+e2etest: cleanup
+	operator-sdk test local ./test/e2e \
+		--namespace default \
+		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID)"
 
 test: cleanup
 	operator-sdk scorecard --olm-tests=false \
