@@ -84,10 +84,6 @@ e2etest: cleanup
 		--namespace default \
 		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID)"
 
-test: cleanup
-	operator-sdk scorecard --olm-tests=false \
-		--cr-manifest deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml \
-
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
