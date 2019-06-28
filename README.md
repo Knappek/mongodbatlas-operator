@@ -145,14 +145,22 @@ make delete-cluster
 make delete-project
 ```
 
-**Run Operator Scorecard Tests**
+## Testing
 
-This test will be deprecated soon at be replaced by real system tests.
+### E2E Tests
 
-This will run the [Operator Scorecard tests](https://github.com/operator-framework/operator-sdk/blob/master/doc/test-framework/scorecard.md):
+In order to run the end-to-end tests, you first have to create a namespace and a secret containing the private key of the programmatic API key pair which is needed by the Operator to perform API call against the MongoDB Atlas API.
+
+The following command will execute the corresponding `kubectl` commands for you
 
 ```shell
-make test
+make inite2etest PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
+```
+
+Afterwards, you can run the end-to-end tests with
+
+```shell
+make e2etest
 ```
 
 ## Contributing
@@ -186,14 +194,15 @@ make generate-openapi
 > You need to have Collaborator permissions to perform this step
 
 A new release will
+
 * create a new release on the Github [release page](https://github.com/Knappek/mongodbatlas-operator/releases) 
 * push a new tagged Docker image to [Dockerhub](https://cloud.docker.com/repository/docker/knappek/mongodbatlas-operator/tags)
 
 In order to do this, follow these steps:
 
-1. Change the version in [.drone.yml](./.drone.yml), [operator.yaml](./deploy/operator.yaml) and in the [Makefile](./Makefile) 
+1. Change the version in [.drone.yml](./.drone.yml), [operator.yaml](./deploy/operator.yaml) and in the [Makefile](./Makefile) according to [Semantic Versioning](http://semver.org/)
 2. Commit your changes (don't push)
-3. Create a new release using Semantic versioning
+3. Create a new release using [SemVer](http://semver.org/)
 
     ```shell
     make release VERSION=<major.minor.patch>
