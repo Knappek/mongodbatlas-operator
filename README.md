@@ -98,6 +98,12 @@ kubectl delete -f deploy/crds/
 
 ## Developers Build Guide
 
+Connect to a Kubernetes cluster
+
+```shell
+export KUBECONFIG=/path/to/config
+```
+
 **Create all CRDs that are managed by the operator**
 
 Run this once:
@@ -109,7 +115,6 @@ make init
 **Run Operator locally**
 
 ```shell
-export KUBECONFIG=/path/to/config
 make dev
 ```
 
