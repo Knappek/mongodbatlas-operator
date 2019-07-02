@@ -54,7 +54,7 @@ func MongoDBAtlasCluster(t *testing.T, ctx *framework.TestCtx, f *framework.Fram
 			ProviderBackupEnabled: false,
 		},
 	}
-	err := f.Client.Create(goctx.TODO(), exampleMongoDBAtlasCluster, &framework.CleanupOptions{TestContext: ctx, Timeout: time.Minute*10, RetryInterval: time.Second*30})
+	err := f.Client.Create(goctx.TODO(), exampleMongoDBAtlasCluster, &framework.CleanupOptions{TestContext: ctx, Timeout: time.Minute * 10, RetryInterval: time.Second * 30})
 	if err != nil {
 		t.Fatal(err)
 	}
