@@ -93,7 +93,8 @@ inite2etest:
 e2etest: cleanup
 	operator-sdk test local ./test/e2e \
 		--namespace e2etest \
-		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID)"
+		--up-local \
+		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID)" 
 	
 
 fmt:

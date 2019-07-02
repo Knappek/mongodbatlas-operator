@@ -221,7 +221,7 @@ func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	_, _, err := atlasClient.Clusters.Get(groupID, clusterName)
 	if err != nil {
 		// cluster does not exist, skip doing something
-		reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
+		reqLogger.Info("MongoDB Atlas Cluster does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
 		return nil
 	}
 	// cluster exists and can be deleted
