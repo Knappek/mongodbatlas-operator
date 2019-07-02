@@ -12,6 +12,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 ![](docs/mongodbatlas-operator-example.gif)
 
+
 <!-- vim-markdown-toc GFM -->
 
 * [Scope](#scope)
@@ -20,11 +21,15 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
   * [Init](#init)
   * [Create a MongoDB Atlas Project](#create-a-mongodb-atlas-project)
   * [Create a Cluster](#create-a-cluster)
+  * [List all MongoDB Atlas resources](#list-all-mongodb-atlas-resources)
 * [Cleanup](#cleanup)
 * [Developers Build Guide](#developers-build-guide)
+* [Testing](#testing)
+  * [E2E Tests](#e2e-tests)
 * [Contributing](#contributing)
   * [Create new API](#create-new-api)
   * [Create new Controller for the API](#create-new-controller-for-the-api)
+  * [Create CRDs](#create-crds)
   * [Create a new Release](#create-a-new-release)
 
 <!-- vim-markdown-toc -->
