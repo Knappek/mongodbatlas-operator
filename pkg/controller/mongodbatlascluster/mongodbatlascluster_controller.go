@@ -13,6 +13,7 @@ import (
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -93,10 +94,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 
 	projectName := atlasCluster.Spec.ProjectName
 	atlasProject := &knappekv1alpha1.MongoDBAtlasProject{}
-	atlasProjectNamespacedName := struct {
-		Namespace string
-		Name      string
-	}{
+	atlasProjectNamespacedName := types.NamespacedName{
 		Name:      projectName,
 		Namespace: atlasCluster.Namespace,
 	}
@@ -223,7 +221,7 @@ func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	_, _, err := atlasClient.Clusters.Get(groupID, clusterName)
 	if err != nil {
 		// cluster does not exist, skip doing something
-		reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
+		reqLogger.Info("MongoDB Atlas Cluster does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
 		return nil
 	}
 	// cluster exists and can be deleted
