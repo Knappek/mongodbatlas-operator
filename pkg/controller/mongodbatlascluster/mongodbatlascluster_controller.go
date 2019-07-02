@@ -207,7 +207,7 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 		if err != nil {
 			return fmt.Errorf("Error creating MongoDB Atlas Cluster %v: %s", cr.Name, err)
 		}
-		reqLogger.Info("MongoDB Atlas Cluster created.", "MongoDBAtlasCluster.GroupID", groupID)
+		reqLogger.Info("Sent request to create MongoDB Atlas Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
 	}
 	updateMongoDBAtlasClusterCRStatus(cr, c)
 
@@ -229,7 +229,7 @@ func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	if err != nil {
 		return fmt.Errorf("(%v) Error deleting MongoDB Cluster %s: %s", resp.StatusCode, clusterName, err)
 	}
-	reqLogger.Info("Send request to delete MongoDB Atlas Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+	reqLogger.Info("Sent request to delete MongoDB Atlas Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
 	return nil
 }
 
