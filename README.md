@@ -205,7 +205,7 @@ A new release will
 
 In order to do this, follow these steps:
 
-1. Change the version in [.drone.yml](./.drone.yml), [operator.yaml](./deploy/operator.yaml) and in the [Makefile](./Makefile) according to [Semantic Versioning](http://semver.org/)
+1. Change the version in [.drone.yml](./.drone.yml) and in [operator.yaml](./deploy/operator.yaml) according to [Semantic Versioning](http://semver.org/)
 2. Commit your changes (don't push)
 3. Create a new release using [SemVer](http://semver.org/)
 

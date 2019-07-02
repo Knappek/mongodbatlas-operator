@@ -10,7 +10,6 @@ ORGANIZATION_ID?=5c4a2a55553855344780cf5f
 PRIVATE_KEY=
 
 VERSION?=latest
-OLM_VERSION?=0.0.4
 API_VERSION?=v1alpha1
 KIND=
 
@@ -76,9 +75,6 @@ delete-cluster:
 cleanup:
 	kubectl delete -f deploy/ >/dev/null 2>&1 || true
 	kubectl delete -f deploy/crds/ >/dev/null 2>&1 || true
-
-csv:
-	operator-sdk olm-catalog gen-csv --csv-version $(OLM_VERSION) --update-crds
 
 inite2etest:
 	@if [ "$(PRIVATE_KEY)" = "" ]; then \
