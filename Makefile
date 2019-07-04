@@ -85,7 +85,7 @@ inite2etest:
 	kubectl -n e2etest create secret generic example-monogdb-atlas-project \
     	--from-literal=privateKey=$(ATLAS_PRIVATE_KEY)
 
-e2etest: cleanup
+e2etest: cleanup fmt lint
 	operator-sdk test local ./test/e2e \
 		--namespace e2etest \
 		--up-local \
