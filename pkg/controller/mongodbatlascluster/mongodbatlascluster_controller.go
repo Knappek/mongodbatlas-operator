@@ -76,8 +76,6 @@ type ReconcileMongoDBAtlasCluster struct {
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "MongoDBAtlasCluster.Name", request.Name)
-
 	// Fetch the MongoDBAtlasCluster atlasCluster
 	atlasCluster := &knappekv1alpha1.MongoDBAtlasCluster{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, atlasCluster)
@@ -98,11 +96,14 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		Name:      projectName,
 		Namespace: atlasCluster.Namespace,
 	}
-
 	err = r.client.Get(context.TODO(), atlasProjectNamespacedName, atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
+	groupID := atlasProject.Status.ID
+
+	// Define default logger
+	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "MongoDBAtlasCluster.Name", request.Name, "MongoDBAtlasCluster.GroupID", groupID)
 
 	// get Kubernetes clientset
 	k8sClient, err := config.GetKubernetesClient()
@@ -124,21 +125,20 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 	// Check if the MongoDBAtlasCluster CR was marked to be deleted
 	isMongoDBAtlasClusterToBeDeleted := atlasCluster.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasClusterToBeDeleted {
-		groupID := atlasProject.Status.ID
 		// check if Delete request has already been sent to the MongoDB Atlas API
 		if atlasCluster.Status.StateName != "DELETING" && atlasCluster.Status.StateName != "DELETED" {
 			err := deleteMongoDBAtlasCluster(reqLogger, atlasClient, atlasCluster)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-			reqLogger.Info("Wait until Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
+			reqLogger.Info("Wait until Cluster has been deleted successfully.")
 		}
 
 		// wait until cluster has been deleted successfully
 		c, resp, err := atlasClient.Clusters.Get(groupID, atlasCluster.Name)
 		if err != nil {
 			if resp.StatusCode == 404 {
-				reqLogger.Info("MongoDB Atlas Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
+				reqLogger.Info("MongoDB Atlas Cluster has been deleted successfully.")
 				// Update finalizer to allow delete CR
 				atlasCluster.SetFinalizers(nil)
 
@@ -154,7 +154,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			return reconcile.Result{}, err
 		}
 		// if err == nil, cluster still exists. Update status of CR
-		updateMongoDBAtlasClusterCRStatus(atlasCluster, c)
+		updateMongoDBAtlasClusterCRStatus(reqLogger, atlasCluster, c)
 		err = r.client.Status().Update(context.TODO(), atlasCluster)
 		if err != nil {
 			return reconcile.Result{}, err
@@ -189,7 +189,6 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	params := ma.Cluster{
 		GroupID:               groupID,
 		Name:                  cr.Name,
-		MongoDBVersion:        cr.Spec.MongoDBVersion,
 		MongoDBMajorVersion:   cr.Spec.MongoDBMajorVersion,
 		DiskSizeGB:            cr.Spec.DiskSizeGB,
 		BackupEnabled:         cr.Spec.BackupEnabled,
@@ -207,9 +206,9 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 		if err != nil {
 			return fmt.Errorf("Error creating MongoDB Atlas Cluster %v: %s", cr.Name, err)
 		}
-		reqLogger.Info("Sent request to create MongoDB Atlas Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+		reqLogger.Info("Sent request to create MongoDB Atlas Cluster.")
 	}
-	updateMongoDBAtlasClusterCRStatus(cr, c)
+	updateMongoDBAtlasClusterCRStatus(reqLogger, cr, c)
 
 	return nil
 }
@@ -221,7 +220,7 @@ func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	_, _, err := atlasClient.Clusters.Get(groupID, clusterName)
 	if err != nil {
 		// cluster does not exist, skip doing something
-		reqLogger.Info("MongoDB Atlas Cluster does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
+		reqLogger.Info("MongoDB Atlas Cluster does not exist in Atlas. Deleting CR.")
 		return nil
 	}
 	// cluster exists and can be deleted
@@ -229,11 +228,15 @@ func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	if err != nil {
 		return fmt.Errorf("(%v) Error deleting MongoDB Cluster %s: %s", resp.StatusCode, clusterName, err)
 	}
-	reqLogger.Info("Sent request to delete MongoDB Atlas Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+	reqLogger.Info("Sent request to delete MongoDB Atlas Cluster.")
 	return nil
 }
 
-func updateMongoDBAtlasClusterCRStatus(cr *knappekv1alpha1.MongoDBAtlasCluster, c *ma.Cluster) {
+func updateMongoDBAtlasClusterCRStatus(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasCluster, c *ma.Cluster) {
+	// save old statename for later
+	oldStateName := cr.Status.StateName
+
+	// update all status fields
 	cr.Status.ID = c.ID
 	cr.Status.GroupID = c.GroupID
 	cr.Status.Name = c.Name
@@ -253,6 +256,13 @@ func updateMongoDBAtlasClusterCRStatus(cr *knappekv1alpha1.MongoDBAtlasCluster, 
 	cr.Status.Paused = c.Paused
 	cr.Status.AutoScaling = c.AutoScaling
 	cr.Status.ProviderSettings = c.ProviderSettings
+
+	newStateName := cr.Status.StateName
+	if oldStateName != newStateName {
+		if oldStateName == "CREATING" && newStateName == "IDLE" {
+			reqLogger.Info("MongoDB Atlas Cluster has been created successfully")
+		}
+	}
 }
 
 //addFinalizer will add this attribute to the Memcached CR
