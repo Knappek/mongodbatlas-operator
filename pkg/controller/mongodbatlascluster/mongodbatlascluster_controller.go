@@ -7,7 +7,6 @@ import (
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	"github.com/Knappek/mongodbatlas-operator/pkg/config"
-	"github.com/Knappek/mongodbatlas-operator/pkg/util"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/go-logr/logr"
@@ -38,7 +37,9 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileMongoDBAtlasCluster{client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	// create MongoDB Atlas client
+	atlasClient := config.GetAtlasClient()
+	return &ReconcileMongoDBAtlasCluster{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: atlasClient}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -64,8 +65,9 @@ var _ reconcile.Reconciler = &ReconcileMongoDBAtlasCluster{}
 type ReconcileMongoDBAtlasCluster struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
+	client      client.Client
+	scheme      *runtime.Scheme
+	atlasClient *ma.Client
 }
 
 // Reconcile reads that state of the cluster for a MongoDBAtlasCluster object and makes changes based on the state read
@@ -104,30 +106,13 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{}, err
 	}
 
-	// get Kubernetes clientset
-	k8sClient, err := config.GetKubernetesClient()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	// create MongoDB Atlas client
-	privateKey, err := util.GetPrivateKey(k8sClient, atlasCluster.Spec.PrivateKey, atlasCluster.Namespace)
-	if err != nil {
-		panic(err.Error())
-	}
-	atlasConfig := config.AtlasConfig{
-		AtlasPublicKey:  atlasCluster.Spec.PublicKey,
-		AtlasPrivateKey: privateKey,
-	}
-	atlasClient := atlasConfig.NewMongoDBAtlasClient()
-
 	// Check if the MongoDBAtlasCluster CR was marked to be deleted
 	isMongoDBAtlasClusterToBeDeleted := atlasCluster.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasClusterToBeDeleted {
 		groupID := atlasProject.Status.ID
 		// check if Delete request has already been sent to the MongoDB Atlas API
 		if atlasCluster.Status.StateName != "DELETING" && atlasCluster.Status.StateName != "DELETED" {
-			err := deleteMongoDBAtlasCluster(reqLogger, atlasClient, atlasCluster)
+			err := deleteMongoDBAtlasCluster(reqLogger, r.atlasClient, atlasCluster)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
@@ -135,7 +120,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		}
 
 		// wait until cluster has been deleted successfully
-		c, resp, err := atlasClient.Clusters.Get(groupID, atlasCluster.Name)
+		c, resp, err := r.atlasClient.Clusters.Get(groupID, atlasCluster.Name)
 		if err != nil {
 			if resp.StatusCode == 404 {
 				reqLogger.Info("MongoDB Atlas Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
@@ -163,7 +148,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 	}
 
 	// Creates a new MongoDB Atlas Cluster with the name defined in atlasCluster iff it does not yet exist
-	err = createMongoDBAtlasCluster(reqLogger, atlasClient, atlasCluster, atlasProject)
+	err = createMongoDBAtlasCluster(reqLogger, r.atlasClient, atlasCluster, atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
 	}

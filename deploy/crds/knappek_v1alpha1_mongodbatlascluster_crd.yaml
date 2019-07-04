@@ -93,19 +93,6 @@ spec:
             numShards:
               format: int64
               type: integer
-            privateKey:
-              properties:
-                valueFrom:
-                  properties:
-                    secretKeyRef:
-                      description: Selects a key of a secret in the CR's namespace
-                      type: object
-                  required:
-                  - secretKeyRef
-                  type: object
-              required:
-              - valueFrom
-              type: object
             projectName:
               type: string
             providerBackupEnabled:
@@ -126,8 +113,6 @@ spec:
                 regionName:
                   type: string
               type: object
-            publicKey:
-              type: string
             replicationFactor:
               format: int64
               type: integer
@@ -154,8 +139,6 @@ spec:
                 type: object
               type: object
           required:
-          - publicKey
-          - privateKey
           - projectName
           - backupEnabled
           - providerBackupEnabled

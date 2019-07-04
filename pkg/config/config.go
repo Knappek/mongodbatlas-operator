@@ -6,9 +6,6 @@ import (
 
 	dac "github.com/akshaykarle/go-http-digest-auth-client"
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 // AtlasConfig stores Programmatic API Keys for authentication to Atlas API
@@ -18,28 +15,27 @@ type AtlasConfig struct {
 }
 
 // NewMongoDBAtlasClient returns a REST API client for MongoDB Atlas
-func (c *AtlasConfig) NewMongoDBAtlasClient() *ma.Client {
+func (c *AtlasConfig) newMongoDBAtlasClient() *ma.Client {
 	t := dac.NewTransport(c.AtlasPublicKey, c.AtlasPrivateKey)
 	httpClient := &http.Client{Transport: &t}
 	client := ma.NewClient(httpClient)
 	return client
 }
 
-// GetKubernetesClient returns a Kubernetes Clientset in order to interact with Kubernetes resources
-func GetKubernetesClient() (*kubernetes.Clientset, error) {
-	var config *rest.Config
-	var err error
-	kubeconfig := os.Getenv("KUBECONFIG")
-	if kubeconfig == "" {
-		// creates the in-cluster config
-		config, err = rest.InClusterConfig()
-	} else {
-		// creates out-of-cluster config
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+// GetAtlasClient returns a MongoDB Atlas client
+func GetAtlasClient() *ma.Client {
+	// create MongoDB Atlas client
+	privateKey, ok := os.LookupEnv("ATLAS_PRIVATE_KEY")
+	if ok != true {
+		panic("Error fetching private key: Env variable ATLAS_PRIVATE_KEY not set.")
 	}
-	if err != nil {
-		panic(err.Error())
+	publicKey, ok := os.LookupEnv("ATLAS_PUBLIC_KEY")
+	if ok != true {
+		panic("Error fetching public key: Env variable ATLAS_PUBLIC_KEY not set.")
 	}
-	// creates the clientset
-	return kubernetes.NewForConfig(config)
+	atlasConfig := AtlasConfig{
+		AtlasPublicKey:  publicKey,
+		AtlasPrivateKey: privateKey,
+	}
+	return atlasConfig.newMongoDBAtlasClient()
 }

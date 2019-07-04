@@ -7,7 +7,6 @@ GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
 
 ORGANIZATION_ID?=5c4a2a55553855344780cf5f
-PRIVATE_KEY=
 
 VERSION?=latest
 API_VERSION?=v1alpha1
@@ -77,14 +76,14 @@ cleanup:
 	kubectl delete -f deploy/crds/ >/dev/null 2>&1 || true
 
 inite2etest:
-	@if [ "$(PRIVATE_KEY)" = "" ]; then \
-		echo "ERROR: Set PRIVATE_KEY variable. For example,"; \
-		echo "  make inite2etest PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
+	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
+		echo "ERROR: Set ATLAS_PRIVATE_KEY variable. For example,"; \
+		echo "  make inite2etest ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
 		exit 1; \
 	fi
 	kubectl create ns e2etest
 	kubectl -n e2etest create secret generic example-monogdb-atlas-project \
-    	--from-literal=privateKey=$(PRIVATE_KEY)
+    	--from-literal=privateKey=$(ATLAS_PRIVATE_KEY)
 
 e2etest: cleanup
 	operator-sdk test local ./test/e2e \

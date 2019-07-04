@@ -11,7 +11,6 @@ import (
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -26,19 +25,6 @@ func MongoDBAtlasCluster(t *testing.T, ctx *framework.TestCtx, f *framework.Fram
 			Namespace: namespace,
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasClusterSpec{
-			MongoDBAtlasAuth: knappekv1alpha1.MongoDBAtlasAuth{
-				PublicKey: "toppaljd",
-				PrivateKey: knappekv1alpha1.PrivateKey{
-					ValueFrom: &knappekv1alpha1.PrivateKeySource{
-						SecretKeyRef: &corev1.SecretKeySelector{
-							Key: "privateKey",
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "example-monogdb-atlas-project",
-							},
-						},
-					},
-				},
-			},
 			ProjectName: atlasProjectName,
 			ProviderSettings: ma.ProviderSettings{
 				ProviderName:     "AWS",

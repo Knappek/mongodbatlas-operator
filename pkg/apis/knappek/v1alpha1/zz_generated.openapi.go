@@ -71,21 +71,11 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref common.Referen
 			SchemaProps: spec.SchemaProps{
 				Description: "MongoDBAtlasClusterSpec defines the desired state of MongoDBAtlasCluster",
 				Properties: map[string]spec.Schema{
-					"publicKey": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"privateKey": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey"),
-						},
-					},
 					"projectName": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Description: "INSERT ADDITIONAL SPEC FIELDS - desired state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 					"mongoDBVersion": {
@@ -153,11 +143,11 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref common.Referen
 						},
 					},
 				},
-				Required: []string{"publicKey", "privateKey", "projectName", "backupEnabled", "providerBackupEnabled"},
+				Required: []string{"projectName", "backupEnabled", "providerBackupEnabled"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.AutoScaling", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ProviderSettings", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ReplicationSpec"},
+			"github.com/akshaykarle/go-mongodbatlas/mongodbatlas.AutoScaling", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ProviderSettings", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ReplicationSpec"},
 	}
 }
 
@@ -344,29 +334,17 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectSpec(ref common.Referen
 			SchemaProps: spec.SchemaProps{
 				Description: "MongoDBAtlasProjectSpec defines the desired state of MongoDBAtlasProject",
 				Properties: map[string]spec.Schema{
-					"publicKey": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"privateKey": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey"),
-						},
-					},
 					"orgID": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Description: "INSERT ADDITIONAL SPEC FIELDS - desired state of cluster Important: Run \"operator-sdk generate k8s\" to regenerate code after modifying this file Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},
-				Required: []string{"publicKey", "privateKey"},
 			},
 		},
-		Dependencies: []string{
-			"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.PrivateKey"},
+		Dependencies: []string{},
 	}
 }
 

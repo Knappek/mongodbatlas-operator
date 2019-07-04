@@ -31,3 +31,10 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: "mongodbatlas-operator"
+            - name: ATLAS_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: privateKey
+                  name: example-monogdb-atlas-project
+            - name: ATLAS_PUBLIC_KEY
+              value: toppaljd

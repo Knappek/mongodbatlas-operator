@@ -70,6 +70,8 @@ kubectl create secret generic example-monogdb-atlas-project \
     --from-literal=privateKey=xxxxxxxxx
 ```
 
+Adapt the environment variable `ATLAS_PUBLIC_KEY` in [operator.yaml](./deploy/operator.yaml) to your public key.
+
 Deploy the MongoDB Atlas Project Operator:
 
 ```shell
@@ -78,7 +80,7 @@ kubectl apply -f deploy/operator.yaml
 
 ### Create a MongoDB Atlas Project
 
-Adapt the `publicKey` and `orgID` in [knappek_v1alpha1_mongodbatlasproject_cr.yaml](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly and deploy your first MongoDB Atlas Project
+Adapt [knappek_v1alpha1_mongodbatlasproject_cr.yaml](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly and deploy your first MongoDB Atlas Project
 
 ```shell
 kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
@@ -159,7 +161,9 @@ In order to run the end-to-end tests, you first have to create a namespace and a
 The following command will execute the corresponding `kubectl` commands for you
 
 ```shell
-make inite2etest PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
+export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
+export ATLAS_PUBLIC_KEY=yyyyy
+make inite2etest
 ```
 
 Afterwards, you can run the end-to-end tests with

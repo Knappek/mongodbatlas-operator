@@ -7,7 +7,6 @@ import (
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	"github.com/Knappek/mongodbatlas-operator/pkg/config"
-	"github.com/Knappek/mongodbatlas-operator/pkg/util"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/go-logr/logr"
@@ -32,7 +31,9 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileMongoDBAtlasProject{client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	// create MongoDB Atlas client
+	atlasClient := config.GetAtlasClient()
+	return &ReconcileMongoDBAtlasProject{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: atlasClient}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -58,8 +59,9 @@ var _ reconcile.Reconciler = &ReconcileMongoDBAtlasProject{}
 type ReconcileMongoDBAtlasProject struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
+	client      client.Client
+	scheme      *runtime.Scheme
+	atlasClient *ma.Client
 }
 
 // Reconcile reads that state of the cluster for a MongoDBAtlasProject object and makes changes based on the state read
@@ -84,25 +86,8 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{}, err
 	}
 
-	// get Kubernetes clientset
-	k8sClient, err := config.GetKubernetesClient()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	// create MongoDB Atlas client
-	privateKey, err := util.GetPrivateKey(k8sClient, atlasProject.Spec.PrivateKey, atlasProject.Namespace)
-	if err != nil {
-		panic(err.Error())
-	}
-	atlasConfig := config.AtlasConfig{
-		AtlasPublicKey:  atlasProject.Spec.PublicKey,
-		AtlasPrivateKey: privateKey,
-	}
-	atlasClient := atlasConfig.NewMongoDBAtlasClient()
-
 	// Creates a new MongoDB Atlas Project with the name defined in atlasProject iff it does not yet exist
-	err = createMongoDBAtlasProject(reqLogger, atlasClient, atlasProject)
+	err = createMongoDBAtlasProject(reqLogger, r.atlasClient, atlasProject)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -117,7 +102,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	isMongoDBAtlasProjectToBeDeleted := atlasProject.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasProjectToBeDeleted {
 		// TODO(user): Add the cleanup steps that the operator needs to do before the CR can be deleted
-		err := deleteMongoDBAtlasProject(reqLogger, atlasClient, atlasProject)
+		err := deleteMongoDBAtlasProject(reqLogger, r.atlasClient, atlasProject)
 		if err != nil {
 			return reconcile.Result{}, err
 		}

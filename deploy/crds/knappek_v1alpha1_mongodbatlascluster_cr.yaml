@@ -4,12 +4,6 @@ metadata:
   name: example-mongodbatlascluster
 spec:
   # Add fields here
-  publicKey: "toppaljd"
-  privateKey:
-    valueFrom:
-      secretKeyRef:
-        name: "example-monogdb-atlas-project"
-        key: "privateKey"
   projectName: "example-project"
   providerSettings:
     providerName: "AWS"
