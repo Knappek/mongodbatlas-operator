@@ -31,9 +31,7 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	// create MongoDB Atlas client
-	atlasClient := config.GetAtlasClient()
-	return &ReconcileMongoDBAtlasProject{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: atlasClient}
+	return &ReconcileMongoDBAtlasProject{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: config.GetAtlasClient()}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -150,28 +148,19 @@ func createMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 }
 
 func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasProject) error {
-	atlasProjectID := cr.Status.ID
-	if atlasProjectID == "" {
-		reqLogger.Info("MongoDBAtlasProject CustomResource has empty Status ID. Searching Project by name and try to delete Project afterwards")
-		p, resp, err := atlasClient.Projects.GetByName(cr.Name)
-		if err != nil {
-			if resp.StatusCode == 404 {
-				reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.")
-				return nil
-			}
-			return fmt.Errorf("Error getting MongoDB Project by Name %s: %s", cr.Name, err)
-		}
-		atlasProjectID = p.ID
-	}
 	// check if project exists
-	_, _, err := atlasClient.Projects.Get(atlasProjectID)
+	p, resp, err := atlasClient.Projects.GetByName(cr.Name)
 	if err != nil {
-		// project does not exist, skip doing something
-		reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.", "MongoDBAtlasProject.ID", atlasProjectID)
-		return nil
+		if resp.StatusCode == 404 {
+			reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.")
+			return nil
+		}
+		return fmt.Errorf("Error getting MongoDB Project %s: %s", cr.Name, err)
 	}
+
 	// project exists and can be deleted
-	resp, err := atlasClient.Projects.Delete(atlasProjectID)
+	atlasProjectID := p.ID
+	resp, err = atlasClient.Projects.Delete(atlasProjectID)
 	if err != nil {
 		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, atlasProjectID, err)
 	}

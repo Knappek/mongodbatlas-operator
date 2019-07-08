@@ -38,7 +38,7 @@ api:
 controller:
 	operator-sdk add controller --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
 
-.PHONY: build
+.PHONY: build 
 build:
 	$(GO) build -o $(PWD)/build/_output/bin/$(BINARY) -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} github.com/$(GITHUB_USERNAME)/$(BINARY)/cmd/manager
 
@@ -74,6 +74,13 @@ delete-cluster:
 cleanup:
 	kubectl delete -f deploy/ >/dev/null 2>&1 || true
 	kubectl delete -f deploy/crds/ >/dev/null 2>&1 || true
+
+.PHONY: test
+test: 
+	go test ./pkg/controller/... -v -race
+
+coverage:
+	go test ./pkg/controller/... -v -race -coverprofile=coverage.txt -covermode=atomic
 
 inite2etest:
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \

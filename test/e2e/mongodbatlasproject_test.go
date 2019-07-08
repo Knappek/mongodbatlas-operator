@@ -2,10 +2,9 @@ package e2e
 
 import (
 	goctx "context"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
