@@ -16,11 +16,11 @@ steps:
   image: golang:1.12-alpine
   commands:
     - apk add --update alpine-sdk
+    - make build
     - make fmt
     - make lint
     - make coverage
     - bash <(curl -s https://codecov.io/bash)
-    - make build
   when:
     event:
     - push
