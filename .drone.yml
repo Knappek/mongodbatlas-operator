@@ -26,7 +26,7 @@ steps:
     - tag
     - pull_request
 
-- name: coverage
+- name: upload_code_coverage
   image: plugins/codecov
   settings:
     token: 
@@ -38,7 +38,7 @@ steps:
     - push
     - tag
     - pull_request
-    
+
 - name: docker_latest
   image: plugins/docker
   pull: always
