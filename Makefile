@@ -80,7 +80,7 @@ test:
 	go test ./pkg/controller/... -v -race
 
 coverage:
-	go test ./pkg/controller/... -v -race -coverprofile=coverage.txt -covermode=atomic
+	go test ./pkg/controller/... -v -coverprofile=coverage.txt -covermode=atomic
 
 inite2etest:
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
