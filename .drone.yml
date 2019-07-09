@@ -20,13 +20,25 @@ steps:
     - make fmt
     - make lint
     - make coverage
-    - bash <(curl -s https://codecov.io/bash)
   when:
     event:
     - push
     - tag
     - pull_request
 
+- name: coverage
+  image: plugins/codecov
+  settings:
+    token: 
+      from_secret: CODECOV_TOKEN
+    files:
+      - coverage.txt
+  when:
+    event:
+    - push
+    - tag
+    - pull_request
+    
 - name: docker_latest
   image: plugins/docker
   pull: always
