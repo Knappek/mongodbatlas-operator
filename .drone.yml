@@ -19,7 +19,7 @@ steps:
     - make build
     - make fmt
     - make lint
-    - make coverage
+    - make test
   when:
     event:
     - push

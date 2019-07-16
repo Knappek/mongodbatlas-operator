@@ -76,10 +76,7 @@ cleanup:
 	kubectl delete -f deploy/crds/ >/dev/null 2>&1 || true
 
 .PHONY: test
-test: 
-	go test ./pkg/controller/... -v -race
-
-coverage:
+test:
 	go test ./pkg/controller/... -v -coverprofile=coverage.txt -covermode=atomic
 
 inite2etest:
