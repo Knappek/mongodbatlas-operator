@@ -108,12 +108,6 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref common.Referen
 							Format: "",
 						},
 					},
-					"replicationFactor": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"integer"},
-							Format: "int32",
-						},
-					},
 					"replicationSpec": {
 						SchemaProps: spec.SchemaProps{
 							Type: []string{"object"},
@@ -234,12 +228,6 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref common.Refer
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
-						},
-					},
-					"replicationFactor": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"integer"},
-							Format: "int32",
 						},
 					},
 					"replicationSpec": {

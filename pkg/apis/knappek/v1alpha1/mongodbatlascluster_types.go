@@ -41,7 +41,6 @@ type MongoDBAtlasClusterSpec struct {
 	DiskSizeGB            float64                       `json:"diskSizeGB,omitempty"`
 	BackupEnabled         bool                          `json:"backupEnabled"`
 	ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
-	ReplicationFactor     int                           `json:"replicationFactor,omitempty"`
 	ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
 	NumShards             int                           `json:"numShards,omitempty"`
 	AutoScaling           ma.AutoScaling                `json:"autoScaling,omitempty"`
@@ -67,7 +66,6 @@ type MongoDBAtlasClusterStatus struct {
 	BackupEnabled         bool                          `json:"backupEnabled"`
 	ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
 	StateName             string                        `json:"stateName,omitempty"`
-	ReplicationFactor     int                           `json:"replicationFactor,omitempty"`
 	ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
 	NumShards             int                           `json:"numShards,omitempty"`
 	Paused                bool                          `json:"paused"`

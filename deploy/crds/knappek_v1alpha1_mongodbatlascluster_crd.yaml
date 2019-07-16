@@ -113,9 +113,6 @@ spec:
                 regionName:
                   type: string
               type: object
-            replicationFactor:
-              format: int64
-              type: integer
             replicationSpec:
               additionalProperties:
                 properties:
@@ -200,9 +197,6 @@ spec:
                 regionName:
                   type: string
               type: object
-            replicationFactor:
-              format: int64
-              type: integer
             replicationSpec:
               additionalProperties:
                 properties:

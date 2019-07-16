@@ -168,7 +168,6 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	return nil
 }
 
-//addFinalizer will add this attribute to the Memcached CR
 func (r *ReconcileMongoDBAtlasProject) addFinalizer(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasProject) error {
 	if len(cr.GetFinalizers()) < 1 && cr.GetDeletionTimestamp() == nil {
 		cr.SetFinalizers([]string{"finalizer.knappek.com"})

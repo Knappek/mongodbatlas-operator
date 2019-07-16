@@ -80,7 +80,7 @@ func TestNonExistingMongoDBAtlasProjectCR(t *testing.T) {
 	})
 	atlasClient := ma.NewClient(httpClient)
 
-	// Create a ReconcileMemcached object with the scheme and fake client.
+	// Create a ReconcileMongoDBAtlasProject object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasProject{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request with non-existing project
@@ -145,7 +145,7 @@ func TestCreateMongoDBAtlasProject(t *testing.T) {
 	})
 	atlasClient := ma.NewClient(httpClient)
 
-	// Create a ReconcileMemcached object with the scheme and fake client.
+	// Create a ReconcileMongoDBAtlasProject object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasProject{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
@@ -228,7 +228,7 @@ func TestDeleteMongoDBAtlasProject(t *testing.T) {
 	})
 	atlasClient := ma.NewClient(httpClient)
 
-	// Create a ReconcileMemcached object with the scheme and fake client.
+	// Create a ReconcileMongoDBAtlasProject object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasProject{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
@@ -251,20 +251,3 @@ func TestDeleteMongoDBAtlasProject(t *testing.T) {
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	assert.Nil(t, err)
 }
-
-// // getById
-// mux.HandleFunc("/api/atlas/v1.0/groups/5a0a1e7e0f2912c554080ae6", func(w http.ResponseWriter, r *http.Request) {
-// 	assertMethod(t, "GET", r)
-// 	fmt.Fprintf(w, `{"clusterCount": 0, "created":"2016-07-14T14:19:33Z", "id":"5a0a1e7e0f2912c554080ae6", "links":[], "name":"ProjectBar", "orgId":"5a0a1e7e0f2912c554080adc"}`)
-// })
-
-// 	// mux.HandleFunc("/api/atlas/v1.0/groups/5a0a1e7e0f2912c554080ae6", func(w http.ResponseWriter, r *http.Request) {
-// 	// 	assertMethod(t, "DELETE", r)
-// 	// 	fmt.Fprintf(w, `{}`)
-// 	// })
-
-// // getByName
-// mux.HandleFunc("/api/atlas/v1.0/groups/byName/unittest-project", func(w http.ResponseWriter, r *http.Request) {
-// 	testutil.AssertMethod(t, "GET", r)
-// 	fmt.Fprintf(w, `{"clusterCount": 0, "created":"2016-07-14T14:19:33Z", "id":"5a0a1e7e0f2912c554080ae6", "links":[], "name":"unittest-project", "orgId":"testOrgID"}`)
-// })
