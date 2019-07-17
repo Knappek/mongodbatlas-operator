@@ -81,8 +81,9 @@ test:
 
 inite2etest:
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
-		echo "ERROR: Set ATLAS_PRIVATE_KEY variable. For example,"; \
-		echo "  make inite2etest ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
+		echo "ERROR: Export ATLAS_PRIVATE_KEY variable and then run init again. For example,"; \
+		echo "  export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
+		echo "  make inite2etest"; \
 		exit 1; \
 	fi
 	kubectl create ns e2etest
@@ -90,11 +91,15 @@ inite2etest:
     	--from-literal=privateKey=$(ATLAS_PRIVATE_KEY)
 
 e2etest: cleanup fmt lint
+	@if [ "$(ATLAS_PUBLIC_KEY)" = "" ]; then \
+		echo "ERROR: Export ATLAS_PUBLIC_KEY variable. For example,"; \
+		echo "  export ATLAS_PUBLIC_KEY=yyyyyy"; \
+		exit 1; \
+	fi
 	operator-sdk test local ./test/e2e \
 		--namespace e2etest \
 		--up-local \
 		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID)" 
-	
 
 fmt:
 	gofmt -w $(GOFMT_FILES)

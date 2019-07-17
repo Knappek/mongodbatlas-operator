@@ -50,10 +50,10 @@ var (
 		DiskGBEnabled: false,
 	}
 	providerSettings = ma.ProviderSettings{
-		ProviderName:     "AWS",
-		RegionName:       "US_EAST_1",
-		InstanceSizeName: "M10",
-		EncryptEBSVolume: true,
+		ProviderName:        "AWS",
+		RegionName:          "US_EAST_1",
+		InstanceSizeName:    "M10",
+		EncryptEBSVolume:    true,
 		BackingProviderName: "",
 	}
 )
@@ -123,10 +123,10 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
 		expectedBody := map[string]interface{}{
-			"name":                clusterName,
-			"mongoDBVersion":      mongoDBVersion,
-			"mongoDBMajorVersion": mongoDBMajorVersion,
-			"groupId":             projectID,
+			"name":                  clusterName,
+			"mongoDBVersion":        mongoDBVersion,
+			"mongoDBMajorVersion":   mongoDBMajorVersion,
+			"groupId":               projectID,
 			"numShards":             float64(numShards),
 			"backupEnabled":         backupEnabled,
 			"providerBackupEnabled": providerBackupEnabled,
@@ -290,8 +290,8 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	// A MongoDBAtlasCluster resource with metadata and spec.
 	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      clusterName,
-			Namespace: namespace,
+			Name:              clusterName,
+			Namespace:         namespace,
 			DeletionTimestamp: &metav1.Time{Time: time.Now()},
 			Finalizers:        []string{"finalizer.knappek.com"},
 		},
@@ -308,8 +308,8 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 			ReplicationSpec:       replicationSpec,
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
-			GroupID: projectID,
-			Name: clusterName,
+			GroupID:   projectID,
+			Name:      clusterName,
 			StateName: "IDLE",
 		},
 	}

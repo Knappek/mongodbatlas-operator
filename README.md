@@ -162,14 +162,14 @@ The following command will execute the corresponding `kubectl` commands for you
 
 ```shell
 export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
-export ATLAS_PUBLIC_KEY=yyyyy
 make inite2etest
 ```
 
 Afterwards, you can run the end-to-end tests with
 
 ```shell
-make e2etest
+export ATLAS_PUBLIC_KEY=yyyyy
+make e2etest ORGANIZATION_ID=123456789
 ```
 
 ## Contributing
@@ -193,6 +193,9 @@ make controller KIND=MongoDBAtlasCluster
 ```
 
 ### Create CRDs
+
+> TODO: This is still deprecated as it will override existing CRDs and remove lots of fields. 
+> Investigation needed how to avoid this
 
 ```shell
 make generate-openapi
