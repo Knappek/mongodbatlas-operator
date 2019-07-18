@@ -1,8 +1,8 @@
 # MongoDB Atlas Kubernetes Operator
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/knappek/mongodbatlas-operator.svg)](https://hub.docker.com/r/knappek/mongodbatlas-operator)
 [![Build Status](https://cloud.drone.io/api/badges/Knappek/mongodbatlas-operator/status.svg)](https://cloud.drone.io/Knappek/mongodbatlas-operator)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Knappek/mongodbatlas-operator)](https://goreportcard.com/report/github.com/Knappek/mongodbatlas-operator)
+[![codecov](https://codecov.io/gh/Knappek/mongodbatlas-operator/branch/master/graph/badge.svg)](https://codecov.io/gh/Knappek/mongodbatlas-operator)
 
 ## Overview
 
@@ -11,7 +11,6 @@ A Kubernetes Operator for [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) w
 This project was inspired from the [MongoDB Atlas Terraform Provider](https://github.com/akshaykarle/terraform-provider-mongodbatlas) with the goal to have Kubernetes as the single source for both your (stateless) applications and MongoDB Atlas as the persistence layer. The benefit over using the Terraform provider is that `mongodbatlas-operator` ensures via Reconcile loops to have the desired state matching with the actual state and thus following the GitOps approach.
 
 ![](docs/mongodbatlas-operator-example.gif)
-
 
 <!-- vim-markdown-toc GFM -->
 
@@ -70,6 +69,8 @@ kubectl create secret generic example-monogdb-atlas-project \
     --from-literal=privateKey=xxxxxxxxx
 ```
 
+Adapt the environment variable `ATLAS_PUBLIC_KEY` in [operator.yaml](./deploy/operator.yaml) to your public key.
+
 Deploy the MongoDB Atlas Project Operator:
 
 ```shell
@@ -78,7 +79,7 @@ kubectl apply -f deploy/operator.yaml
 
 ### Create a MongoDB Atlas Project
 
-Adapt the `publicKey` and `orgID` in [knappek_v1alpha1_mongodbatlasproject_cr.yaml](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly and deploy your first MongoDB Atlas Project
+Adapt [knappek_v1alpha1_mongodbatlasproject_cr.yaml](./deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml) accordingly and deploy your first MongoDB Atlas Project
 
 ```shell
 kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
@@ -159,13 +160,15 @@ In order to run the end-to-end tests, you first have to create a namespace and a
 The following command will execute the corresponding `kubectl` commands for you
 
 ```shell
-make inite2etest PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
+export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
+make inite2etest
 ```
 
 Afterwards, you can run the end-to-end tests with
 
 ```shell
-make e2etest
+export ATLAS_PUBLIC_KEY=yyyyy
+make e2etest ORGANIZATION_ID=123456789
 ```
 
 ## Contributing
@@ -189,6 +192,9 @@ make controller KIND=MongoDBAtlasCluster
 ```
 
 ### Create CRDs
+
+> TODO: This is still deprecated as it will override existing CRDs and remove lots of fields. 
+> Investigation needed how to avoid this
 
 ```shell
 make generate-openapi

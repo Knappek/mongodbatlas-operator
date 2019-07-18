@@ -9,7 +9,8 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a build.
 2. Update the README.md with details of changes to the interface, this includes new environment variables, exposed ports, useful file locations and table of contents.
-3. Enhance the [e2e test suite](./test/e2e), run the [tests](./README.md#e2e-tests) and make sure they pass.
+3. Ensure you have implemented proper unit tests.
+4. Enhance the [e2e test suite](./test/e2e), [run them](./README.md#e2e-tests) and ensure they pass.
 
 ## Code of Conduct
 

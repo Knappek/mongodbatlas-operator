@@ -19,6 +19,20 @@ steps:
     - make build
     - make fmt
     - make lint
+    - make test
+  when:
+    event:
+    - push
+    - tag
+    - pull_request
+
+- name: upload_code_coverage
+  image: plugins/codecov
+  settings:
+    token: 
+      from_secret: CODECOV_TOKEN
+    files:
+      - coverage.txt
   when:
     event:
     - push

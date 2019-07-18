@@ -35,14 +35,12 @@ type MongoDBAtlasClusterSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
-	MongoDBAtlasAuth      `json:",inline"`
 	ProjectName           string                        `json:"projectName,project"`
 	MongoDBVersion        string                        `json:"mongoDBVersion,omitempty"`
 	MongoDBMajorVersion   string                        `json:"mongoDBMajorVersion,omitempty"`
 	DiskSizeGB            float64                       `json:"diskSizeGB,omitempty"`
 	BackupEnabled         bool                          `json:"backupEnabled"`
 	ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
-	ReplicationFactor     int                           `json:"replicationFactor,omitempty"`
 	ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
 	NumShards             int                           `json:"numShards,omitempty"`
 	AutoScaling           ma.AutoScaling                `json:"autoScaling,omitempty"`
@@ -68,7 +66,6 @@ type MongoDBAtlasClusterStatus struct {
 	BackupEnabled         bool                          `json:"backupEnabled"`
 	ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
 	StateName             string                        `json:"stateName,omitempty"`
-	ReplicationFactor     int                           `json:"replicationFactor,omitempty"`
 	ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
 	NumShards             int                           `json:"numShards,omitempty"`
 	Paused                bool                          `json:"paused"`

@@ -7,7 +7,6 @@ GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
 
 ORGANIZATION_ID?=5c4a2a55553855344780cf5f
-PRIVATE_KEY=
 
 VERSION?=latest
 API_VERSION?=v1alpha1
@@ -39,7 +38,7 @@ api:
 controller:
 	operator-sdk add controller --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
 
-.PHONY: build
+.PHONY: build 
 build:
 	$(GO) build -o $(PWD)/build/_output/bin/$(BINARY) -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} github.com/$(GITHUB_USERNAME)/$(BINARY)/cmd/manager
 
@@ -76,22 +75,31 @@ cleanup:
 	kubectl delete -f deploy/ >/dev/null 2>&1 || true
 	kubectl delete -f deploy/crds/ >/dev/null 2>&1 || true
 
+.PHONY: test
+test:
+	go test ./pkg/controller/... -v -coverprofile=coverage.txt -covermode=atomic
+
 inite2etest:
-	@if [ "$(PRIVATE_KEY)" = "" ]; then \
-		echo "ERROR: Set PRIVATE_KEY variable. For example,"; \
-		echo "  make inite2etest PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
+	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
+		echo "ERROR: Export ATLAS_PRIVATE_KEY variable and then run init again. For example,"; \
+		echo "  export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
+		echo "  make inite2etest"; \
 		exit 1; \
 	fi
 	kubectl create ns e2etest
 	kubectl -n e2etest create secret generic example-monogdb-atlas-project \
-    	--from-literal=privateKey=$(PRIVATE_KEY)
+    	--from-literal=privateKey=$(ATLAS_PRIVATE_KEY)
 
-e2etest: cleanup
+e2etest: cleanup fmt lint
+	@if [ "$(ATLAS_PUBLIC_KEY)" = "" ]; then \
+		echo "ERROR: Export ATLAS_PUBLIC_KEY variable. For example,"; \
+		echo "  export ATLAS_PUBLIC_KEY=yyyyyy"; \
+		exit 1; \
+	fi
 	operator-sdk test local ./test/e2e \
 		--namespace e2etest \
 		--up-local \
 		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID)" 
-	
 
 fmt:
 	gofmt -w $(GOFMT_FILES)
