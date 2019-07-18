@@ -3,6 +3,7 @@ package mongodbatlascluster
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
@@ -100,8 +101,8 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	groupID := atlasProject.Status.ID
 
+	groupID := atlasProject.Status.ID
 	// Define default logger
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "MongoDBAtlasCluster.Name", request.Name, "MongoDBAtlasCluster.GroupID", groupID)
 
@@ -146,6 +147,8 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{RequeueAfter: time.Second * 20}, nil
 	}
 
+	// isMongoDBAtlasClusterToBeUpdated :=
+
 	// Creates a new MongoDB Atlas Cluster with the name defined in atlasCluster iff it does not yet exist
 	err = createMongoDBAtlasCluster(reqLogger, r.atlasClient, atlasCluster, atlasProject)
 	if err != nil {
@@ -170,7 +173,6 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasCluster, ap *knappekv1alpha1.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
 	params := ma.Cluster{
-		GroupID:               groupID,
 		Name:                  cr.Name,
 		MongoDBMajorVersion:   cr.Spec.MongoDBMajorVersion,
 		DiskSizeGB:            cr.Spec.DiskSizeGB,
@@ -191,9 +193,8 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 		}
 	}
 
-	// save old statename for later
+	// save old stateName for later
 	oldStateName := cr.Status.StateName
-
 	// update status field in CR
 	cr.Status.ID = c.ID
 	cr.Status.GroupID = c.GroupID
@@ -213,7 +214,7 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	cr.Status.Paused = c.Paused
 	cr.Status.AutoScaling = c.AutoScaling
 	cr.Status.ProviderSettings = c.ProviderSettings
-
+	// compare old stateName with new stateName
 	newStateName := cr.Status.StateName
 	if oldStateName != newStateName {
 		if oldStateName == "CREATING" && newStateName == "IDLE" {
@@ -229,7 +230,7 @@ func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	// cluster exists and can be deleted
 	resp, err := atlasClient.Clusters.Delete(groupID, clusterName)
 	if err != nil {
-		if resp.StatusCode == 404 {
+		if resp.StatusCode == http.StatusNotFound {
 			reqLogger.Info("MongoDB Atlas Cluster does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
 			// CR can be deleted - Requeue
 			return nil

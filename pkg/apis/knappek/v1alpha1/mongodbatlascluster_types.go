@@ -41,6 +41,8 @@ type MongoDBAtlasClusterSpec struct {
 	DiskSizeGB            float64                       `json:"diskSizeGB,omitempty"`
 	BackupEnabled         bool                          `json:"backupEnabled"`
 	ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
+	// TODO: ReplicationSpec is deprecated, update to ReplicationSpecs. 
+	// This needs to be done in the Go clinet library first: https://github.com/akshaykarle/go-mongodbatlas
 	ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
 	NumShards             int                           `json:"numShards,omitempty"`
 	AutoScaling           ma.AutoScaling                `json:"autoScaling,omitempty"`
