@@ -53,24 +53,8 @@ spec:
           properties:
             orgID:
               type: string
-            privateKey:
-              properties:
-                valueFrom:
-                  properties:
-                    secretKeyRef:
-                      description: Selects a key of a secret in the CR's namespace
-                      type: object
-                  required:
-                  - secretKeyRef
-                  type: object
-              required:
-              - valueFrom
-              type: object
-            publicKey:
-              type: string
           required:
-          - publicKey
-          - privateKey
+          - orgID
           type: object
         status:
           properties:
