@@ -24,7 +24,6 @@ steps:
     event:
     - push
     - tag
-    - pull_request
 
 - name: upload_code_coverage
   image: plugins/codecov
@@ -37,7 +36,6 @@ steps:
     event:
     - push
     - tag
-    - pull_request
 
 - name: docker_latest
   image: plugins/docker
