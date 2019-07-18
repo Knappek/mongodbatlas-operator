@@ -31,7 +31,7 @@ steps:
     token: 
       from_secret: CODECOV_TOKEN
     files:
-      - coverage.txt
+      - coverage.out
   when:
     event:
     - push

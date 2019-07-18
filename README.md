@@ -24,6 +24,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 * [Cleanup](#cleanup)
 * [Developers Build Guide](#developers-build-guide)
 * [Testing](#testing)
+  * [Unit Tests](#unit-tests)
   * [E2E Tests](#e2e-tests)
 * [Contributing](#contributing)
   * [Create new API](#create-new-api)
@@ -152,6 +153,14 @@ make delete-project
 ```
 
 ## Testing
+
+### Unit Tests
+
+The following executes unit tests for the controllers in `./pkg/controller/`
+
+```shell
+make test
+```
 
 ### E2E Tests
 

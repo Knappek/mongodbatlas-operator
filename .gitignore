@@ -74,6 +74,4 @@ tags
 ### VisualStudioCode ###
 .vscode/*
 .history
-### Code coverage
-coverage.txt
 # End of https://www.gitignore.io/api/go,vim,emacs,visualstudiocode

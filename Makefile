@@ -77,7 +77,7 @@ cleanup:
 
 .PHONY: test
 test:
-	go test ./pkg/controller/... -v -coverprofile=coverage.txt -covermode=atomic
+	go test ./pkg/controller/... -v -coverprofile=coverage.out -covermode=atomic
 
 inite2etest:
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
