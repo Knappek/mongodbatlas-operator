@@ -12,7 +12,6 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 ![](docs/mongodbatlas-operator-example.gif)
 
-
 <!-- vim-markdown-toc GFM -->
 
 * [Scope](#scope)

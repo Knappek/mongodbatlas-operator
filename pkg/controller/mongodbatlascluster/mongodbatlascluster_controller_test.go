@@ -200,6 +200,14 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	}
 	assert.Equal(t, time.Second*30, res.RequeueAfter)
 
+	// Check if the CR has been created and has the correct status.
+	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
+	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
+	if err != nil {
+		t.Fatalf("get MongoDBAtlasCluster: (%v)", err)
+	}
+	assert.Equal(t, "CREATING", cr.Status.StateName, "stateName not as expected")
+
 	// GET: Simulate a new reconcile where stateName changed from CREATING to IDLE
 	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
@@ -242,7 +250,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	}
 
 	// Check if the CR has been created and has the correct status.
-	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
+	cr = &knappekv1alpha1.MongoDBAtlasCluster{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	if err != nil {
 		t.Fatalf("get MongoDBAtlasCluster: (%v)", err)

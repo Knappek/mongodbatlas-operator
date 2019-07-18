@@ -119,7 +119,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-			reqLogger.Info("Wait until Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
+			reqLogger.Info("Wait until Cluster has been deleted.", "MongoDBAtlasCluster.GroupID", groupID)
 			// Requeue after 20 seconds and check again for the status until CR can be deleted
 			return reconcile.Result{RequeueAfter: time.Second * 20}, nil
 		}
@@ -128,7 +128,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		_, resp, err := r.atlasClient.Clusters.Get(groupID, atlasCluster.Name)
 		if err != nil {
 			if resp.StatusCode == 404 {
-				reqLogger.Info("MongoDB Atlas Cluster has been deleted successfully.", "MongoDBAtlasCluster.GroupID", groupID)
+				reqLogger.Info("Cluster deleted.", "MongoDBAtlasCluster.GroupID", groupID)
 				// Update finalizer to allow delete CR
 				atlasCluster.SetFinalizers(nil)
 				// Update CR
@@ -162,7 +162,6 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		return reconcile.Result{}, err
 	}
 
-	// MongoDB Atlas Cluster successfully created
 	// Requeue to periodically reconcile the CR MongoDBAtlasCluster in order to recreate a manually deleted Atlas cluster
 	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 }
@@ -190,31 +189,9 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 		if err != nil {
 			return fmt.Errorf("Error creating MongoDB Atlas Cluster %v: %s", cr.Name, err)
 		}
-		reqLogger.Info("Sent request to create MongoDB Atlas Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+		reqLogger.Info("Sent request to create Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
 	}
-	updateMongoDBAtlasClusterCRStatus(cr, c)
-
-	return nil
-}
-
-func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasCluster) error {
-	groupID := cr.Status.GroupID
-	clusterName := cr.Status.Name
-	// cluster exists and can be deleted
-	resp, err := atlasClient.Clusters.Delete(groupID, clusterName)
-	if err != nil {
-		if resp.StatusCode == 404 {
-			reqLogger.Info("MongoDB Atlas Cluster does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
-			// CR can be deleted - Requeue
-			return nil
-		}
-		return fmt.Errorf("(%v) Error deleting MongoDB Cluster %s: %s", resp.StatusCode, clusterName, err)
-	}
-	reqLogger.Info("Sent request to delete MongoDB Atlas Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
-	return nil
-}
-
-func updateMongoDBAtlasClusterCRStatus(cr *knappekv1alpha1.MongoDBAtlasCluster, c *ma.Cluster) {
+	// update status field
 	cr.Status.ID = c.ID
 	cr.Status.GroupID = c.GroupID
 	cr.Status.Name = c.Name
@@ -233,6 +210,25 @@ func updateMongoDBAtlasClusterCRStatus(cr *knappekv1alpha1.MongoDBAtlasCluster, 
 	cr.Status.Paused = c.Paused
 	cr.Status.AutoScaling = c.AutoScaling
 	cr.Status.ProviderSettings = c.ProviderSettings
+
+	return nil
+}
+
+func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasCluster) error {
+	groupID := cr.Status.GroupID
+	clusterName := cr.Status.Name
+	// cluster exists and can be deleted
+	resp, err := atlasClient.Clusters.Delete(groupID, clusterName)
+	if err != nil {
+		if resp.StatusCode == 404 {
+			reqLogger.Info("MongoDB Atlas Cluster does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
+			// CR can be deleted - Requeue
+			return nil
+		}
+		return fmt.Errorf("(%v) Error deleting Cluster %s: %s", resp.StatusCode, clusterName, err)
+	}
+	reqLogger.Info("Sent request to delete Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+	return nil
 }
 
 func (r *ReconcileMongoDBAtlasCluster) addFinalizer(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasCluster) error {
@@ -242,7 +238,7 @@ func (r *ReconcileMongoDBAtlasCluster) addFinalizer(reqLogger logr.Logger, cr *k
 		// Update CR
 		err := r.client.Update(context.TODO(), cr)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update MongoDB Atlas Cluster with finalizer")
+			reqLogger.Error(err, "Failed to update Cluster with finalizer")
 			return err
 		}
 	}
