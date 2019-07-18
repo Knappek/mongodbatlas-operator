@@ -119,24 +119,17 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-<<<<<<< HEAD
-			reqLogger.Info("Wait until Cluster has been deleted successfully.")
-=======
+
 			reqLogger.Info("Wait until Cluster has been deleted.", "MongoDBAtlasCluster.GroupID", groupID)
 			// Requeue after 20 seconds and check again for the status until CR can be deleted
 			return reconcile.Result{RequeueAfter: time.Second * 20}, nil
->>>>>>> unit-testing
 		}
 
 		// wait until cluster has been deleted successfully
 		_, resp, err := r.atlasClient.Clusters.Get(groupID, atlasCluster.Name)
 		if err != nil {
 			if resp.StatusCode == 404 {
-<<<<<<< HEAD
-				reqLogger.Info("MongoDB Atlas Cluster has been deleted successfully.")
-=======
 				reqLogger.Info("Cluster deleted.", "MongoDBAtlasCluster.GroupID", groupID)
->>>>>>> unit-testing
 				// Update finalizer to allow delete CR
 				atlasCluster.SetFinalizers(nil)
 				// Update CR
@@ -149,16 +142,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			}
 			return reconcile.Result{}, err
 		}
-<<<<<<< HEAD
-		// if err == nil, cluster still exists. Update status of CR
-		updateMongoDBAtlasClusterCRStatus(reqLogger, atlasCluster, c)
-		err = r.client.Status().Update(context.TODO(), atlasCluster)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-=======
 		// if err == nil, cluster still exists - Requeue after 20 seconds
->>>>>>> unit-testing
 		return reconcile.Result{RequeueAfter: time.Second * 20}, nil
 	}
 
