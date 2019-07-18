@@ -99,7 +99,7 @@ e2etest: cleanup fmt lint
 	operator-sdk test local ./test/e2e \
 		--namespace e2etest \
 		--up-local \
-		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID)" 
+		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID) -timeout 20m" 
 
 fmt:
 	gofmt -w $(GOFMT_FILES)
