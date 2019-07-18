@@ -120,7 +120,6 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-
 			reqLogger.Info("Wait until Cluster has been deleted.", "MongoDBAtlasCluster.GroupID", groupID)
 			// Requeue after 20 seconds and check again for the status until CR can be deleted
 			return reconcile.Result{RequeueAfter: time.Second * 20}, nil

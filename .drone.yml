@@ -24,7 +24,6 @@ steps:
     event:
     - push
     - tag
-    - pull_request
 
 - name: upload_code_coverage
   image: plugins/codecov
@@ -32,12 +31,11 @@ steps:
     token: 
       from_secret: CODECOV_TOKEN
     files:
-      - coverage.txt
+      - coverage.out
   when:
     event:
     - push
     - tag
-    - pull_request
 
 - name: docker_latest
   image: plugins/docker
