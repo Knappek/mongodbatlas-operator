@@ -3,60 +3,61 @@ kind: CustomResourceDefinition
 metadata:
   name: mongodbatlasclusters.knappek.com
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.projectName
+    description: The MongoDB Atlas Project where the cluster has been deployed
+    name: Project Name
+    type: string
+  - JSONPath: .status.mongoDBVersion
+    description: The MongoDB version of the cluster
+    name: MongoDB_Version
+    type: string
+  - JSONPath: .status.stateName
+    description: The status of the cluster
+    name: Status
+    type: string
+  - JSONPath: .status.providerSettings.regionName
+    description: Physical location of your MongoDB cluster
+    name: Region
+    type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
+  - JSONPath: .status.providerSettings.providerName
+    description: Cloud service provider on which the servers are provisioned
+    name: Provider
+    priority: 1
+    type: string
+  - JSONPath: .status.backupEnabled
+    description: Set to true to enable Atlas continuous backups for the cluster
+    name: ContinuousBackups
+    priority: 1
+    type: boolean
+  - JSONPath: .status.providerBackupEnabled
+    description: Flag indicating if the cluster uses Cloud Provider Snapshots for
+      backups
+    name: ProviderBackups
+    priority: 1
+    type: boolean
+  - JSONPath: .status.srvAddress
+    description: Connection string (DNS SRV Record) for connecting to the Atlas cluster
+    name: SRV_Address
+    priority: 1
+    type: string
   group: knappek.com
   names:
-    kind: MongoDBAtlasCluster
-    listKind: MongoDBAtlasClusterList
-    plural: mongodbatlasclusters
-    singular: mongodbatlascluster
-    shortNames:
-    - mac
     categories:
     - all
     - mongodbatlas
+    kind: MongoDBAtlasCluster
+    listKind: MongoDBAtlasClusterList
+    plural: mongodbatlasclusters
+    shortNames:
+    - mac
+    singular: mongodbatlascluster
   scope: Namespaced
   subresources:
     status: {}
-  additionalPrinterColumns:
-    - name: Project Name
-      type: string
-      description: The MongoDB Atlas Project where the cluster has been deployed
-      JSONPath: .spec.projectName
-    - name: MongoDB_Version
-      type: string
-      description: The MongoDB version of the cluster
-      JSONPath: .status.mongoDBVersion
-    - name: Status
-      type: string
-      description: The status of the cluster
-      JSONPath: .status.stateName
-    - name: Region
-      type: string
-      description: Physical location of your MongoDB cluster
-      JSONPath: .status.providerSettings.regionName
-    - name: Age
-      type: date
-      JSONPath: .metadata.creationTimestamp
-    - name: Provider
-      type: string
-      description: Cloud service provider on which the servers are provisioned
-      JSONPath: .status.providerSettings.providerName
-      priority: 1
-    - name: ContinuousBackups
-      type: boolean
-      description: Set to true to enable Atlas continuous backups for the cluster
-      JSONPath: .status.backupEnabled
-      priority: 1
-    - name: ProviderBackups
-      type: boolean
-      description: Flag indicating if the cluster uses Cloud Provider Snapshots for backups
-      JSONPath: .status.providerBackupEnabled
-      priority: 1
-    - name: SRV_Address
-      type: string
-      description: Connection string (DNS SRV Record) for connecting to the Atlas cluster
-      JSONPath: .status.srvAddress
-      priority: 1
   validation:
     openAPIV3Schema:
       properties:
@@ -134,6 +135,8 @@ spec:
                 - readOnlyNodes
                 - analyticsNodes
                 type: object
+              description: 'TODO: ReplicationSpec is deprecated, update to ReplicationSpecs.
+                This needs to be done in the Go clinet library first: https://github.com/akshaykarle/go-mongodbatlas'
               type: object
           required:
           - projectName
@@ -157,10 +160,6 @@ spec:
             groupID:
               type: string
             id:
-              description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
-                of cluster Important: Run "operator-sdk generate k8s" to regenerate
-                code after modifying this file Add custom validation using kubebuilder
-                tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html'
               type: string
             mongoDBMajorVersion:
               type: string

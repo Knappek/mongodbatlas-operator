@@ -205,9 +205,6 @@ make controller KIND=MongoDBAtlasCluster
 
 ### Create CRDs
 
-> TODO: This is still deprecated as it will override existing CRDs and remove lots of fields. 
-> Investigation needed how to avoid this
-
 ```shell
 make generate-openapi
 ```

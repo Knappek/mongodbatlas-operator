@@ -7,6 +7,8 @@ import (
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
+// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/reference/generating-crd.html
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -21,6 +23,18 @@ type MongoDBAtlasClusterList struct {
 
 // MongoDBAtlasCluster is the Schema for the mongodbatlasclusters API
 // +k8s:openapi-gen=true
+// +kubebuilder:printcolumn:name="Project Name",type="string",JSONPath=".spec.projectName",description="The MongoDB Atlas Project where the cluster has been deployed"
+// +kubebuilder:printcolumn:name="MongoDB_Version",type="string",JSONPath=".status.mongoDBVersion",description="The MongoDB version of the cluster"
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.stateName",description="The status of the cluster"
+// +kubebuilder:printcolumn:name="Region",type="string",JSONPath=".status.providerSettings.regionName",description="Physical location of your MongoDB cluster"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
+// +kubebuilder:printcolumn:name="Provider",type="string",JSONPath=".status.providerSettings.providerName",description="Cloud service provider on which the servers are provisioned",priority="1"
+// +kubebuilder:printcolumn:name="ContinuousBackups",type="boolean",JSONPath=".status.backupEnabled",description="Set to true to enable Atlas continuous backups for the cluster",priority="1"
+// +kubebuilder:printcolumn:name="ProviderBackups",type="boolean",JSONPath=".status.providerBackupEnabled",description="Flag indicating if the cluster uses Cloud Provider Snapshots for backups",priority="1"
+// +kubebuilder:printcolumn:name="SRV_Address",type="string",JSONPath=".status.srvAddress",description="Connection string (DNS SRV Record) for connecting to the Atlas cluster",priority="1"
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:path=mongodbatlasclusters,shortName=mac
+// +kubebuilder:categories=all,mongodbatlas
 type MongoDBAtlasCluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -32,9 +46,6 @@ type MongoDBAtlasCluster struct {
 // MongoDBAtlasClusterSpec defines the desired state of MongoDBAtlasCluster
 // +k8s:openapi-gen=true
 type MongoDBAtlasClusterSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 	ProjectName           string                        `json:"projectName,project"`
 	MongoDBVersion        string                        `json:"mongoDBVersion,omitempty"`
 	MongoDBMajorVersion   string                        `json:"mongoDBMajorVersion,omitempty"`
@@ -52,9 +63,6 @@ type MongoDBAtlasClusterSpec struct {
 // MongoDBAtlasClusterStatus defines the observed state of MongoDBAtlasCluster
 // +k8s:openapi-gen=true
 type MongoDBAtlasClusterStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 	ID                    string                        `json:"id,omitempty"`
 	GroupID               string                        `json:"groupID,omitempty"`
 	Name                  string                        `json:"name,omitempty"`
