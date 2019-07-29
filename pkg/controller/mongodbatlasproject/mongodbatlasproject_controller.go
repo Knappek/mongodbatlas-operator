@@ -134,9 +134,9 @@ func createMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	if err != nil {
 		p, _, err = atlasClient.Projects.Create(&params)
 		if err != nil {
-			return fmt.Errorf("Error creating MongoDB Atlas Project %v: %s", cr.Name, err)
+			return fmt.Errorf("Error creating Project %v: %s", cr.Name, err)
 		}
-		reqLogger.Info("MongoDB Atlas Project created.", "MongoDBAtlasProject.ID", p.ID)
+		reqLogger.Info("Project created.", "MongoDBAtlasProject.ID", p.ID)
 	}
 	cr.Status.ID = p.ID
 	cr.Status.OrgID = p.OrgID
@@ -152,7 +152,7 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	p, resp, err := atlasClient.Projects.GetByName(cr.Name)
 	if err != nil {
 		if resp.StatusCode == 404 {
-			reqLogger.Info("MongoDB Atlas Project does not exist in Atlas. Deleting CR.")
+			reqLogger.Info("Project does not exist in Atlas. Deleting CR.")
 			return nil
 		}
 		return fmt.Errorf("Error getting MongoDB Project %s: %s", cr.Name, err)
@@ -164,7 +164,7 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	if err != nil {
 		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, atlasProjectID, err)
 	}
-	reqLogger.Info("MongoDB Atlas Project deleted.", "MongoDBAtlasProject.ID", atlasProjectID)
+	reqLogger.Info("Project deleted.", "MongoDBAtlasProject.ID", atlasProjectID)
 	return nil
 }
 
@@ -175,7 +175,7 @@ func (r *ReconcileMongoDBAtlasProject) addFinalizer(reqLogger logr.Logger, cr *k
 		// Update CR
 		err := r.client.Update(context.TODO(), cr)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update MongoDB Atlas Project with finalizer")
+			reqLogger.Error(err, "Failed to update Project with finalizer")
 			return err
 		}
 	}
