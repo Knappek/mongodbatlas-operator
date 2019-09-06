@@ -89,8 +89,6 @@ spec:
               type: number
             mongoDBMajorVersion:
               type: string
-            mongoDBVersion:
-              type: string
             numShards:
               format: int64
               type: integer

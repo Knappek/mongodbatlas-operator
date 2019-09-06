@@ -43,44 +43,141 @@ type MongoDBAtlasCluster struct {
 	Status MongoDBAtlasClusterStatus `json:"status,omitempty"`
 }
 
+// MongoDBAtlasClusterRequestBody defines the Request Body Parameters when creating/updating a cluster
+type MongoDBAtlasClusterRequestBody struct {
+	MongoDBMajorVersion   string  `json:"mongoDBMajorVersion,omitempty"`
+	DiskSizeGB            float64 `json:"diskSizeGB,omitempty"`
+	BackupEnabled         bool    `json:"backupEnabled"`
+	ProviderBackupEnabled bool    `json:"providerBackupEnabled"`
+	// TODO: ReplicationSpec is deprecated, update to ReplicationSpecs.
+	// This needs to be done in the Go clinet library first: https://github.com/akshaykarle/go-mongodbatlas
+	ReplicationSpec  map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
+	NumShards        int                           `json:"numShards,omitempty"`
+	AutoScaling      ma.AutoScaling                `json:"autoScaling,omitempty"`
+	ProviderSettings ma.ProviderSettings           `json:"providerSettings,omitempty"`
+}
+
+// IsMongoDBAtlasClusterToBeUpdated is used to compare spec.MongoDBAtlasClusterRequestBody with status.MongoDBAtlasClusterRequestBody
+func IsMongoDBAtlasClusterToBeUpdated(m1 MongoDBAtlasClusterRequestBody, m2 MongoDBAtlasClusterRequestBody) bool {
+	region := m1.ProviderSettings.RegionName
+	if m1.MongoDBMajorVersion != m2.MongoDBMajorVersion {
+		if !isZeroValue(m1.MongoDBMajorVersion) {
+			return true
+		}
+	}
+	if m1.DiskSizeGB != m2.DiskSizeGB {
+		if !isZeroValue(m1.DiskSizeGB) {
+			return true
+		}
+	}
+	if m1.BackupEnabled != m2.BackupEnabled {
+		if !isZeroValue(m1.BackupEnabled) {
+			return true
+		}
+	}
+	if m1.ReplicationSpec[region].Priority != m2.ReplicationSpec[region].Priority {
+		if !isZeroValue(m1.ReplicationSpec[region].Priority) {
+			return true
+		}
+	}
+	if m1.ReplicationSpec[region].ElectableNodes != m2.ReplicationSpec[region].ElectableNodes {
+		if !isZeroValue(m1.ReplicationSpec[region].ElectableNodes) {
+			return true
+		}
+	}
+	if m1.ReplicationSpec[region].ReadOnlyNodes != m2.ReplicationSpec[region].ReadOnlyNodes {
+		if !isZeroValue(m1.ReplicationSpec[region].ReadOnlyNodes) {
+			return true
+		}
+	}
+	if m1.ReplicationSpec[region].AnalyticsNodes != m2.ReplicationSpec[region].AnalyticsNodes {
+		if !isZeroValue(m1.ReplicationSpec[region].AnalyticsNodes) {
+			return true
+		}
+	}
+	if m1.NumShards != m2.NumShards {
+		if !isZeroValue(m1.NumShards) {
+			return true
+		}
+	}
+	if m1.AutoScaling.DiskGBEnabled != m2.AutoScaling.DiskGBEnabled {
+		if !isZeroValue(m1.AutoScaling.DiskGBEnabled) {
+			return true
+		}
+	}
+	if m1.ProviderSettings.ProviderName != m2.ProviderSettings.ProviderName {
+		if !isZeroValue(m1.ProviderSettings.ProviderName) {
+			return true
+		}
+	}
+	if m1.ProviderSettings.BackingProviderName != m2.ProviderSettings.BackingProviderName {
+		if !isZeroValue(m1.ProviderSettings.BackingProviderName) {
+			return true
+		}
+	}
+	if m1.ProviderSettings.RegionName != m2.ProviderSettings.RegionName {
+		if !isZeroValue(m1.ProviderSettings.RegionName) {
+			return true
+		}
+	}
+	if m1.ProviderSettings.InstanceSizeName != m2.ProviderSettings.InstanceSizeName {
+		if !isZeroValue(m1.ProviderSettings.InstanceSizeName) {
+			return true
+		}
+	}
+	if m1.ProviderSettings.DiskIOPS != m2.ProviderSettings.DiskIOPS {
+		if !isZeroValue(m1.ProviderSettings.DiskIOPS) {
+			return true
+		}
+	}
+	if m1.ProviderSettings.EncryptEBSVolume != m2.ProviderSettings.EncryptEBSVolume {
+		if !isZeroValue(m1.ProviderSettings.EncryptEBSVolume) {
+			return true
+		}
+	}
+	return false
+}
+
+func isZeroValue(i interface{}) bool {
+	if i == nil {
+		return true
+	} // nil interface
+	if i == "" {
+		return true
+	} // zero value of a string
+	if i == 0.0 {
+		return true
+	} // zero value of a float64
+	if i == 0 {
+		return true
+	} // zero value of an int
+	if i == false {
+		return true
+	} // zero value of a boolean
+	return false
+}
+
 // MongoDBAtlasClusterSpec defines the desired state of MongoDBAtlasCluster
 // +k8s:openapi-gen=true
 type MongoDBAtlasClusterSpec struct {
-	ProjectName           string                        `json:"projectName,project"`
-	MongoDBVersion        string                        `json:"mongoDBVersion,omitempty"`
-	MongoDBMajorVersion   string                        `json:"mongoDBMajorVersion,omitempty"`
-	DiskSizeGB            float64                       `json:"diskSizeGB,omitempty"`
-	BackupEnabled         bool                          `json:"backupEnabled"`
-	ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
-	// TODO: ReplicationSpec is deprecated, update to ReplicationSpecs. 
-	// This needs to be done in the Go clinet library first: https://github.com/akshaykarle/go-mongodbatlas
-	ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
-	NumShards             int                           `json:"numShards,omitempty"`
-	AutoScaling           ma.AutoScaling                `json:"autoScaling,omitempty"`
-	ProviderSettings      ma.ProviderSettings           `json:"providerSettings,omitempty"`
+	ProjectName                    string `json:"projectName,project"`
+	MongoDBAtlasClusterRequestBody `json:",inline"`
 }
 
 // MongoDBAtlasClusterStatus defines the observed state of MongoDBAtlasCluster
 // +k8s:openapi-gen=true
 type MongoDBAtlasClusterStatus struct {
-	ID                    string                        `json:"id,omitempty"`
-	GroupID               string                        `json:"groupID,omitempty"`
-	Name                  string                        `json:"name,omitempty"`
-	MongoDBVersion        string                        `json:"mongoDBVersion,omitempty"`
-	MongoDBMajorVersion   string                        `json:"mongoDBMajorVersion,omitempty"`
-	MongoURI              string                        `json:"mongoURI,omitempty"`
-	MongoURIUpdated       string                        `json:"mongoURIUpdated,omitempty"`
-	MongoURIWithOptions   string                        `json:"mongoURIWithOptions,omitempty"`
-	SrvAddress            string                        `json:"srvAddress,omitempty"`
-	DiskSizeGB            float64                       `json:"diskSizeGB,omitempty"`
-	BackupEnabled         bool                          `json:"backupEnabled"`
-	ProviderBackupEnabled bool                          `json:"providerBackupEnabled"`
-	StateName             string                        `json:"stateName,omitempty"`
-	ReplicationSpec       map[string]ma.ReplicationSpec `json:"replicationSpec,omitempty"`
-	NumShards             int                           `json:"numShards,omitempty"`
-	Paused                bool                          `json:"paused"`
-	AutoScaling           ma.AutoScaling                `json:"autoScaling,omitempty"`
-	ProviderSettings      ma.ProviderSettings           `json:"providerSettings,omitempty"`
+	ID                             string `json:"id,omitempty"`
+	GroupID                        string `json:"groupID,omitempty"`
+	Name                           string `json:"name,omitempty"`
+	MongoDBAtlasClusterRequestBody `json:",inline"`
+	MongoDBVersion                 string `json:"mongoDBVersion,omitempty"`
+	MongoURI                       string `json:"mongoURI,omitempty"`
+	MongoURIUpdated                string `json:"mongoURIUpdated,omitempty"`
+	MongoURIWithOptions            string `json:"mongoURIWithOptions,omitempty"`
+	SrvAddress                     string `json:"srvAddress,omitempty"`
+	StateName                      string `json:"stateName,omitempty"`
+	Paused                         bool   `json:"paused"`
 }
 
 func init() {

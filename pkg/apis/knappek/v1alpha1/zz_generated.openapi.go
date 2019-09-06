@@ -77,12 +77,6 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref common.Referen
 							Format: "",
 						},
 					},
-					"mongoDBVersion": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
 					"mongoDBMajorVersion": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
