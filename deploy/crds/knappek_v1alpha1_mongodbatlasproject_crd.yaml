@@ -3,37 +3,37 @@ kind: CustomResourceDefinition
 metadata:
   name: mongodbatlasprojects.knappek.com
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.orgID
+    description: The MongoDB Atlas Organization ID
+    name: OrgID
+    type: string
+  - JSONPath: .status.clusterCount
+    description: The number of Clusters in the Project
+    name: ClusterCount
+    type: integer
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
+  - JSONPath: .status.id
+    description: The ID of the Project
+    name: ProjectID
+    priority: 1
+    type: string
   group: knappek.com
   names:
-    kind: MongoDBAtlasProject
-    listKind: MongoDBAtlasProjectList
-    plural: mongodbatlasprojects
-    singular: mongodbatlasproject
-    shortNames:
-    - map
     categories:
     - all
     - mongodbatlas
+    kind: MongoDBAtlasProject
+    listKind: MongoDBAtlasProjectList
+    plural: mongodbatlasprojects
+    shortNames:
+    - map
+    singular: mongodbatlasproject
   scope: Namespaced
   subresources:
     status: {}
-  additionalPrinterColumns:
-    - name: OrgID
-      type: string
-      description: The MongoDB Atlas Organization ID
-      JSONPath: .spec.orgID
-    - name: ClusterCount
-      type: integer
-      description: The number of Clusters in the Project
-      JSONPath: .status.clusterCount
-    - name: Age
-      type: date
-      JSONPath: .metadata.creationTimestamp
-    - name: ProjectID
-      type: string
-      description: The ID of the Project
-      JSONPath: .status.id
-      priority: 1
   validation:
     openAPIV3Schema:
       properties:
@@ -64,10 +64,6 @@ spec:
             created:
               type: string
             id:
-              description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
-                of cluster Important: Run "operator-sdk generate k8s" to regenerate
-                code after modifying this file Add custom validation using kubebuilder
-                tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html'
               type: string
             name:
               type: string

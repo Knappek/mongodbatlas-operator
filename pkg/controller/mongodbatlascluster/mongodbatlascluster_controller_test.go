@@ -87,16 +87,17 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 			Namespace: namespace,
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasClusterSpec{
-			ProjectName:           projectName,
-			ProviderSettings:      providerSettings,
-			MongoDBVersion:        mongoDBVersion,
-			MongoDBMajorVersion:   mongoDBMajorVersion,
-			DiskSizeGB:            diskSizeGB,
-			NumShards:             numShards,
-			AutoScaling:           autoscaling,
-			BackupEnabled:         backupEnabled,
-			ProviderBackupEnabled: providerBackupEnabled,
-			ReplicationSpec:       replicationSpec,
+			ProjectName: projectName,
+			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
+				ProviderSettings:      providerSettings,
+				MongoDBMajorVersion:   mongoDBMajorVersion,
+				DiskSizeGB:            diskSizeGB,
+				NumShards:             numShards,
+				AutoScaling:           autoscaling,
+				BackupEnabled:         backupEnabled,
+				ProviderBackupEnabled: providerBackupEnabled,
+				ReplicationSpec:       replicationSpec,
+			},
 		},
 	}
 
@@ -123,18 +124,16 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
 		expectedBody := map[string]interface{}{
-			"name":                  clusterName,
-			"mongoDBVersion":        mongoDBVersion,
-			"mongoDBMajorVersion":   mongoDBMajorVersion,
-			"groupId":               projectID,
-			"numShards":             float64(numShards),
-			"backupEnabled":         backupEnabled,
-			"providerBackupEnabled": providerBackupEnabled,
-			"paused":                paused,
-			"diskSizeGB":            diskSizeGB,
 			"autoScaling": map[string]interface{}{
 				"diskGBEnabled": autoscaling.DiskGBEnabled,
 			},
+			"backupEnabled":         backupEnabled,
+			"diskSizeGB":            diskSizeGB,
+			"name":                  clusterName,
+			"mongoDBMajorVersion":   mongoDBMajorVersion,
+			"numShards":             float64(numShards),
+			"paused":                paused,
+			"providerBackupEnabled": providerBackupEnabled,
 			"providerSettings": map[string]interface{}{
 				"providerName":     providerSettings.ProviderName,
 				"regionName":       providerSettings.RegionName,
@@ -152,20 +151,19 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 		}
 		testutil.AssertReqJSON(t, expectedBody, r)
 		fmt.Fprintf(w, `{
-			"id": "`+clusterID+`",
-			"groupId": "`+projectID+`",
-			"name":"`+clusterName+`",
-			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
-			"mongoDBVersion":"`+mongoDBVersion+`",
-			"numShards": `+strconv.Itoa(numShards)+`,
-			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
-			"providerBackupEnabled":`+strconv.FormatBool(providerBackupEnabled)+`,
-			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"paused":`+strconv.FormatBool(paused)+`,
-			"stateName": "CREATING",
 			"autoScaling":{
 				"diskGBEnabled":`+strconv.FormatBool(autoscaling.DiskGBEnabled)+`
 			},
+			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
+			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
+			"groupId": "`+projectID+`",
+			"id": "`+clusterID+`",
+			"mongoDBVersion":"`+mongoDBVersion+`",
+			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
+			"name":"`+clusterName+`",
+			"numShards": `+strconv.Itoa(numShards)+`,
+			"paused":`+strconv.FormatBool(paused)+`,
+			"providerBackupEnabled":`+strconv.FormatBool(providerBackupEnabled)+`,
 			"providerSettings":{
 				"providerName":"`+providerSettings.ProviderName+`",
 				"regionName":"`+providerSettings.RegionName+`",
@@ -179,7 +177,8 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 					"readOnlyNodes":1,
 					"analyticsNodes":1
 				}
-			}
+			},
+			"stateName": "CREATING"
 		}`)
 	})
 
@@ -212,20 +211,19 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
 		fmt.Fprintf(w, `{
-			"id": "`+clusterID+`",
-			"groupId": "`+projectID+`",
-			"name":"`+clusterName+`",
-			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
-			"mongoDBVersion":"`+mongoDBVersion+`",
-			"numShards": `+strconv.Itoa(numShards)+`,
-			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
-			"providerBackupEnabled":`+strconv.FormatBool(providerBackupEnabled)+`,
-			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"paused":`+strconv.FormatBool(paused)+`,
-			"stateName": "IDLE",
 			"autoScaling":{
 				"diskGBEnabled":`+strconv.FormatBool(autoscaling.DiskGBEnabled)+`
 			},
+			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
+			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
+			"groupId": "`+projectID+`",
+			"id": "`+clusterID+`",
+			"mongoDBVersion":"`+mongoDBVersion+`",
+			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
+			"name":"`+clusterName+`",
+			"numShards": `+strconv.Itoa(numShards)+`,
+			"paused":`+strconv.FormatBool(paused)+`,
+			"providerBackupEnabled":`+strconv.FormatBool(providerBackupEnabled)+`,
 			"providerSettings":{
 				"providerName":"`+providerSettings.ProviderName+`",
 				"regionName":"`+providerSettings.RegionName+`",
@@ -239,7 +237,8 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 					"readOnlyNodes":1,
 					"analyticsNodes":1
 				}
-			}
+			},
+			"stateName": "IDLE"
 		}`)
 	})
 
@@ -304,16 +303,17 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 			Finalizers:        []string{"finalizer.knappek.com"},
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasClusterSpec{
-			ProjectName:           projectName,
-			ProviderSettings:      providerSettings,
-			MongoDBVersion:        mongoDBVersion,
-			MongoDBMajorVersion:   mongoDBMajorVersion,
-			DiskSizeGB:            diskSizeGB,
-			NumShards:             numShards,
-			AutoScaling:           autoscaling,
-			BackupEnabled:         backupEnabled,
-			ProviderBackupEnabled: providerBackupEnabled,
-			ReplicationSpec:       replicationSpec,
+			ProjectName: projectName,
+			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
+				ProviderSettings:      providerSettings,
+				MongoDBMajorVersion:   mongoDBMajorVersion,
+				DiskSizeGB:            diskSizeGB,
+				NumShards:             numShards,
+				AutoScaling:           autoscaling,
+				BackupEnabled:         backupEnabled,
+				ProviderBackupEnabled: providerBackupEnabled,
+				ReplicationSpec:       replicationSpec,
+			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
 			GroupID:   projectID,
@@ -396,4 +396,291 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	}
 	// verify that Finalizer has been removed
 	assert.Nil(t, cr.ObjectMeta.GetFinalizers())
+}
+
+func TestUpdateMongoDBAtlasCluster(t *testing.T) {
+	// Set the logger to development mode for verbose logs.
+	logf.SetLogger(logf.ZapLogger(true))
+
+	// A MongoDBAtlasProject resource with metadata and spec.
+	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      projectName,
+			Namespace: namespace,
+		},
+		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
+			OrgID: organizationID,
+		},
+		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
+			ID:           projectID,
+			Name:         projectName,
+			OrgID:        organizationID,
+			Created:      "2016-07-14T14:19:33Z",
+			ClusterCount: 1,
+		},
+	}
+
+	// updates
+	updatedDiskSizeGB := diskSizeGB + 10
+	updatedInstanceSizeName := "M20"
+	updatedProviderSettings := ma.ProviderSettings{
+		ProviderName:        "AWS",
+		RegionName:          "US_EAST_1",
+		InstanceSizeName:    updatedInstanceSizeName,
+		EncryptEBSVolume:    true,
+		BackingProviderName: "",
+	}
+	// A MongoDBAtlasCluster resource with metadata and spec.
+	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      clusterName,
+			Namespace: namespace,
+		},
+		Spec: knappekv1alpha1.MongoDBAtlasClusterSpec{
+			ProjectName: projectName,
+			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
+				ProviderSettings:      updatedProviderSettings, // update
+				MongoDBMajorVersion:   mongoDBMajorVersion,
+				DiskSizeGB:            updatedDiskSizeGB, // update
+				NumShards:             numShards,
+				AutoScaling:           autoscaling,
+				BackupEnabled:         !backupEnabled, // update
+				ProviderBackupEnabled: providerBackupEnabled,
+				ReplicationSpec:       replicationSpec,
+			},
+		},
+		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
+			GroupID:        projectID,
+			Name:           clusterName,
+			StateName:      "IDLE",
+			ID:             clusterID,
+			MongoDBVersion: mongoDBVersion,
+			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
+				ProviderSettings:      providerSettings,
+				MongoDBMajorVersion:   mongoDBMajorVersion,
+				DiskSizeGB:            diskSizeGB,
+				NumShards:             numShards,
+				AutoScaling:           autoscaling,
+				BackupEnabled:         backupEnabled,
+				ProviderBackupEnabled: providerBackupEnabled,
+				ReplicationSpec:       replicationSpec,
+			},
+			Paused: paused,
+		},
+	}
+
+	// Objects to track in the fake client.
+	objs := []runtime.Object{
+		mongodbatlascluster,
+		mongodbatlasproject,
+	}
+
+	// Register operator types with the runtime scheme.
+	s := scheme.Scheme
+	s.AddKnownTypes(knappekv1alpha1.SchemeGroupVersion, mongodbatlascluster, mongodbatlasproject)
+
+	// Create a fake k8s client to mock API calls.
+	k8sClient := fake.NewFakeClient(objs...)
+	// Create a fake atlas client to mock API calls.
+	// atlasClient, server := test.NewAtlasFakeClient(t)
+	httpClient, mux, server := testutil.Server()
+	defer server.Close()
+	atlasClient := ma.NewClient(httpClient)
+	// Construct Update API call
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+		testutil.AssertMethod(t, "PATCH", r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{
+			"autoScaling":{
+				"diskGBEnabled":`+strconv.FormatBool(autoscaling.DiskGBEnabled)+`
+			},
+			"backupEnabled":`+strconv.FormatBool(!backupEnabled)+`,
+			"diskSizeGB":`+strconv.FormatFloat(updatedDiskSizeGB, 'f', 6, 64)+`,
+			"groupId": "`+projectID+`",
+			"id": "`+clusterID+`",
+			"mongoDBVersion":"`+mongoDBVersion+`",
+			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
+			"name":"`+clusterName+`",
+			"numShards": `+strconv.Itoa(numShards)+`,
+			"paused":`+strconv.FormatBool(paused)+`,
+			"providerBackupEnabled":`+strconv.FormatBool(providerBackupEnabled)+`,
+			"providerSettings":{
+				"providerName":"`+providerSettings.ProviderName+`",
+				"regionName":"`+providerSettings.RegionName+`",
+				"instanceSizeName":"`+updatedInstanceSizeName+`",
+				"encryptEBSVolume": `+strconv.FormatBool(providerSettings.EncryptEBSVolume)+`
+			},
+			"replicationSpec":{
+				"US_EAST_1":{
+					"priority":7,
+					"electableNodes":2,
+					"readOnlyNodes":1,
+					"analyticsNodes":1
+				}
+			},
+			"stateName": "UPDATING"
+		}`)
+	})
+	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
+	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+
+	// Mock request to simulate Reconcile() being called on an event for a
+	// watched resource .
+	req := reconcile.Request{
+		NamespacedName: types.NamespacedName{
+			Name:      clusterName,
+			Namespace: namespace,
+		},
+	}
+	res, err := r.Reconcile(req)
+	if err != nil {
+		t.Fatalf("reconcile: (%v)", err)
+	}
+	assert.Equal(t, time.Second*30, res.RequeueAfter)
+
+	// Check if the CR has been created and has the correct status.
+	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
+	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
+	if err != nil {
+		t.Fatalf("get MongoDBAtlasCluster: (%v)", err)
+	}
+	assert.Equal(t, "UPDATING", cr.Status.StateName, "stateName not as expected")
+	assert.Equal(t, !backupEnabled, cr.Status.BackupEnabled, "backupEnabled not as expected")
+	assert.Equal(t, updatedDiskSizeGB, cr.Status.DiskSizeGB, "diskSizeGB not as expected")
+	assert.Equal(t, updatedInstanceSizeName, cr.Status.ProviderSettings.InstanceSizeName, "instanceSizeName not as expected")
+	assert.False(t, paused, "paused not as expected")
+}
+
+func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
+	// Set the logger to development mode for verbose logs.
+	logf.SetLogger(logf.ZapLogger(true))
+
+	// A MongoDBAtlasProject resource with metadata and spec.
+	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      projectName,
+			Namespace: namespace,
+		},
+		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
+			OrgID: organizationID,
+		},
+		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
+			ID:           projectID,
+			Name:         projectName,
+			OrgID:        organizationID,
+			Created:      "2016-07-14T14:19:33Z",
+			ClusterCount: 1,
+		},
+	}
+
+	// A MongoDBAtlasCluster resource with metadata and spec. This Spec contains only the bare minimum, other values
+	// will be filled with default values
+	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      clusterName,
+			Namespace: namespace,
+		},
+		Spec: knappekv1alpha1.MongoDBAtlasClusterSpec{
+			ProjectName: projectName,
+			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
+				ProviderSettings: providerSettings,
+				ReplicationSpec:  replicationSpec,
+			},
+		},
+		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
+			GroupID:        projectID,
+			Name:           clusterName,
+			StateName:      "IDLE",
+			ID:             clusterID,
+			MongoDBVersion: mongoDBVersion,
+			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
+				ProviderSettings:      providerSettings,
+				MongoDBMajorVersion:   mongoDBMajorVersion,
+				DiskSizeGB:            diskSizeGB,
+				NumShards:             numShards,
+				AutoScaling:           autoscaling,
+				BackupEnabled:         backupEnabled,
+				ProviderBackupEnabled: providerBackupEnabled,
+				ReplicationSpec:       replicationSpec,
+			},
+			Paused: paused,
+		},
+	}
+
+	// Objects to track in the fake client.
+	objs := []runtime.Object{
+		mongodbatlascluster,
+		mongodbatlasproject,
+	}
+
+	// Register operator types with the runtime scheme.
+	s := scheme.Scheme
+	s.AddKnownTypes(knappekv1alpha1.SchemeGroupVersion, mongodbatlascluster, mongodbatlasproject)
+
+	// Create a fake k8s client to mock API calls.
+	k8sClient := fake.NewFakeClient(objs...)
+	// Create a fake atlas client to mock API calls.
+	// atlasClient, server := test.NewAtlasFakeClient(t)
+	httpClient, mux, server := testutil.Server()
+	defer server.Close()
+	atlasClient := ma.NewClient(httpClient)
+	// Construct Update API call
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+		testutil.AssertMethod(t, "GET", r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{
+			"autoScaling":{
+				"diskGBEnabled":`+strconv.FormatBool(autoscaling.DiskGBEnabled)+`
+			},
+			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
+			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
+			"groupId": "`+projectID+`",
+			"id": "`+clusterID+`",
+			"mongoDBVersion":"`+mongoDBVersion+`",
+			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
+			"name":"`+clusterName+`",
+			"numShards": `+strconv.Itoa(numShards)+`,
+			"paused":`+strconv.FormatBool(paused)+`,
+			"providerBackupEnabled":`+strconv.FormatBool(providerBackupEnabled)+`,
+			"providerSettings":{
+				"providerName":"`+providerSettings.ProviderName+`",
+				"regionName":"`+providerSettings.RegionName+`",
+				"instanceSizeName":"`+providerSettings.InstanceSizeName+`",
+				"encryptEBSVolume": `+strconv.FormatBool(providerSettings.EncryptEBSVolume)+`
+			},
+			"replicationSpec":{
+				"US_EAST_1":{
+					"priority":7,
+					"electableNodes":2,
+					"readOnlyNodes":1,
+					"analyticsNodes":1
+				}
+			},
+			"stateName": "IDLE"
+		}`)
+	})
+	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
+	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+
+	// Mock request to simulate Reconcile() being called on an event for a
+	// watched resource .
+	req := reconcile.Request{
+		NamespacedName: types.NamespacedName{
+			Name:      clusterName,
+			Namespace: namespace,
+		},
+	}
+	res, err := r.Reconcile(req)
+	if err != nil {
+		t.Fatalf("reconcile: (%v)", err)
+	}
+	assert.Equal(t, time.Second*30, res.RequeueAfter)
+
+	// Check if the CR has been created and has the correct status.
+	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
+	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
+	if err != nil {
+		t.Fatalf("get MongoDBAtlasCluster: (%v)", err)
+	}
+	assert.Equal(t, "IDLE", cr.Status.StateName, "stateName not as expected")
 }
