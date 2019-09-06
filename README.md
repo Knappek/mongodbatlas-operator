@@ -3,7 +3,6 @@
 [![Build Status](https://cloud.drone.io/api/badges/Knappek/mongodbatlas-operator/status.svg)](https://cloud.drone.io/Knappek/mongodbatlas-operator)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Knappek/mongodbatlas-operator)](https://goreportcard.com/report/github.com/Knappek/mongodbatlas-operator)
 [![codecov](https://codecov.io/gh/Knappek/mongodbatlas-operator/branch/master/graph/badge.svg)](https://codecov.io/gh/Knappek/mongodbatlas-operator)
-[![Known Vulnerabilities](https://snyk.io//test/github/Knappek/mongodbatlas-operator/badge.svg?targetFile=Gopkg.lock)](https://snyk.io//test/github/Knappek/mongodbatlas-operator?targetFile=Gopkg.lock)
 
 ## Overview
 
