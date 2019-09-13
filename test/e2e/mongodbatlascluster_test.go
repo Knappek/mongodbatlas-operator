@@ -26,18 +26,20 @@ func MongoDBAtlasCluster(t *testing.T, ctx *framework.TestCtx, f *framework.Fram
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasClusterSpec{
 			ProjectName: atlasProjectName,
-			ProviderSettings: ma.ProviderSettings{
-				ProviderName:     "AWS",
-				RegionName:       "EU_CENTRAL_1",
-				InstanceSizeName: "M10",
-				EncryptEBSVolume: false,
+			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
+				ProviderSettings:      ma.ProviderSettings{
+					ProviderName:     "AWS",
+					RegionName:       "EU_CENTRAL_1",
+					InstanceSizeName: "M10",
+					EncryptEBSVolume: false,
+				},
+				NumShards:             1,
+				AutoScaling:           ma.AutoScaling{
+					DiskGBEnabled: false,
+				},
+				BackupEnabled:         false,
+				ProviderBackupEnabled: false,
 			},
-			NumShards: 1,
-			AutoScaling: ma.AutoScaling{
-				DiskGBEnabled: false,
-			},
-			BackupEnabled:         false,
-			ProviderBackupEnabled: false,
 		},
 	}
 	err := f.Client.Create(goctx.TODO(), exampleMongoDBAtlasCluster, &framework.CleanupOptions{TestContext: ctx, Timeout: time.Minute * 10, RetryInterval: time.Second * 30})
@@ -45,20 +47,30 @@ func MongoDBAtlasCluster(t *testing.T, ctx *framework.TestCtx, f *framework.Fram
 		t.Fatal(err)
 	}
 
-	err = waitForMongoDBAtlasCluster(t, f, exampleMongoDBAtlasCluster)
+	err = waitForMongoDBAtlasCluster(t, f, exampleMongoDBAtlasCluster, "IDLE")
+	if err != nil {
+		t.Fatal(err)
+	}
+	
+	// update cluster
+	exampleMongoDBAtlasCluster.Spec.BackupEnabled = true
+	err = f.Client.Update(goctx.TODO(), exampleMongoDBAtlasCluster)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, "IDLE", exampleMongoDBAtlasCluster.Status.StateName, "The Cluster StateName is not IDLE")
+	err = waitForMongoDBAtlasCluster(t, f, exampleMongoDBAtlasCluster, "IDLE")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
-func waitForMongoDBAtlasCluster(t *testing.T, f *framework.Framework, p *knappekv1alpha1.MongoDBAtlasCluster) error {
+func waitForMongoDBAtlasCluster(t *testing.T, f *framework.Framework, p *knappekv1alpha1.MongoDBAtlasCluster, desiredState string) error {
 	retryInterval := time.Second * 30
 	timeout := time.Minute * 15
 	err := wait.Poll(retryInterval, timeout, func() (done bool, err error) {
 		err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: p.Name, Namespace: p.Namespace}, p)
-		return waitForManifestStatus(t, err, p.Name, p.Kind, p.Status.StateName, "CREATING")
+		return isInDesiredState(t, err, p.Name, p.Kind, p.Status.StateName, desiredState)
 	})
 	if err != nil {
 		return err

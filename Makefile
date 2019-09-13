@@ -79,20 +79,15 @@ cleanup:
 test:
 	go test ./pkg/controller/... -v -coverprofile=coverage.out -covermode=atomic
 
-inite2etest:
+e2etest: cleanup fmt lint
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
-		echo "ERROR: Export ATLAS_PRIVATE_KEY variable and then run init again. For example,"; \
+		echo "ERROR: Export ATLAS_PRIVATE_KEY variable and then run init again. For example:"; \
 		echo "  export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
 		echo "  make inite2etest"; \
 		exit 1; \
 	fi
-	kubectl create ns e2etest
-	kubectl -n e2etest create secret generic example-monogdb-atlas-project \
-    	--from-literal=privateKey=$(ATLAS_PRIVATE_KEY)
-
-e2etest: cleanup fmt lint
 	@if [ "$(ATLAS_PUBLIC_KEY)" = "" ]; then \
-		echo "ERROR: Export ATLAS_PUBLIC_KEY variable. For example,"; \
+		echo "ERROR: Export ATLAS_PUBLIC_KEY variable. For example:"; \
 		echo "  export ATLAS_PUBLIC_KEY=yyyyyy"; \
 		exit 1; \
 	fi
