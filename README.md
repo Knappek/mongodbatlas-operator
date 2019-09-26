@@ -39,7 +39,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 **Currently it supports**:
 
 * Create/Delete MongoDB Atlas Projects
-* Create/Delete MongoDB Atlas Clusters
+* Create/Update/Delete MongoDB Atlas Clusters
 
 ## Prerequisites
 
