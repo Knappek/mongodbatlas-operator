@@ -2,10 +2,9 @@ package e2e
 
 import (
 	goctx "context"
+	"fmt"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
@@ -27,14 +26,14 @@ func MongoDBAtlasCluster(t *testing.T, ctx *framework.TestCtx, f *framework.Fram
 		Spec: knappekv1alpha1.MongoDBAtlasClusterSpec{
 			ProjectName: atlasProjectName,
 			MongoDBAtlasClusterRequestBody: knappekv1alpha1.MongoDBAtlasClusterRequestBody{
-				ProviderSettings:      ma.ProviderSettings{
+				ProviderSettings: ma.ProviderSettings{
 					ProviderName:     "AWS",
 					RegionName:       "EU_CENTRAL_1",
 					InstanceSizeName: "M10",
 					EncryptEBSVolume: false,
 				},
-				NumShards:             1,
-				AutoScaling:           ma.AutoScaling{
+				NumShards: 1,
+				AutoScaling: ma.AutoScaling{
 					DiskGBEnabled: false,
 				},
 				BackupEnabled:         false,
@@ -42,27 +41,29 @@ func MongoDBAtlasCluster(t *testing.T, ctx *framework.TestCtx, f *framework.Fram
 			},
 		},
 	}
-	err := f.Client.Create(goctx.TODO(), exampleMongoDBAtlasCluster, &framework.CleanupOptions{TestContext: ctx, Timeout: time.Minute * 10, RetryInterval: time.Second * 30})
+	err := f.Client.Create(goctx.TODO(), exampleMongoDBAtlasCluster, &framework.CleanupOptions{TestContext: ctx, Timeout: time.Minute * 20, RetryInterval: time.Second * 30})
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	fmt.Printf("wait for creating the cluster: %v\n", exampleMongoDBAtlasCluster.ObjectMeta.Name)
 	err = waitForMongoDBAtlasCluster(t, f, exampleMongoDBAtlasCluster, "IDLE")
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+	fmt.Printf("cluster %v successfully created\n", exampleMongoDBAtlasCluster.ObjectMeta.Name)
+
 	// update cluster
-	exampleMongoDBAtlasCluster.Spec.BackupEnabled = true
+	exampleMongoDBAtlasCluster.Spec.AutoScaling.DiskGBEnabled = true
 	err = f.Client.Update(goctx.TODO(), exampleMongoDBAtlasCluster)
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	fmt.Printf("wait for updating the cluster: %v\n", exampleMongoDBAtlasCluster.ObjectMeta.Name)
 	err = waitForMongoDBAtlasCluster(t, f, exampleMongoDBAtlasCluster, "IDLE")
 	if err != nil {
 		t.Fatal(err)
 	}
+	fmt.Printf("cluster %v successfully updated\n", exampleMongoDBAtlasCluster.ObjectMeta.Name)
 }
 
 func waitForMongoDBAtlasCluster(t *testing.T, f *framework.Framework, p *knappekv1alpha1.MongoDBAtlasCluster, desiredState string) error {

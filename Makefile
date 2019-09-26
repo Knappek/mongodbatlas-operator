@@ -91,10 +91,12 @@ e2etest: cleanup fmt lint
 		echo "  export ATLAS_PUBLIC_KEY=yyyyyy"; \
 		exit 1; \
 	fi
+	kubectl create ns e2etest || true
 	operator-sdk test local ./test/e2e \
 		--namespace e2etest \
 		--up-local \
-		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID) -timeout 20m" 
+		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID) -timeout 30m"
+	kubectl delete ns e2etest
 
 fmt:
 	gofmt -w $(GOFMT_FILES)
