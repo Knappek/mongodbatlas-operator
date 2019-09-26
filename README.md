@@ -166,18 +166,10 @@ make test
 
 ### E2E Tests
 
-In order to run the end-to-end tests, you first have to create a namespace and a secret containing the private key of the programmatic API key pair which is needed by the Operator to perform API call against the MongoDB Atlas API.
-
-The following command will execute the corresponding `kubectl` commands for you
+Export the Programmatic API key pair and run the end-to-end tests with
 
 ```shell
 export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
-make inite2etest
-```
-
-Afterwards, you can run the end-to-end tests with
-
-```shell
 export ATLAS_PUBLIC_KEY=yyyyy
 make e2etest ORGANIZATION_ID=123456789
 ```
