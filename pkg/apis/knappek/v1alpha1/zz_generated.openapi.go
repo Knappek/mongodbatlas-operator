@@ -11,12 +11,15 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasCluster":       schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasCluster(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterSpec":   schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterStatus": schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProject":       schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProject(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectSpec":   schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectSpec(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectStatus": schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectStatus(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasCluster":            schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasCluster(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterSpec":        schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterStatus":      schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUser":       schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUser(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserSpec":   schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserStatus": schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProject":            schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProject(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectSpec":        schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectSpec(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectStatus":      schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectStatus(ref),
 	}
 }
 
@@ -262,6 +265,73 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref common.Refer
 		},
 		Dependencies: []string{
 			"github.com/akshaykarle/go-mongodbatlas/mongodbatlas.AutoScaling", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ProviderSettings", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.ReplicationSpec"},
+	}
+}
+
+func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUser(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MongoDBAtlasDatabaseUser is the Schema for the mongodbatlasdatabaseusers API",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserSpec", "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MongoDBAtlasDatabaseUserSpec defines the desired state of MongoDBAtlasDatabaseUser",
+				Properties:  map[string]spec.Schema{},
+			},
+		},
+		Dependencies: []string{},
+	}
+}
+
+func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MongoDBAtlasDatabaseUserStatus defines the observed state of MongoDBAtlasDatabaseUser",
+				Properties:  map[string]spec.Schema{},
+			},
+		},
+		Dependencies: []string{},
 	}
 }
 
