@@ -36,7 +36,7 @@ api:
 	operator-sdk add api --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
 
 controller:
-	./code-generation/controller-gen.sh --api-version v1alpha1 -k $(KIND)
+	./code-generation/controller-gen.sh --api-version v1alpha1 -k $(KIND) && gofmt -w $(GOFMT_FILES)
 
 .PHONY: build 
 build:

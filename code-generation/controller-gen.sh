@@ -58,4 +58,7 @@ mv substitued_values.go pkg/controller/add_${KIND_LOWERCASE}.go
 # handle kind_controller.gp.tmpl
 substitute_values kind_controller
 mv substitued_values.go pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller.go
+# handle kind_controller_test.gp.tmpl
+substitute_values kind_controller_test
+mv substitued_values.go pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller_test.go
 popd > /dev/null
