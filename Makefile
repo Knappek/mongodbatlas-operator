@@ -36,7 +36,7 @@ api:
 	operator-sdk add api --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
 
 controller:
-	operator-sdk add controller --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
+	./code-generation/controller-gen.sh --api-version v1alpha1 -k $(KIND)
 
 .PHONY: build 
 build:
