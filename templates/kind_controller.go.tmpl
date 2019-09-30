@@ -3,8 +3,6 @@ package _KIND_LOWERCASE_
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 	"reflect"
 	"time"
 
@@ -174,7 +172,7 @@ func (r *Reconcile_KIND_) Reconcile(request reconcile.Request) (reconcile.Result
 	}
 	err = r.client.Status().Update(context.TODO(), atlas_KIND_SHORT_)
 	if err != nil {
-		return err
+		return reconcile.Result{}, err
 	}
 
 	// Requeue to periodically reconcile the CR _KIND_ in order to recreate a manually deleted Atlas _KIND_SHORT_
@@ -186,6 +184,10 @@ func create_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API
 	//
 	// TODO
 	//
+	if err != nil {
+		return fmt.Errorf("Error creating _KIND_SHORT_ %v: %s", cr.Name, err)
+	}
+	reqLogger.Info("Sent request to create _KIND_SHORT_.", "_KIND_.GroupID", groupID)
 	return updateCRStatus(reqLogger, cr, c)
 }
 
@@ -194,6 +196,10 @@ func update_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API
 	//
 	// TODO
 	//
+	if err != nil {
+		return fmt.Errorf("Error updating _KIND_SHORT_ %v: %s", cr.Name, err)
+	}
+	reqLogger.Info("Sent request to update _KIND_SHORT_.", "_KIND_.GroupID", groupID)
 	return updateCRStatus(reqLogger, cr, c)
 }
 
@@ -202,22 +208,25 @@ func delete_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API
 	//
 	// TODO
 	//
+	if err != nil {
+		return fmt.Errorf("Error deleting _KIND_SHORT_ %v: %s", cr.Name, err)
+	}
+	reqLogger.Info("Sent request to delete _KIND_SHORT_.", "_KIND_.GroupID", groupID)
 	return nil
 }
 
-func get_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API_VERSION_._KIND_) error {
+func get_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API_VERSION_._KIND_) (*_KIND_SHORT_, *http.Response, error) {
 	//
 	// TODO
 	//
-	// Update CR Status
-	return updateCRStatus(reqLogger, cr, c)
+	return kindShort, resp, err
 }
 
 func updateCRStatus(reqLogger logr.Logger, cr *knappek_API_VERSION_._KIND_, c *ma._KIND_SHORT_) error {
 	// update status field in CR
-	cr.Status.ID = c.ID
-	cr.Status.GroupID = c.GroupID
-	cr.Status.Name = c.Name
+	cr.Status.ID = kindShort.ID
+	cr.Status.GroupID = kindShort.GroupID
+	cr.Status.Name = kindShort.Name
 	//
 	// TODO
 	//	

@@ -2,8 +2,6 @@ package mongodbatlasdatabaseuser
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 	"reflect"
 	"time"
 
@@ -78,9 +76,9 @@ type ReconcileMongoDBAtlasDatabaseUser struct {
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	// Fetch the MongoDBAtlasDatabaseUser atlasMongoDBAtlasDatabaseUserSHORT_
-	atlasMongoDBAtlasDatabaseUserSHORT_ := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, atlasMongoDBAtlasDatabaseUserSHORT_)
+	// Fetch the MongoDBAtlasDatabaseUser atlasDatabaseUser
+	atlasDatabaseUser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
+	err := r.client.Get(context.TODO(), request.NamespacedName, atlasDatabaseUser)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
@@ -92,11 +90,11 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 		return reconcile.Result{}, err
 	}
 
-	projectName := atlasMongoDBAtlasDatabaseUserSHORT_.Spec.ProjectName
+	projectName := atlasDatabaseUser.Spec.ProjectName
 	atlasProject := &knappekv1alpha1.MongoDBAtlasProject{}
 	atlasProjectNamespacedName := types.NamespacedName{
 		Name:      projectName,
-		Namespace: atlasMongoDBAtlasDatabaseUserSHORT_.Namespace,
+		Namespace: atlasDatabaseUser.Namespace,
 	}
 
 	err = r.client.Get(context.TODO(), atlasProjectNamespacedName, atlasProject)
@@ -109,7 +107,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "MongoDBAtlasDatabaseUser.Name", request.Name, "MongoDBAtlasDatabaseUser.GroupID", groupID)
 
 	// Check if the MongoDBAtlasDatabaseUser CR was marked to be deleted
-	isMongoDBAtlasDatabaseUserToBeDeleted := atlasMongoDBAtlasDatabaseUserSHORT_.GetDeletionTimestamp() != nil
+	isMongoDBAtlasDatabaseUserToBeDeleted := atlasDatabaseUser.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasDatabaseUserToBeDeleted {
 		// check if Delete request has already been sent to the MongoDB Atlas API
 		//
@@ -125,21 +123,21 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 	}
 
 	// Create a new MongoDBAtlasDatabaseUser
-	isMongoDBAtlasDatabaseUserToBeCreated := reflect.DeepEqual(atlasMongoDBAtlasDatabaseUserSHORT_.Status, knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{})
+	isMongoDBAtlasDatabaseUserToBeCreated := reflect.DeepEqual(atlasDatabaseUser.Status, knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{})
 	if isMongoDBAtlasDatabaseUserToBeCreated {
 		// check if Create request has already been sent to the MongoDB Atlas API
-		if atlasMongoDBAtlasDatabaseUserSHORT_.Status.StateName != "CREATING" {
-			err = createMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasMongoDBAtlasDatabaseUserSHORT_, atlasProject)
+		if atlasDatabaseUser.Status.StateName != "CREATING" {
+			err = createMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser, atlasProject)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-			atlasMongoDBAtlasDatabaseUserSHORT_.Status.StateName = "CREATING"
-			err = r.client.Status().Update(context.TODO(), atlasMongoDBAtlasDatabaseUserSHORT_)
+			atlasDatabaseUser.Status.StateName = "CREATING"
+			err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
 			// Add finalizer for this CR
-			if err := r.addFinalizer(reqLogger, atlasMongoDBAtlasDatabaseUserSHORT_); err != nil {
+			if err := r.addFinalizer(reqLogger, atlasDatabaseUser); err != nil {
 				return reconcile.Result{}, err
 			}
 			// Requeue after 30 seconds and check again for the status until CR can be deleted
@@ -148,16 +146,16 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 	}
 
 	// update existing MongoDBAtlasDatabaseUser
-	isMongoDBAtlasDatabaseUserToBeUpdated := knappekv1alpha1.IsMongoDBAtlasDatabaseUserToBeUpdated(atlasMongoDBAtlasDatabaseUserSHORT_.Spec.MongoDBAtlasDatabaseUserRequestBody, atlasMongoDBAtlasDatabaseUserSHORT_.Status.MongoDBAtlasDatabaseUserRequestBody)
+	isMongoDBAtlasDatabaseUserToBeUpdated := knappekv1alpha1.IsMongoDBAtlasDatabaseUserToBeUpdated(atlasDatabaseUser.Spec.MongoDBAtlasDatabaseUserRequestBody, atlasDatabaseUser.Status.MongoDBAtlasDatabaseUserRequestBody)
 	if isMongoDBAtlasDatabaseUserToBeUpdated {
 		// check if Update request has already been sent to the MongoDB Atlas API
-		if atlasMongoDBAtlasDatabaseUserSHORT_.Status.StateName != "UPDATING" {
-			err = updateMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasMongoDBAtlasDatabaseUserSHORT_, atlasProject)
+		if atlasDatabaseUser.Status.StateName != "UPDATING" {
+			err = updateMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser, atlasProject)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-			atlasMongoDBAtlasDatabaseUserSHORT_.Status.StateName = "UPDATING"
-			err = r.client.Status().Update(context.TODO(), atlasMongoDBAtlasDatabaseUserSHORT_)
+			atlasDatabaseUser.Status.StateName = "UPDATING"
+			err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
 			if err != nil {
 				return reconcile.Result{}, err
 			}
@@ -167,16 +165,16 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 	}
 
 	// if no Create/Update/Delete command apply, then fetch the status
-	err = getMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasMongoDBAtlasDatabaseUserSHORT_)
+	err = getMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	err = r.client.Status().Update(context.TODO(), atlasMongoDBAtlasDatabaseUserSHORT_)
+	err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
 	if err != nil {
-		return err
+		return reconcile.Result{}, err
 	}
 
-	// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas MongoDBAtlasDatabaseUserSHORT_
+	// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
 	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 }
 
@@ -185,6 +183,10 @@ func createMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Clien
 	//
 	// TODO
 	//
+	if err != nil {
+		return fmt.Errorf("Error creating DatabaseUser %v: %s", cr.Name, err)
+	}
+	reqLogger.Info("Sent request to create DatabaseUser.", "MongoDBAtlasDatabaseUser.GroupID", groupID)
 	return updateCRStatus(reqLogger, cr, c)
 }
 
@@ -193,6 +195,10 @@ func updateMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Clien
 	//
 	// TODO
 	//
+	if err != nil {
+		return fmt.Errorf("Error updating DatabaseUser %v: %s", cr.Name, err)
+	}
+	reqLogger.Info("Sent request to update DatabaseUser.", "MongoDBAtlasDatabaseUser.GroupID", groupID)
 	return updateCRStatus(reqLogger, cr, c)
 }
 
@@ -201,22 +207,25 @@ func deleteMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Clien
 	//
 	// TODO
 	//
+	if err != nil {
+		return fmt.Errorf("Error deleting DatabaseUser %v: %s", cr.Name, err)
+	}
+	reqLogger.Info("Sent request to delete DatabaseUser.", "MongoDBAtlasDatabaseUser.GroupID", groupID)
 	return nil
 }
 
-func getMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) error {
+func getMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) (*DatabaseUser, *http.Response, error) {
 	//
 	// TODO
 	//
-	// Update CR Status
-	return updateCRStatus(reqLogger, cr, c)
+	return kindShort, resp, err
 }
 
-func updateCRStatus(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser, c *ma.MongoDBAtlasDatabaseUserSHORT_) error {
+func updateCRStatus(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser, c *ma.DatabaseUser) error {
 	// update status field in CR
-	cr.Status.ID = c.ID
-	cr.Status.GroupID = c.GroupID
-	cr.Status.Name = c.Name
+	cr.Status.ID = kindShort.ID
+	cr.Status.GroupID = kindShort.GroupID
+	cr.Status.Name = kindShort.Name
 	//
 	// TODO
 	//
@@ -230,7 +239,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) addFinalizer(reqLogger logr.Logger, 
 		// Update CR
 		err := r.client.Update(context.TODO(), cr)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update MongoDBAtlasDatabaseUserSHORT_ with finalizer")
+			reqLogger.Error(err, "Failed to update DatabaseUser with finalizer")
 			return err
 		}
 	}

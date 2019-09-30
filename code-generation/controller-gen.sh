@@ -41,9 +41,9 @@ substitute_values() {
     KIND_LOWERCASE=$(echo $KIND | tr '[:upper:]' '[:lower:]')
     KIND_SHORT=$(echo $KIND | sed 's/MongoDBAtlas//g')
     sed 's/_KIND_LOWERCASE_/'${KIND_LOWERCASE}'/g' $line > kind_lower_replaced_line.tmp
-    sed 's/_KIND_/'${KIND}'/g' kind_lower_replaced_line.tmp > kind_replaced_line.tmp
-    sed 's/_KIND_SHORT_/'${KIND_SHORT}'/g' kind_replaced_line.tmp > kind_short_replaced_line.tmp
-    sed 's/_API_VERSION_/'${API_VERSION}'/g' kind_short_replaced_line.tmp > substitued_values.go
+    sed 's/_KIND_SHORT_/'${KIND_SHORT}'/g' kind_lower_replaced_line.tmp > kind_short_replaced_line.tmp
+    sed 's/_KIND_/'${KIND}'/g' kind_short_replaced_line.tmp > kind_replaced_line.tmp
+    sed 's/_API_VERSION_/'${API_VERSION}'/g' kind_replaced_line.tmp > substitued_values.go
     done < "$input"
     rm kind_lower_replaced_line.tmp kind_replaced_line.tmp kind_short_replaced_line.tmp
 }
