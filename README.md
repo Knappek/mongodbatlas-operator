@@ -176,6 +176,8 @@ make e2etest ORGANIZATION_ID=123456789
 
 ## Contributing
 
+I am working on this project in my spare time, hence feature development and release cycles could be improved ;). Contributors are welcome!
+
 Read through the [Contributing Guidelines and Code of Conduct](./CONTRIBUTING.md).
 
 ### Create new API
