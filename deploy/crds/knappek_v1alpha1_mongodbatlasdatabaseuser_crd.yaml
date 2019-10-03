@@ -67,38 +67,27 @@ spec:
           type: object
         status:
           properties:
-            results:
+            databaseName:
+              type: string
+            deleteAfterDate:
+              type: string
+            groupId:
+              type: string
+            password:
+              type: string
+            roles:
               items:
                 properties:
+                  collectionName:
+                    type: string
                   databaseName:
                     type: string
-                  deleteAfterDate:
-                    type: string
-                  groupId:
-                    type: string
-                  password:
-                    type: string
-                  roles:
-                    items:
-                      properties:
-                        collectionName:
-                          type: string
-                        databaseName:
-                          type: string
-                        roleName:
-                          type: string
-                      type: object
-                    type: array
-                  username:
+                  roleName:
                     type: string
                 type: object
               type: array
-            totalCount:
-              format: int64
-              type: integer
-          required:
-          - results
-          - totalCount
+            username:
+              type: string
           type: object
   version: v1alpha1
   versions:

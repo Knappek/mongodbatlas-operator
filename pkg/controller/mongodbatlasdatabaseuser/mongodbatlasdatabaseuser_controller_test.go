@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 	"testing"
 	"time"
 
@@ -62,7 +61,7 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
@@ -105,8 +104,8 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 		}`)
 	})
 
-	// Create a Reconcilemongodbatlasdatabaseuser object with the scheme and fake client.
-	r := &Reconcilemongodbatlasdatabaseuser{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a ReconcileMongoDBAtlasDatabaseUser object with the scheme and fake client.
+	r := &ReconcileMongoDBAtlasDatabaseUser{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -165,18 +164,21 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
-			GroupID: projectID,
-			Name:    resourceName,
 			//
-			// TODO
+			// TODO: some other read only values
 			//
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+				//
+				// TODO
+				//
+			},
 		},
 	}
 
@@ -204,8 +206,8 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 		fmt.Fprintf(w, `{}`)
 	})
 
-	// Create a Reconcilemongodbatlasdatabaseuser object with the scheme and fake client.
-	r := &Reconcilemongodbatlasdatabaseuser{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a ReconcileMongoDBAtlasDatabaseUser object with the scheme and fake client.
+	r := &ReconcileMongoDBAtlasDatabaseUser{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -228,8 +230,6 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)
 	}
 
-	assert.Equal(t, "DELETING", cr.Status.StateName, "clusterID not as expected")
-
 	httpClient2, mux2, server2 := testutil.Server()
 	defer server2.Close()
 	atlasClient2 := ma.NewClient(httpClient2)
@@ -239,8 +239,8 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	})
 
-	// Create a Reconcilemongodbatlasdatabaseuser object with the scheme and fake client.
-	r2 := &Reconcilemongodbatlasdatabaseuser{client: k8sClient, scheme: s, atlasClient: atlasClient2}
+	// Create a ReconcileMongoDBAtlasDatabaseUser object with the scheme and fake client.
+	r2 := &ReconcileMongoDBAtlasDatabaseUser{client: k8sClient, scheme: s, atlasClient: atlasClient2}
 
 	res2, err := r2.Reconcile(req)
 	if err != nil {
@@ -291,18 +291,21 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
-			GroupID: projectID,
-			Name:    clusterName,
 			//
-			// TODO
+			// TODO: some other read only values
 			//
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+				//
+				// TODO
+				//
+			},
 		},
 	}
 
@@ -333,8 +336,8 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 			//
 		}`)
 	})
-	// Create a Reconcilemongodbatlasdatabaseuser object with the scheme and fake client.
-	r := &Reconcilemongodbatlasdatabaseuser{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a ReconcileMongoDBAtlasDatabaseUser object with the scheme and fake client.
+	r := &ReconcileMongoDBAtlasDatabaseUser{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -392,19 +395,17 @@ func TestNoUpdatemongodbatlasdatabaseuser(t *testing.T) {
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO: minimum requirements for the spec
 				//
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
-			GroupID: projectID,
-			Name:    resourceName,
 			//
 			// TODO: some other read only values
 			//
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
@@ -439,8 +440,8 @@ func TestNoUpdatemongodbatlasdatabaseuser(t *testing.T) {
 			//
 		}`)
 	})
-	// Create a Reconcilemongodbatlasdatabaseuser object with the scheme and fake client.
-	r := &Reconcilemongodbatlasdatabaseuser{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a ReconcileMongoDBAtlasDatabaseUser object with the scheme and fake client.
+	r := &ReconcileMongoDBAtlasDatabaseUser{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .

@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 	"testing"
 	"time"
 
@@ -63,7 +62,7 @@ func TestCreate_KIND_LOWERCASE_(t *testing.T) {
 		},
 		Spec: knappek_API_VERSION_._KIND_Spec{
 			ProjectName: projectName,
-			_KIND_LOWERCASE_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
 				//
 				// TODO
 				//
@@ -106,8 +105,8 @@ func TestCreate_KIND_LOWERCASE_(t *testing.T) {
 		}`)
 	})
 
-	// Create a Reconcile_KIND_LOWERCASE_ object with the scheme and fake client.
-	r := &Reconcile_KIND_LOWERCASE_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a Reconcile_KIND_ object with the scheme and fake client.
+	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -166,18 +165,21 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 		},
 		Spec: knappek_API_VERSION_._KIND_Spec{
 			ProjectName: projectName,
-			_KIND_LOWERCASE_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
 				//
 				// TODO
 				//
 			},
 		},
 		Status: knappek_API_VERSION_._KIND_Status{
-			GroupID:   projectID,
-			Name:      resourceName,
 			//
-			// TODO
+			// TODO: some other read only values
 			//
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+				//
+				// TODO
+				//
+			},
 		},
 	}
 
@@ -205,8 +207,8 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 		fmt.Fprintf(w, `{}`)
 	})
 
-	// Create a Reconcile_KIND_LOWERCASE_ object with the scheme and fake client.
-	r := &Reconcile_KIND_LOWERCASE_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a Reconcile_KIND_ object with the scheme and fake client.
+	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -229,8 +231,6 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 		t.Fatalf("get _KIND_LOWERCASE_: (%v)", err)
 	}
 
-	assert.Equal(t, "DELETING", cr.Status.StateName, "clusterID not as expected")
-
 	httpClient2, mux2, server2 := testutil.Server()
 	defer server2.Close()
 	atlasClient2 := ma.NewClient(httpClient2)
@@ -240,8 +240,8 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	})
 
-	// Create a Reconcile_KIND_LOWERCASE_ object with the scheme and fake client.
-	r2 := &Reconcile_KIND_LOWERCASE_{client: k8sClient, scheme: s, atlasClient: atlasClient2}
+	// Create a Reconcile_KIND_ object with the scheme and fake client.
+	r2 := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient2}
 
 	res2, err := r2.Reconcile(req)
 	if err != nil {
@@ -292,18 +292,21 @@ func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
 		},
 		Spec: knappek_API_VERSION_._KIND_Spec{
 			ProjectName: projectName,
-			_KIND_LOWERCASE_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
 				//
 				// TODO
 				//
 			},
 		},
 		Status: knappek_API_VERSION_._KIND_Status{
-			GroupID:        projectID,
-			Name:           clusterName,
 			//
-			// TODO
+			// TODO: some other read only values
 			//
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+				//
+				// TODO
+				//
+			},
 		},
 	}
 
@@ -334,8 +337,8 @@ func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
 			//
 		}`)
 	})
-	// Create a Reconcile_KIND_LOWERCASE_ object with the scheme and fake client.
-	r := &Reconcile_KIND_LOWERCASE_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a Reconcile_KIND_ object with the scheme and fake client.
+	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -393,19 +396,17 @@ func TestNoUpdate_KIND_LOWERCASE_(t *testing.T) {
 		},
 		Spec: knappek_API_VERSION_._KIND_Spec{
 			ProjectName: projectName,
-			_KIND_LOWERCASE_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
 				//
 				// TODO: minimum requirements for the spec
 				//
 			},
 		},
 		Status: knappek_API_VERSION_._KIND_Status{
-			GroupID:        projectID,
-			Name:           resourceName,
 			//
 			// TODO: some other read only values
 			//
-			_KIND_LOWERCASE_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
 				//
 				// TODO
 				//
@@ -440,8 +441,8 @@ func TestNoUpdate_KIND_LOWERCASE_(t *testing.T) {
 			//
 		}`)
 	})
-	// Create a Reconcile_KIND_LOWERCASE_ object with the scheme and fake client.
-	r := &Reconcile_KIND_LOWERCASE_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	// Create a Reconcile_KIND_ object with the scheme and fake client.
+	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .

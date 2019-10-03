@@ -9,7 +9,12 @@ import (
 
 // MongoDBAtlasDatabaseUserRequestBody defines the Request Body Parameters when creating/updating a database user
 type MongoDBAtlasDatabaseUserRequestBody struct {
-	ma.DatabaseUser `json:",inline"`
+	GroupID         string    `json:"groupId,omitempty"`
+	Username        string    `json:"username,omitempty"`
+	Password        string    `json:"password,omitempty"`
+	DatabaseName    string    `json:"databaseName,omitempty"`
+	DeleteAfterDate string    `json:"deleteAfterDate,omitempty"`
+	Roles           []ma.Role `json:"roles,omitempty"`
 }
 
 // MongoDBAtlasDatabaseUserSpec defines the desired state of MongoDBAtlasDatabaseUser
@@ -22,8 +27,7 @@ type MongoDBAtlasDatabaseUserSpec struct {
 // MongoDBAtlasDatabaseUserStatus defines the observed state of MongoDBAtlasDatabaseUser
 // +k8s:openapi-gen=true
 type MongoDBAtlasDatabaseUserStatus struct {
-	Results    []ma.DatabaseUser `json:"results"`
-	TotalCount int               `json:"totalCount"`
+	MongoDBAtlasDatabaseUserRequestBody `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
