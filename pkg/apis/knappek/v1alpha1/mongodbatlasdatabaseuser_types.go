@@ -1,33 +1,38 @@
 package v1alpha1
 
 import (
+	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
+// MongoDBAtlasDatabaseUserRequestBody defines the Request Body Parameters when creating/updating a database user
+type MongoDBAtlasDatabaseUserRequestBody struct {
+	ma.DatabaseUser `json:",inline"`
+}
 
 // MongoDBAtlasDatabaseUserSpec defines the desired state of MongoDBAtlasDatabaseUser
 // +k8s:openapi-gen=true
 type MongoDBAtlasDatabaseUserSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+	MongoDBAtlasDatabaseUserRequestBody `json:",inline"`
 }
 
 // MongoDBAtlasDatabaseUserStatus defines the observed state of MongoDBAtlasDatabaseUser
 // +k8s:openapi-gen=true
 type MongoDBAtlasDatabaseUserStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+	Results    []ma.DatabaseUser `json:"results"`
+	TotalCount int               `json:"totalCount"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // MongoDBAtlasDatabaseUser is the Schema for the mongodbatlasdatabaseusers API
 // +k8s:openapi-gen=true
+// +kubebuilder:printcolumn:name="Project Name",type="string",JSONPath=".spec.projectName",description="The MongoDB Atlas Project to which the database user has access to"
 // +kubebuilder:subresource:status
+// +kubebuilder:resource:path=mongodbatlasdatabaseusers,shortName=madbuser
+// +kubebuilder:categories=all,mongodbatlas
 type MongoDBAtlasDatabaseUser struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

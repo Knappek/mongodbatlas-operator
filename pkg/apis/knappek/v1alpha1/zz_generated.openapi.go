@@ -316,10 +316,54 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref common.Re
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "MongoDBAtlasDatabaseUserSpec defines the desired state of MongoDBAtlasDatabaseUser",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"groupId": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"username": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"password": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"databaseName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"deleteAfterDate": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"roles": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Role"),
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
-		Dependencies: []string{},
+		Dependencies: []string{
+			"github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Role"},
 	}
 }
 
@@ -328,10 +372,31 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref common.
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "MongoDBAtlasDatabaseUserStatus defines the observed state of MongoDBAtlasDatabaseUser",
-				Properties:  map[string]spec.Schema{},
+				Properties: map[string]spec.Schema{
+					"results": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.DatabaseUser"),
+									},
+								},
+							},
+						},
+					},
+					"totalCount": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+				},
+				Required: []string{"results", "totalCount"},
 			},
 		},
-		Dependencies: []string{},
+		Dependencies: []string{
+			"github.com/akshaykarle/go-mongodbatlas/mongodbatlas.DatabaseUser"},
 	}
 }
 
