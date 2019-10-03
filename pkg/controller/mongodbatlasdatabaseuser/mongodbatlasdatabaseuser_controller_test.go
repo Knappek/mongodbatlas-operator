@@ -55,14 +55,14 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	}
 
 	// A mongodbatlasdatabaseuser resource with metadata and spec.
-	mongodbatlasdatabaseuser := &knappekv1alpha1.mongodbatlasdatabaseuser{
+	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      resourceName,
 			Namespace: namespace,
 		},
-		Spec: knappekv1alpha1.mongodbatlasdatabaseuserSpec{
+		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.mongodbatlasdatabaseuserRequestBody{
+			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
@@ -123,7 +123,7 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Equal(t, time.Second*30, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
-	cr := &knappekv1alpha1.mongodbatlasdatabaseuser{}
+	cr := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	if err != nil {
 		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)
@@ -156,22 +156,22 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 	}
 
 	// A mongodbatlasdatabaseuser resource with metadata and spec.
-	mongodbatlasdatabaseuser := &knappekv1alpha1.mongodbatlasdatabaseuser{
+	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              resourceName,
 			Namespace:         namespace,
 			DeletionTimestamp: &metav1.Time{Time: time.Now()},
 			Finalizers:        []string{"finalizer.knappek.com"},
 		},
-		Spec: knappekv1alpha1.mongodbatlasdatabaseuserSpec{
+		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.mongodbatlasdatabaseuserRequestBody{
+			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
 			},
 		},
-		Status: knappekv1alpha1.mongodbatlasdatabaseuserStatus{
+		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
 			GroupID: projectID,
 			Name:    resourceName,
 			//
@@ -222,7 +222,7 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Equal(t, time.Second*20, res.RequeueAfter)
 
 	// Check if the CR has been updated and has the correct status.
-	cr := &knappekv1alpha1.mongodbatlasdatabaseuser{}
+	cr := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	if err != nil {
 		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)
@@ -247,7 +247,7 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 		t.Fatalf("reconcile: (%v)", err)
 	}
 	assert.Equal(t, reconcile.Result{}, res2)
-	cr = &knappekv1alpha1.mongodbatlasdatabaseuser{}
+	cr = &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	if err != nil {
 		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)
@@ -284,20 +284,20 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 	//
 
 	// A mongodbatlasdatabaseuser resource with metadata and spec.
-	mongodbatlasdatabaseuser := &knappekv1alpha1.mongodbatlasdatabaseuser{
+	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      resourceName,
 			Namespace: namespace,
 		},
-		Spec: knappekv1alpha1.mongodbatlasdatabaseuserSpec{
+		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.mongodbatlasdatabaseuserRequestBody{
+			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
 			},
 		},
-		Status: knappekv1alpha1.mongodbatlasdatabaseuserStatus{
+		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
 			GroupID: projectID,
 			Name:    clusterName,
 			//
@@ -351,7 +351,7 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Equal(t, time.Second*30, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
-	cr := &knappekv1alpha1.mongodbatlasdatabaseuser{}
+	cr := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	if err != nil {
 		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)
@@ -385,26 +385,26 @@ func TestNoUpdatemongodbatlasdatabaseuser(t *testing.T) {
 
 	// A mongodbatlasdatabaseuser resource with metadata and spec. This Spec contains only the bare minimum, other values
 	// will be filled with default values
-	mongodbatlasdatabaseuser := &knappekv1alpha1.mongodbatlasdatabaseuser{
+	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      resourceName,
 			Namespace: namespace,
 		},
-		Spec: knappekv1alpha1.mongodbatlasdatabaseuserSpec{
+		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName:                         projectName,
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.mongodbatlasdatabaseuserRequestBody{
+			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO: minimum requirements for the spec
 				//
 			},
 		},
-		Status: knappekv1alpha1.mongodbatlasdatabaseuserStatus{
+		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
 			GroupID: projectID,
 			Name:    resourceName,
 			//
 			// TODO: some other read only values
 			//
-			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.mongodbatlasdatabaseuserRequestBody{
+			mongodbatlasdatabaseuserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
 				//
 				// TODO
 				//
@@ -457,7 +457,7 @@ func TestNoUpdatemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Equal(t, time.Second*30, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
-	cr := &knappekv1alpha1.mongodbatlasdatabaseuser{}
+	cr := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	if err != nil {
 		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)

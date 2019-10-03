@@ -47,6 +47,8 @@ spec:
               type: string
             password:
               type: string
+            projectName:
+              type: string
             roles:
               items:
                 properties:
@@ -60,6 +62,8 @@ spec:
               type: array
             username:
               type: string
+          required:
+          - projectName
           type: object
         status:
           properties:

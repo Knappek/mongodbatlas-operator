@@ -15,6 +15,7 @@ type MongoDBAtlasDatabaseUserRequestBody struct {
 // MongoDBAtlasDatabaseUserSpec defines the desired state of MongoDBAtlasDatabaseUser
 // +k8s:openapi-gen=true
 type MongoDBAtlasDatabaseUserSpec struct {
+	ProjectName                         string `json:"projectName,project"`
 	MongoDBAtlasDatabaseUserRequestBody `json:",inline"`
 }
 

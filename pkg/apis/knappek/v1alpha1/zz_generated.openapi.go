@@ -317,6 +317,12 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref common.Re
 			SchemaProps: spec.SchemaProps{
 				Description: "MongoDBAtlasDatabaseUserSpec defines the desired state of MongoDBAtlasDatabaseUser",
 				Properties: map[string]spec.Schema{
+					"projectName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
 					"groupId": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
@@ -360,6 +366,7 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref common.Re
 						},
 					},
 				},
+				Required: []string{"projectName"},
 			},
 		},
 		Dependencies: []string{
