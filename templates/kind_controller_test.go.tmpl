@@ -37,22 +37,7 @@ func TestCreate_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappek_API_VERSION_.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappek_API_VERSION_.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappek_API_VERSION_.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 0,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// A _KIND_LOWERCASE_ resource with metadata and spec.
 	_KIND_LOWERCASE_ := &knappek_API_VERSION_._KIND_{
@@ -138,22 +123,7 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappek_API_VERSION_.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappek_API_VERSION_.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappek_API_VERSION_.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 0,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// A _KIND_LOWERCASE_ resource with metadata and spec.
 	_KIND_LOWERCASE_ := &knappek_API_VERSION_._KIND_{
@@ -262,22 +232,7 @@ func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappek_API_VERSION_.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappek_API_VERSION_.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappek_API_VERSION_.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 1,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// updates
 	//
@@ -370,22 +325,7 @@ func TestNoUpdate_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappek_API_VERSION_.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappek_API_VERSION_.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappek_API_VERSION_.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 1,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// A _KIND_LOWERCASE_ resource with metadata and spec. This Spec contains only the bare minimum, other values
 	// will be filled with default values

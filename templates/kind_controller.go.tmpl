@@ -5,6 +5,8 @@ import (
 	"context"
 	"reflect"
 	"time"
+	"net/http"
+	"fmt"
 
 	knappek_API_VERSION_ "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/_API_VERSION_"
 	"github.com/Knappek/mongodbatlas-operator/pkg/config"
@@ -126,43 +128,35 @@ func (r *Reconcile_KIND_) Reconcile(request reconcile.Request) (reconcile.Result
 	// Create a new _KIND_
 	is_KIND_ToBeCreated := reflect.DeepEqual(atlas_KIND_SHORT_.Status, knappek_API_VERSION_._KIND_Status{})
 	if is_KIND_ToBeCreated {
-		// check if Create request has already been sent to the MongoDB Atlas API
-		if atlas_KIND_SHORT_.Status.StateName != "CREATING" {
-			err = create_KIND_(reqLogger, r.atlasClient, atlas_KIND_SHORT_, atlasProject)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			atlas_KIND_SHORT_.Status.StateName = "CREATING"
-			err = r.client.Status().Update(context.TODO(), atlas_KIND_SHORT_)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			// Add finalizer for this CR
-			if err := r.addFinalizer(reqLogger, atlas_KIND_SHORT_); err != nil {
-				return reconcile.Result{}, err
-			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		err = create_KIND_(reqLogger, r.atlasClient, atlas_KIND_SHORT_, atlasProject)
+		if err != nil {
+			return reconcile.Result{}, err
 		}
+		err = r.client.Status().Update(context.TODO(), atlas_KIND_SHORT_)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		// Add finalizer for this CR
+		if err := r.addFinalizer(reqLogger, atlas_KIND_SHORT_); err != nil {
+			return reconcile.Result{}, err
+		}
+		// Requeue after 30 seconds and check again for the status until CR can be deleted
+		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 
 	// update existing _KIND_
 	is_KIND_ToBeUpdated := knappek_API_VERSION_.Is_KIND_ToBeUpdated(atlas_KIND_SHORT_.Spec._KIND_RequestBody, atlas_KIND_SHORT_.Status._KIND_RequestBody)
 	if is_KIND_ToBeUpdated {
-		// check if Update request has already been sent to the MongoDB Atlas API
-		if atlas_KIND_SHORT_.Status.StateName != "UPDATING" {
-			err = update_KIND_(reqLogger, r.atlasClient, atlas_KIND_SHORT_, atlasProject)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			atlas_KIND_SHORT_.Status.StateName = "UPDATING"
-			err = r.client.Status().Update(context.TODO(), atlas_KIND_SHORT_)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		err = update_KIND_(reqLogger, r.atlasClient, atlas_KIND_SHORT_, atlasProject)
+		if err != nil {
+			return reconcile.Result{}, err
 		}
+		err = r.client.Status().Update(context.TODO(), atlas_KIND_SHORT_)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		// Requeue after 30 seconds and check again for the status until CR can be deleted
+		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 
 	// if no Create/Update/Delete command apply, then fetch the status
@@ -181,52 +175,81 @@ func (r *Reconcile_KIND_) Reconcile(request reconcile.Request) (reconcile.Result
 
 func create_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API_VERSION_._KIND_, ap *knappek_API_VERSION_.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
-	//
-	// TODO
-	//
+	name := cr.Name
+	params := get_KIND_SHORT_Params(cr)
+	c, resp, err := atlasClient._KIND_SHORT_s.Create(groupID, &params)
 	if err != nil {
-		return fmt.Errorf("Error creating _KIND_SHORT_ %v: %s", cr.Name, err)
+		return fmt.Errorf("Error creating _KIND_SHORT_ %v: %s", name, err)
 	}
-	reqLogger.Info("Sent request to create _KIND_SHORT_.", "_KIND_.GroupID", groupID)
-	return updateCRStatus(reqLogger, cr, c)
+	if resp.StatusCode == http.StatusOK {
+		reqLogger.Info("_KIND_SHORT_ created.")
+		return updateCRStatus(reqLogger, cr, c)
+	}
+	return fmt.Errorf("(%v) Error creating _KIND_SHORT_ %s: %s", resp.StatusCode, name, err)
 }
 
 func update_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API_VERSION_._KIND_, ap *knappek_API_VERSION_.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
-	//
-	// TODO
-	//
+	name := cr.Name
+	params := get_KIND_SHORT_Params(cr)
+	c, resp, err := atlasClient._KIND_SHORT_s.Update(groupID, name, &params)
 	if err != nil {
-		return fmt.Errorf("Error updating _KIND_SHORT_ %v: %s", cr.Name, err)
+		return fmt.Errorf("Error updating _KIND_SHORT_ %v: %s", name, err)
 	}
-	reqLogger.Info("Sent request to update _KIND_SHORT_.", "_KIND_.GroupID", groupID)
-	return updateCRStatus(reqLogger, cr, c)
+	if resp.StatusCode == http.StatusOK {
+		reqLogger.Info("_KIND_SHORT_ updated.")
+		return updateCRStatus(reqLogger, cr, c)
+	}
+	return fmt.Errorf("(%v) Error updating _KIND_SHORT_ %s: %s", resp.StatusCode, name, err)
 }
 
 func delete_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API_VERSION_._KIND_) error {
 	groupID := cr.Status.GroupID
-	//
-	// TODO
-	//
+	name := cr.Name
+	// cluster exists and can be deleted
+	resp, err := atlasClient._KIND_SHORT_s.Delete(groupID, name)
 	if err != nil {
-		return fmt.Errorf("Error deleting _KIND_SHORT_ %v: %s", cr.Name, err)
+		if resp.StatusCode == http.StatusNotFound {
+			reqLogger.Info("_KIND_SHORT_ does not exist in Atlas. Deleting CR.")
+			// CR can be deleted - Requeue
+			return nil
+		}
+		return fmt.Errorf("(%v) Error deleting _KIND_SHORT_ %s: %s", resp.StatusCode, name, err)
 	}
-	reqLogger.Info("Sent request to delete _KIND_SHORT_.", "_KIND_.GroupID", groupID)
+	if resp.StatusCode == http.StatusOK {
+		reqLogger.Info("Sent request to delete _KIND_SHORT_.")
+		return nil
+	}
+	return fmt.Errorf("(%v) Error deleting _KIND_SHORT_ %s: %s", resp.StatusCode, name, err)
+}
+
+func get_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API_VERSION_._KIND_) error {
+	groupID := cr.Status.GroupID
+	name := cr.Name
+	c, resp, err := atlasClient._KIND_SHORT_s.Get(groupID, name)
+	if err != nil {
+		return fmt.Errorf("(%v) Error fetching _KIND_SHORT_ information %s: %s", resp.StatusCode, name, err)
+	}
+	err = updateCRStatus(reqLogger, cr, c)
+	if err != nil {
+		return fmt.Errorf("Error updating _KIND_SHORT_ CR Status: %s", err)
+	}
 	return nil
 }
 
-func get_KIND_(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappek_API_VERSION_._KIND_) (*_KIND_SHORT_, *http.Response, error) {
-	//
-	// TODO
-	//
-	return kindShort, resp, err
+func get_KIND_SHORT_Params(cr *knappek_API_VERSION_._KIND_) ma._KIND_SHORT_ {
+	return ma._KIND_SHORT_{
+		//
+		// TODO
+		//
+	}
 }
 
 func updateCRStatus(reqLogger logr.Logger, cr *knappek_API_VERSION_._KIND_, c *ma._KIND_SHORT_) error {
 	// update status field in CR
-	cr.Status.ID = kindShort.ID
-	cr.Status.GroupID = kindShort.GroupID
-	cr.Status.Name = kindShort.Name
+	cr.Status.ID = c.ID
+	cr.Status.GroupID = c.GroupID
+	cr.Status.Name = c.Name
 	//
 	// TODO
 	//	
