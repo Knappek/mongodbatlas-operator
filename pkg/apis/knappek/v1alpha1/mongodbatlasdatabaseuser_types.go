@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"github.com/Knappek/mongodbatlas-operator/pkg/util"
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -9,11 +10,9 @@ import (
 
 // MongoDBAtlasDatabaseUserRequestBody defines the Request Body Parameters when creating/updating a database user
 type MongoDBAtlasDatabaseUserRequestBody struct {
-	GroupID         string    `json:"groupId,omitempty"`
-	Username        string    `json:"username,omitempty"`
 	Password        string    `json:"password,omitempty"`
-	DatabaseName    string    `json:"databaseName,omitempty"`
 	DeleteAfterDate string    `json:"deleteAfterDate,omitempty"`
+	DatabaseName    string    `json:"databaseName,omitempty"`
 	Roles           []ma.Role `json:"roles,omitempty"`
 }
 
@@ -27,7 +26,21 @@ type MongoDBAtlasDatabaseUserSpec struct {
 // MongoDBAtlasDatabaseUserStatus defines the observed state of MongoDBAtlasDatabaseUser
 // +k8s:openapi-gen=true
 type MongoDBAtlasDatabaseUserStatus struct {
-	MongoDBAtlasDatabaseUserRequestBody `json:",inline"`
+	GroupID         string    `json:"groupID,omitempty"`
+	Username        string    `json:"username,omitempty"`
+	DatabaseName    string    `json:"databaseName,omitempty"`
+	Roles           []ma.Role `json:"roles,omitempty"`
+	Links           string    `json:"links,omitempty"`
+}
+
+// IsMongoDBAtlasDatabaseUserToBeUpdated is used to compare spec.MongoDBAtlasDatabaseUserRequestBody with status.MongoDBAtlasDatabaseUserRequestBody
+func IsMongoDBAtlasDatabaseUserToBeUpdated(m1 MongoDBAtlasDatabaseUserRequestBody, m2 MongoDBAtlasDatabaseUserStatus) bool {
+	if m1.DatabaseName != m2.DatabaseName {
+		if !util.IsZeroValue(m1.DatabaseName) {
+			return true
+		}
+	}
+	return false
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

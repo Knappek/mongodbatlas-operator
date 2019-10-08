@@ -43,8 +43,6 @@ spec:
               type: string
             deleteAfterDate:
               type: string
-            groupId:
-              type: string
             password:
               type: string
             projectName:
@@ -60,8 +58,6 @@ spec:
                     type: string
                 type: object
               type: array
-            username:
-              type: string
           required:
           - projectName
           type: object
@@ -69,11 +65,9 @@ spec:
           properties:
             databaseName:
               type: string
-            deleteAfterDate:
+            groupID:
               type: string
-            groupId:
-              type: string
-            password:
+            links:
               type: string
             roles:
               items:

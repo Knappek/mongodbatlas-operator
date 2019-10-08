@@ -2,7 +2,9 @@ package v1alpha1
 
 import (
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
+	"github.com/Knappek/mongodbatlas-operator/pkg/util"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -61,99 +63,80 @@ type MongoDBAtlasClusterRequestBody struct {
 func IsMongoDBAtlasClusterToBeUpdated(m1 MongoDBAtlasClusterRequestBody, m2 MongoDBAtlasClusterRequestBody) bool {
 	region := m1.ProviderSettings.RegionName
 	if m1.MongoDBMajorVersion != m2.MongoDBMajorVersion {
-		if !isZeroValue(m1.MongoDBMajorVersion) {
+		if !util.IsZeroValue(m1.MongoDBMajorVersion) {
 			return true
 		}
 	}
 	if m1.DiskSizeGB != m2.DiskSizeGB {
-		if !isZeroValue(m1.DiskSizeGB) {
+		if !util.IsZeroValue(m1.DiskSizeGB) {
 			return true
 		}
 	}
 	if m1.BackupEnabled != m2.BackupEnabled {
-		if !isZeroValue(m1.BackupEnabled) {
+		if !util.IsZeroValue(m1.BackupEnabled) {
 			return true
 		}
 	}
 	if m1.ReplicationSpec[region].Priority != m2.ReplicationSpec[region].Priority {
-		if !isZeroValue(m1.ReplicationSpec[region].Priority) {
+		if !util.IsZeroValue(m1.ReplicationSpec[region].Priority) {
 			return true
 		}
 	}
 	if m1.ReplicationSpec[region].ElectableNodes != m2.ReplicationSpec[region].ElectableNodes {
-		if !isZeroValue(m1.ReplicationSpec[region].ElectableNodes) {
+		if !util.IsZeroValue(m1.ReplicationSpec[region].ElectableNodes) {
 			return true
 		}
 	}
 	if m1.ReplicationSpec[region].ReadOnlyNodes != m2.ReplicationSpec[region].ReadOnlyNodes {
-		if !isZeroValue(m1.ReplicationSpec[region].ReadOnlyNodes) {
+		if !util.IsZeroValue(m1.ReplicationSpec[region].ReadOnlyNodes) {
 			return true
 		}
 	}
 	if m1.ReplicationSpec[region].AnalyticsNodes != m2.ReplicationSpec[region].AnalyticsNodes {
-		if !isZeroValue(m1.ReplicationSpec[region].AnalyticsNodes) {
+		if !util.IsZeroValue(m1.ReplicationSpec[region].AnalyticsNodes) {
 			return true
 		}
 	}
 	if m1.NumShards != m2.NumShards {
-		if !isZeroValue(m1.NumShards) {
+		if !util.IsZeroValue(m1.NumShards) {
 			return true
 		}
 	}
 	if m1.AutoScaling.DiskGBEnabled != m2.AutoScaling.DiskGBEnabled {
-		if !isZeroValue(m1.AutoScaling.DiskGBEnabled) {
+		if !util.IsZeroValue(m1.AutoScaling.DiskGBEnabled) {
 			return true
 		}
 	}
 	if m1.ProviderSettings.ProviderName != m2.ProviderSettings.ProviderName {
-		if !isZeroValue(m1.ProviderSettings.ProviderName) {
+		if !util.IsZeroValue(m1.ProviderSettings.ProviderName) {
 			return true
 		}
 	}
 	if m1.ProviderSettings.BackingProviderName != m2.ProviderSettings.BackingProviderName {
-		if !isZeroValue(m1.ProviderSettings.BackingProviderName) {
+		if !util.IsZeroValue(m1.ProviderSettings.BackingProviderName) {
 			return true
 		}
 	}
 	if m1.ProviderSettings.RegionName != m2.ProviderSettings.RegionName {
-		if !isZeroValue(m1.ProviderSettings.RegionName) {
+		if !util.IsZeroValue(m1.ProviderSettings.RegionName) {
 			return true
 		}
 	}
 	if m1.ProviderSettings.InstanceSizeName != m2.ProviderSettings.InstanceSizeName {
-		if !isZeroValue(m1.ProviderSettings.InstanceSizeName) {
+		if !util.IsZeroValue(m1.ProviderSettings.InstanceSizeName) {
 			return true
 		}
 	}
 	if m1.ProviderSettings.DiskIOPS != m2.ProviderSettings.DiskIOPS {
-		if !isZeroValue(m1.ProviderSettings.DiskIOPS) {
+		if !util.IsZeroValue(m1.ProviderSettings.DiskIOPS) {
 			return true
 		}
 	}
 	if m1.ProviderSettings.EncryptEBSVolume != m2.ProviderSettings.EncryptEBSVolume {
-		if !isZeroValue(m1.ProviderSettings.EncryptEBSVolume) {
+		if !util.IsZeroValue(m1.ProviderSettings.EncryptEBSVolume) {
 			return true
 		}
 	}
-	return false
-}
-
-func isZeroValue(i interface{}) bool {
-	if i == nil {
-		return true
-	} // nil interface
-	if i == "" {
-		return true
-	} // zero value of a string
-	if i == 0.0 {
-		return true
-	} // zero value of a float64
-	if i == 0 {
-		return true
-	} // zero value of an int
-	if i == false {
-		return true
-	} // zero value of a boolean
 	return false
 }
 

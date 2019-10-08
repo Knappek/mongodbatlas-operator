@@ -323,31 +323,19 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref common.Re
 							Format: "",
 						},
 					},
-					"groupId": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"username": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
 					"password": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
 						},
 					},
-					"databaseName": {
+					"deleteAfterDate": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
 						},
 					},
-					"deleteAfterDate": {
+					"databaseName": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -380,7 +368,7 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref common.
 			SchemaProps: spec.SchemaProps{
 				Description: "MongoDBAtlasDatabaseUserStatus defines the observed state of MongoDBAtlasDatabaseUser",
 				Properties: map[string]spec.Schema{
-					"groupId": {
+					"groupID": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -392,19 +380,7 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref common.
 							Format: "",
 						},
 					},
-					"password": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
 					"databaseName": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
-						},
-					},
-					"deleteAfterDate": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",
@@ -420,6 +396,12 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref common.
 									},
 								},
 							},
+						},
+					},
+					"links": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
 					},
 				},

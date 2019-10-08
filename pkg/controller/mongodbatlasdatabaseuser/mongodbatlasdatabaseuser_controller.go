@@ -2,6 +2,8 @@ package mongodbatlasdatabaseuser
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"reflect"
 	"time"
 
@@ -125,43 +127,35 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 	// Create a new MongoDBAtlasDatabaseUser
 	isMongoDBAtlasDatabaseUserToBeCreated := reflect.DeepEqual(atlasDatabaseUser.Status, knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{})
 	if isMongoDBAtlasDatabaseUserToBeCreated {
-		// check if Create request has already been sent to the MongoDB Atlas API
-		if atlasDatabaseUser.Status.StateName != "CREATING" {
-			err = createMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser, atlasProject)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			atlasDatabaseUser.Status.StateName = "CREATING"
-			err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			// Add finalizer for this CR
-			if err := r.addFinalizer(reqLogger, atlasDatabaseUser); err != nil {
-				return reconcile.Result{}, err
-			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		err = createMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser, atlasProject)
+		if err != nil {
+			return reconcile.Result{}, err
 		}
+		err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		// Add finalizer for this CR
+		if err := r.addFinalizer(reqLogger, atlasDatabaseUser); err != nil {
+			return reconcile.Result{}, err
+		}
+		// Requeue after 30 seconds and check again for the status until CR can be deleted
+		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 
 	// update existing MongoDBAtlasDatabaseUser
-	isMongoDBAtlasDatabaseUserToBeUpdated := knappekv1alpha1.IsMongoDBAtlasDatabaseUserToBeUpdated(atlasDatabaseUser.Spec.MongoDBAtlasDatabaseUserRequestBody, atlasDatabaseUser.Status.MongoDBAtlasDatabaseUserRequestBody)
+	isMongoDBAtlasDatabaseUserToBeUpdated := knappekv1alpha1.IsMongoDBAtlasDatabaseUserToBeUpdated(atlasDatabaseUser.Spec.MongoDBAtlasDatabaseUserRequestBody, atlasDatabaseUser.Status)
 	if isMongoDBAtlasDatabaseUserToBeUpdated {
-		// check if Update request has already been sent to the MongoDB Atlas API
-		if atlasDatabaseUser.Status.StateName != "UPDATING" {
-			err = updateMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser, atlasProject)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			atlasDatabaseUser.Status.StateName = "UPDATING"
-			err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
-			if err != nil {
-				return reconcile.Result{}, err
-			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		err = updateMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser, atlasProject)
+		if err != nil {
+			return reconcile.Result{}, err
 		}
+		err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		// Requeue after 30 seconds and check again for the status until CR can be deleted
+		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 
 	// if no Create/Update/Delete command apply, then fetch the status
@@ -180,55 +174,83 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 
 func createMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser, ap *knappekv1alpha1.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
-	//
-	// TODO
-	//
+	name := cr.Name
+	params := getDatabaseUserParams(cr)
+	c, resp, err := atlasClient.DatabaseUsers.Create(groupID, &params)
 	if err != nil {
-		return fmt.Errorf("Error creating DatabaseUser %v: %s", cr.Name, err)
+		return fmt.Errorf("(%v) Error creating DatabaseUser %v: %s", resp.StatusCode, name, err)
 	}
-	reqLogger.Info("Sent request to create DatabaseUser.", "MongoDBAtlasDatabaseUser.GroupID", groupID)
-	return updateCRStatus(reqLogger, cr, c)
+	if resp.StatusCode == http.StatusOK {
+		reqLogger.Info("DatabaseUser created.")
+		return updateCRStatus(reqLogger, cr, c)
+	}
+	return fmt.Errorf("(%v) Error creating DatabaseUser %s: %s", resp.StatusCode, name, err)
 }
 
 func updateMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser, ap *knappekv1alpha1.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
-	//
-	// TODO
-	//
+	name := cr.Name
+	params := getDatabaseUserParams(cr)
+	c, resp, err := atlasClient.DatabaseUsers.Update(groupID, name, &params)
 	if err != nil {
-		return fmt.Errorf("Error updating DatabaseUser %v: %s", cr.Name, err)
+		return fmt.Errorf("Error updating DatabaseUser %v: %s", name, err)
 	}
-	reqLogger.Info("Sent request to update DatabaseUser.", "MongoDBAtlasDatabaseUser.GroupID", groupID)
-	return updateCRStatus(reqLogger, cr, c)
+	if resp.StatusCode == http.StatusOK {
+		reqLogger.Info("DatabaseUser updated.")
+		return updateCRStatus(reqLogger, cr, c)
+	}
+	return fmt.Errorf("(%v) Error updating DatabaseUser %s: %s", resp.StatusCode, name, err)
 }
 
 func deleteMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) error {
 	groupID := cr.Status.GroupID
-	//
-	// TODO
-	//
+	name := cr.Name
+	// cluster exists and can be deleted
+	resp, err := atlasClient.DatabaseUsers.Delete(groupID, name)
 	if err != nil {
-		return fmt.Errorf("Error deleting DatabaseUser %v: %s", cr.Name, err)
+		if resp.StatusCode == http.StatusNotFound {
+			reqLogger.Info("DatabaseUser does not exist in Atlas. Deleting CR.")
+			// CR can be deleted - Requeue
+			return nil
+		}
+		return fmt.Errorf("(%v) Error deleting DatabaseUser %s: %s", resp.StatusCode, name, err)
 	}
-	reqLogger.Info("Sent request to delete DatabaseUser.", "MongoDBAtlasDatabaseUser.GroupID", groupID)
+	if resp.StatusCode == http.StatusOK {
+		reqLogger.Info("Sent request to delete DatabaseUser.")
+		return nil
+	}
+	return fmt.Errorf("(%v) Error deleting DatabaseUser %s: %s", resp.StatusCode, name, err)
+}
+
+func getMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) error {
+	groupID := cr.Status.GroupID
+	name := cr.Name
+	c, resp, err := atlasClient.DatabaseUsers.Get(groupID, name)
+	if err != nil {
+		return fmt.Errorf("(%v) Error fetching DatabaseUser information %s: %s", resp.StatusCode, name, err)
+	}
+	err = updateCRStatus(reqLogger, cr, c)
+	if err != nil {
+		return fmt.Errorf("Error updating DatabaseUser CR Status: %s", err)
+	}
 	return nil
 }
 
-func getMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) (*DatabaseUser, *http.Response, error) {
-	//
-	// TODO
-	//
-	return kindShort, resp, err
+func getDatabaseUserParams(cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) ma.DatabaseUser {
+	return ma.DatabaseUser{
+		Username:     cr.Name,
+		Password:     cr.Spec.Password,
+		DatabaseName: "admin",
+		Roles: cr.Spec.Roles,
+	}
 }
 
 func updateCRStatus(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser, c *ma.DatabaseUser) error {
 	// update status field in CR
-	cr.Status.ID = kindShort.ID
-	cr.Status.GroupID = kindShort.GroupID
-	cr.Status.Name = kindShort.Name
-	//
-	// TODO
-	//
+	cr.Status.Username = c.Username
+	cr.Status.GroupID = c.GroupID
+	cr.Status.DatabaseName = c.DatabaseName
+	cr.Status.Roles = c.Roles
 	return nil
 }
 
