@@ -7,7 +7,9 @@ import (
 	"net/url"
 	"testing"
 
+	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	"github.com/stretchr/testify/assert"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Server returns an http Client, ServeMux, and Server. The client proxies
@@ -55,4 +57,24 @@ func AssertReqJSON(t *testing.T, expected map[string]interface{}, req *http.Requ
 		t.Errorf("error decoding request JSON %v", err)
 	}
 	assert.Equal(t, expected, reqJSON)
+}
+
+// CreateAtlasProject returns a standard atlas project
+func CreateAtlasProject(projectName string, projectID string, namespace string, organizationID string) *knappekv1alpha1.MongoDBAtlasProject {
+	return &knappekv1alpha1.MongoDBAtlasProject{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      projectName,
+			Namespace: namespace,
+		},
+		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
+			OrgID: organizationID,
+		},
+		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
+			ID:           projectID,
+			Name:         projectName,
+			OrgID:        organizationID,
+			Created:      "2016-07-14T14:19:33Z",
+			ClusterCount: 0,
+		},
+	}
 }

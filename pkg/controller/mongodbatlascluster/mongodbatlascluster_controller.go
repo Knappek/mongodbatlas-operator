@@ -224,7 +224,6 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 func updateMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasCluster, ap *knappekv1alpha1.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
 	params := getClusterParams(cr)
-
 	c, _, err := atlasClient.Clusters.Update(groupID, cr.Name, &params)
 	if err != nil {
 		return fmt.Errorf("Error updating Cluster %v: %s", cr.Name, err)

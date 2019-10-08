@@ -63,22 +63,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 0,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec.
 	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
@@ -277,22 +262,7 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 0,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec.
 	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
@@ -403,22 +373,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 1,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// updates
 	updatedDiskSizeGB := diskSizeGB + 10
@@ -556,22 +511,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 1,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec. This Spec contains only the bare minimum, other values
 	// will be filled with default values
