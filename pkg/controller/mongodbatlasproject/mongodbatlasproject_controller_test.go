@@ -71,11 +71,6 @@ func TestNonExistingMongoDBAtlasProjectCR(t *testing.T) {
 	mux.HandleFunc("/api/atlas/v1.0/groups/", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
-		expectedBody := map[string]interface{}{
-			"orgId": organizationID,
-			"name":  projectName,
-		}
-		testutil.AssertReqJSON(t, expectedBody, r)
 		fmt.Fprintf(w, `{"clusterCount": `+strconv.Itoa(clusterCount)+`, "created":"`+created+`", "id":"`+projectID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
 	})
 	atlasClient := ma.NewClient(httpClient)
@@ -136,11 +131,6 @@ func TestCreateMongoDBAtlasProject(t *testing.T) {
 	mux.HandleFunc("/api/atlas/v1.0/groups/", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
-		expectedBody := map[string]interface{}{
-			"orgId": organizationID,
-			"name":  projectName,
-		}
-		testutil.AssertReqJSON(t, expectedBody, r)
 		fmt.Fprintf(w, `{"clusterCount": `+strconv.Itoa(clusterCount)+`, "created":"`+created+`", "id":"`+projectID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
 	})
 	atlasClient := ma.NewClient(httpClient)

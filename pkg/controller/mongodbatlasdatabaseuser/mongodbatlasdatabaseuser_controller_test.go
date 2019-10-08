@@ -81,16 +81,6 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/databaseUsers", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
-		expectedBody := map[string]interface{}{
-			"username":        resourceName,
-			"password":        password,
-			"databaseName":    "admin",
-			"roles": []interface{}{map[string]interface{}{
-				"databaseName": roles[0].DatabaseName,
-				"roleName":     roles[0].RoleName,
-			}},
-		}
-		testutil.AssertReqJSON(t, expectedBody, r)
 		fmt.Fprintf(w, `{
 			"groupId":"`+projectID+`",
 			"databaseName":"admin",

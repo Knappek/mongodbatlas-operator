@@ -108,33 +108,6 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
-		expectedBody := map[string]interface{}{
-			"autoScaling": map[string]interface{}{
-				"diskGBEnabled": autoscaling.DiskGBEnabled,
-			},
-			"backupEnabled":         backupEnabled,
-			"diskSizeGB":            diskSizeGB,
-			"name":                  clusterName,
-			"mongoDBMajorVersion":   mongoDBMajorVersion,
-			"numShards":             float64(numShards),
-			"paused":                paused,
-			"providerBackupEnabled": providerBackupEnabled,
-			"providerSettings": map[string]interface{}{
-				"providerName":     providerSettings.ProviderName,
-				"regionName":       providerSettings.RegionName,
-				"instanceSizeName": providerSettings.InstanceSizeName,
-				"encryptEBSVolume": providerSettings.EncryptEBSVolume,
-			},
-			"replicationSpec": map[string]interface{}{
-				"US_EAST_1": map[string]interface{}{
-					"priority":       float64(7),
-					"electableNodes": float64(2),
-					"readOnlyNodes":  float64(1),
-					"analyticsNodes": float64(1),
-				},
-			},
-		}
-		testutil.AssertReqJSON(t, expectedBody, r)
 		fmt.Fprintf(w, `{
 			"autoScaling":{
 				"diskGBEnabled":`+strconv.FormatBool(autoscaling.DiskGBEnabled)+`
