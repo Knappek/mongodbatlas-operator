@@ -111,17 +111,16 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 	// Check if the MongoDBAtlasDatabaseUser CR was marked to be deleted
 	isMongoDBAtlasDatabaseUserToBeDeleted := atlasDatabaseUser.GetDeletionTimestamp() != nil
 	if isMongoDBAtlasDatabaseUserToBeDeleted {
-		// check if Delete request has already been sent to the MongoDB Atlas API
-		//
-		// TODO
-		//
-
-		// wait until MongoDBAtlasDatabaseUser has been deleted successfully
-		//
-		// TODO
-		//
-		// if err == nil, MongoDBAtlasDatabaseUser still exists - Requeue after 20 seconds
-		return reconcile.Result{RequeueAfter: time.Second * 20}, nil
+		err := deleteMongoDBAtlasDatabaseUser(reqLogger, r.atlasClient, atlasDatabaseUser)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
+		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 
 	// Create a new MongoDBAtlasDatabaseUser
@@ -139,7 +138,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 		if err := r.addFinalizer(reqLogger, atlasDatabaseUser); err != nil {
 			return reconcile.Result{}, err
 		}
-		// Requeue after 30 seconds and check again for the status until CR can be deleted
+		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
 		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 
@@ -154,7 +153,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		// Requeue after 30 seconds and check again for the status until CR can be deleted
+		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
 		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 
@@ -210,13 +209,17 @@ func deleteMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Clien
 	if err != nil {
 		if resp.StatusCode == http.StatusNotFound {
 			reqLogger.Info("DatabaseUser does not exist in Atlas. Deleting CR.")
+			// Update finalizer to allow delete CR
+			cr.SetFinalizers(nil)
 			// CR can be deleted - Requeue
 			return nil
 		}
 		return fmt.Errorf("(%v) Error deleting DatabaseUser %s: %s", resp.StatusCode, name, err)
 	}
 	if resp.StatusCode == http.StatusOK {
-		reqLogger.Info("Sent request to delete DatabaseUser.")
+		// Update finalizer to allow delete CR
+		cr.SetFinalizers(nil)
+		reqLogger.Info("DatabaseUser deleted.")
 		return nil
 	}
 	return fmt.Errorf("(%v) Error deleting DatabaseUser %s: %s", resp.StatusCode, name, err)

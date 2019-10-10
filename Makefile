@@ -5,6 +5,8 @@ BUILD_DATE=$(shell date +%FT%T%z)
 CRDS=$(shell echo deploy/crds/*_crd.yaml | sed 's/ / -f /g')
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
+TEST_DIR?=./pkg/controller/...
+VERBOSE?=
 
 ORGANIZATION_ID?=5c4a2a55553855344780cf5f
 
@@ -77,7 +79,7 @@ cleanup:
 
 .PHONY: test
 test:
-	go test ./pkg/controller/... -v -coverprofile=coverage.out -covermode=atomic
+	go test $(TEST_DIR) $(VERBOSE) -coverprofile=coverage.out -covermode=atomic
 
 inite2etest:
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \

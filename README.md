@@ -162,6 +162,10 @@ The following executes unit tests for the controllers in `./pkg/controller/`
 
 ```shell
 make test
+# test only a subset
+make test TEST_DIR=./pkg/controller/mongodbatlasdatabaseuser/...
+# increase verbosity
+make test TEST_DIR=./pkg/controller/mongodbatlasdatabaseuser/... VERBOSE="-v"
 ```
 
 ### E2E Tests

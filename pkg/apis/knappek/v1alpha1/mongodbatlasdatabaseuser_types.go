@@ -30,10 +30,9 @@ type MongoDBAtlasDatabaseUserStatus struct {
 	Username        string    `json:"username,omitempty"`
 	DatabaseName    string    `json:"databaseName,omitempty"`
 	Roles           []ma.Role `json:"roles,omitempty"`
-	Links           string    `json:"links,omitempty"`
 }
 
-// IsMongoDBAtlasDatabaseUserToBeUpdated is used to compare spec.MongoDBAtlasDatabaseUserRequestBody with status.MongoDBAtlasDatabaseUserRequestBody
+// IsMongoDBAtlasDatabaseUserToBeUpdated is used to compare spec.MongoDBAtlasDatabaseUserRequestBody with status
 func IsMongoDBAtlasDatabaseUserToBeUpdated(m1 MongoDBAtlasDatabaseUserRequestBody, m2 MongoDBAtlasDatabaseUserStatus) bool {
 	if m1.DatabaseName != m2.DatabaseName {
 		if !util.IsZeroValue(m1.DatabaseName) {
