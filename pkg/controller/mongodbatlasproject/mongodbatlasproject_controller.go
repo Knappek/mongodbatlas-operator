@@ -104,16 +104,13 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		// Update finalizer to allow delete CR
-		atlasProject.SetFinalizers(nil)
-
 		// Update CR
 		err = r.client.Update(context.TODO(), atlasProject)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		// MongoDB Atlas Project successfully deleted
-		return reconcile.Result{}, nil
+		// Requeue to periodically reconcile the CR MongoDBAtlasProject in order to recreate a manually deleted Atlas DatabaseUser
+		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
 	}
 	// Add finalizer for this CR
 	if err := r.addFinalizer(reqLogger, atlasProject); err != nil {
@@ -153,6 +150,8 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	if err != nil {
 		if resp.StatusCode == 404 {
 			reqLogger.Info("Project does not exist in Atlas. Deleting CR.")
+			// Update finalizer to allow delete CR
+			cr.SetFinalizers(nil)
 			return nil
 		}
 		return fmt.Errorf("Error getting MongoDB Project %s: %s", cr.Name, err)
@@ -164,6 +163,8 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	if err != nil {
 		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, atlasProjectID, err)
 	}
+	// Update finalizer to allow delete CR
+	cr.SetFinalizers(nil)
 	reqLogger.Info("Project deleted.", "MongoDBAtlasProject.ID", atlasProjectID)
 	return nil
 }

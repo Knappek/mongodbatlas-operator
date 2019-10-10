@@ -233,11 +233,11 @@ func TestDeleteMongoDBAtlasProject(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, reconcile.Result{}, res)
-	assert.Equal(t, false, res.Requeue)
+	assert.Equal(t, time.Second*30, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappekv1alpha1.MongoDBAtlasProject{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	assert.Nil(t, err)
+	assert.Nil(t, cr.ObjectMeta.GetFinalizers())
 }
