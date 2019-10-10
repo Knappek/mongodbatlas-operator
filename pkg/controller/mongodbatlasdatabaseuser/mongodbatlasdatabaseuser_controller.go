@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
-	"time"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	"github.com/Knappek/mongodbatlas-operator/pkg/config"
@@ -39,7 +38,12 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileMongoDBAtlasDatabaseUser{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: config.GetAtlasClient()}
+	return &ReconcileMongoDBAtlasDatabaseUser{
+		client:               mgr.GetClient(),
+		scheme:               mgr.GetScheme(),
+		atlasClient:          config.GetAtlasClient(),
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -65,9 +69,10 @@ var _ reconcile.Reconciler = &ReconcileMongoDBAtlasDatabaseUser{}
 type ReconcileMongoDBAtlasDatabaseUser struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client      client.Client
-	scheme      *runtime.Scheme
-	atlasClient *ma.Client
+	client               client.Client
+	scheme               *runtime.Scheme
+	atlasClient          *ma.Client
+	reconciliationConfig *config.ReconciliationConfig
 }
 
 // Reconcile reads that state of the MongoDBAtlasDatabaseUser object and makes changes based on the state read
@@ -120,7 +125,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 			return reconcile.Result{}, err
 		}
 		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
-		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 	}
 
 	// Create a new MongoDBAtlasDatabaseUser
@@ -139,7 +144,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 			return reconcile.Result{}, err
 		}
 		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
-		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 	}
 
 	// update existing MongoDBAtlasDatabaseUser
@@ -154,7 +159,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 			return reconcile.Result{}, err
 		}
 		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
-		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 	}
 
 	// if no Create/Update/Delete command apply, then fetch the status
@@ -168,7 +173,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 	}
 
 	// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
-	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+	return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 }
 
 func createMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser, ap *knappekv1alpha1.MongoDBAtlasProject) error {
@@ -244,7 +249,7 @@ func getDatabaseUserParams(cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) ma.Data
 		Username:     cr.Name,
 		Password:     cr.Spec.Password,
 		DatabaseName: "admin",
-		Roles: cr.Spec.Roles,
+		Roles:        cr.Spec.Roles,
 	}
 }
 

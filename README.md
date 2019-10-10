@@ -12,7 +12,6 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 ![](docs/mongodbatlas-operator-example.gif)
 
-
 <!-- vim-markdown-toc GFM -->
 
 * [Scope](#scope)
@@ -103,6 +102,19 @@ kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
 kubectl delete -f deploy/
 kubectl delete -f deploy/crds/
 ```
+
+## Environment Variables
+
+You can specify the following environment variables in the Operator's [operator.yaml](./deploy/operator.yaml):
+
+| Name | Description | Default | Required |
+|------|-------------|:----:|:-----:|:-----:|
+| WATCH_NAMESPACE | The namespace which the operator should watch for MongoDBAtlas CRDs. | n/a | yes |
+| POD_NAME | Operator pod name. | n/a | no |
+| OPERATOR_NAME | Operator name. | n/a | no |
+| ATLAS_PRIVATE_KEY | The private key of the Atlas API. | n/a | yes |
+| ATLAS_PUBLIC_KEY | The private key of the Atlas API. | n/a | yes |
+| RECONCILIATION_TIME | Time in seconds which should be used to periodically reconcile the actual status in MongoDB Atlas with the current status in the corresponding Kubernetes CRD. | `"120"` | no |
 
 ## Contributing
 

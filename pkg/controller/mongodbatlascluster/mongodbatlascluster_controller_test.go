@@ -14,6 +14,7 @@ import (
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
+	"github.com/Knappek/mongodbatlas-operator/pkg/config"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -141,7 +142,12 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	})
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient, 
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -155,7 +161,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
@@ -290,7 +296,12 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	})
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient, 
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -325,7 +336,12 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	})
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r2 := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient2}
+	r2 := &ReconcileMongoDBAtlasCluster{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient2, 
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	res2, err := r2.Reconcile(req)
 	if err != nil {
@@ -450,7 +466,12 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 		}`)
 	})
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient, 
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -464,7 +485,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
@@ -573,7 +594,12 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 		}`)
 	})
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient, 
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -587,7 +613,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappekv1alpha1.MongoDBAtlasCluster{}

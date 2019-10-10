@@ -39,7 +39,12 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileMongoDBAtlasCluster{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: config.GetAtlasClient()}
+	return &ReconcileMongoDBAtlasCluster{
+		client: mgr.GetClient(), 
+		scheme: mgr.GetScheme(), 
+		atlasClient: config.GetAtlasClient(),
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -65,9 +70,10 @@ var _ reconcile.Reconciler = &ReconcileMongoDBAtlasCluster{}
 type ReconcileMongoDBAtlasCluster struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client      client.Client
-	scheme      *runtime.Scheme
-	atlasClient *ma.Client
+	client               client.Client
+	scheme               *runtime.Scheme
+	atlasClient          *ma.Client
+	reconciliationConfig *config.ReconciliationConfig
 }
 
 // Reconcile reads that state of the cluster for a MongoDBAtlasCluster object and makes changes based on the state read
@@ -166,8 +172,8 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err := r.addFinalizer(reqLogger, atlasCluster); err != nil {
 				return reconcile.Result{}, err
 			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+			// Requeue to periodically reconcile the CR MongoDBAtlasCluster in order to recreate a manually deleted Atlas cluster
+			return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 		}
 	}
 
@@ -185,8 +191,8 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+			// Requeue to periodically reconcile the CR MongoDBAtlasCluster in order to recreate a manually deleted Atlas cluster
+			return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 		}
 	}
 
@@ -206,7 +212,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 	}
 
 	// Requeue to periodically reconcile the CR MongoDBAtlasCluster in order to recreate a manually deleted Atlas cluster
-	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+	return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 }
 
 func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasCluster, ap *knappekv1alpha1.MongoDBAtlasProject) error {

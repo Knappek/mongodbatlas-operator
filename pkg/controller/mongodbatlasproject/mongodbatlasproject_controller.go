@@ -3,7 +3,6 @@ package mongodbatlasproject
 import (
 	"context"
 	"fmt"
-	"time"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
 	"github.com/Knappek/mongodbatlas-operator/pkg/config"
@@ -29,9 +28,13 @@ func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
 }
 
-// newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileMongoDBAtlasProject{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: config.GetAtlasClient()}
+	return &ReconcileMongoDBAtlasProject{
+		client:               mgr.GetClient(),
+		scheme:               mgr.GetScheme(),
+		atlasClient:          config.GetAtlasClient(),
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -57,9 +60,10 @@ var _ reconcile.Reconciler = &ReconcileMongoDBAtlasProject{}
 type ReconcileMongoDBAtlasProject struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client      client.Client
-	scheme      *runtime.Scheme
-	atlasClient *ma.Client
+	client               client.Client
+	scheme               *runtime.Scheme
+	atlasClient          *ma.Client
+	reconciliationConfig *config.ReconciliationConfig
 }
 
 // Reconcile reads that state of the cluster for a MongoDBAtlasProject object and makes changes based on the state read
@@ -110,7 +114,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 			return reconcile.Result{}, err
 		}
 		// Requeue to periodically reconcile the CR MongoDBAtlasProject in order to recreate a manually deleted Atlas DatabaseUser
-		return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+		return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 	}
 	// Add finalizer for this CR
 	if err := r.addFinalizer(reqLogger, atlasProject); err != nil {
@@ -118,7 +122,7 @@ func (r *ReconcileMongoDBAtlasProject) Reconcile(request reconcile.Request) (rec
 	}
 	// MongoDB Atlas Project successfully created
 	// Requeue to periodically reconcile the CR MongoDBAtlasProject in order to recreate a manually deleted Atlas project
-	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+	return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 }
 
 func createMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasProject) error {

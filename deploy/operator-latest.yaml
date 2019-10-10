@@ -38,3 +38,5 @@ spec:
                   name: example-monogdb-atlas-project
             - name: ATLAS_PUBLIC_KEY
               value: toppaljd
+            - name: RECONCILIATION_TIME
+              value: "120"

@@ -14,6 +14,7 @@ import (
 
 	knappek_API_VERSION_ "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/_API_VERSION_"
 	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
+	"github.com/Knappek/mongodbatlas-operator/pkg/config"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -91,7 +92,12 @@ func TestCreate_KIND_LOWERCASE_(t *testing.T) {
 	})
 
 	// Create a Reconcile_KIND_ object with the scheme and fake client.
-	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &Reconcile_KIND_{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -105,7 +111,7 @@ func TestCreate_KIND_LOWERCASE_(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappek_API_VERSION_._KIND_{}
@@ -178,7 +184,12 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 	})
 
 	// Create a Reconcile_KIND_ object with the scheme and fake client.
-	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &Reconcile_KIND_{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -211,7 +222,12 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 	})
 
 	// Create a Reconcile_KIND_ object with the scheme and fake client.
-	r2 := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient2}
+	r := &Reconcile_KIND_{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient2,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	res2, err := r2.Reconcile(req)
 	if err != nil {
@@ -293,7 +309,12 @@ func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
 		}`)
 	})
 	// Create a Reconcile_KIND_ object with the scheme and fake client.
-	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &Reconcile_KIND_{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -307,7 +328,7 @@ func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappek_API_VERSION_._KIND_{}
@@ -382,7 +403,12 @@ func TestNoUpdate_KIND_LOWERCASE_(t *testing.T) {
 		}`)
 	})
 	// Create a Reconcile_KIND_ object with the scheme and fake client.
-	r := &Reconcile_KIND_{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &Reconcile_KIND_{
+		client: k8sClient, 
+		scheme: s, 
+		atlasClient: atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -396,7 +422,7 @@ func TestNoUpdate_KIND_LOWERCASE_(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappek_API_VERSION_._KIND_{}
