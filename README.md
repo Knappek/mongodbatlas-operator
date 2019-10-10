@@ -107,9 +107,8 @@ kubectl delete -f deploy/crds/
 
 You can specify the following environment variables in the Operator's [operator.yaml](./deploy/operator.yaml):
 
-
 | Name | Description | Default | Required |
-|------|-------------|:----:|:-----:|:-----:|
+|------|-------------|---------|----------|
 | WATCH_NAMESPACE | The namespace which the operator should watch for MongoDBAtlas CRDs. | n/a | yes |
 | POD_NAME | Operator pod name. | n/a | no |
 | OPERATOR_NAME | Operator name. | n/a | no |
