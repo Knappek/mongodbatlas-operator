@@ -258,6 +258,7 @@ func updateCRStatus(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasDatab
 	cr.Status.Username = c.Username
 	cr.Status.GroupID = c.GroupID
 	cr.Status.DatabaseName = c.DatabaseName
+	cr.Status.DeleteAfterDate = c.DeleteAfterDate
 	cr.Status.Roles = c.Roles
 	return nil
 }

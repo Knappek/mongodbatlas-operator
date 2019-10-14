@@ -28,15 +28,33 @@ type MongoDBAtlasDatabaseUserSpec struct {
 type MongoDBAtlasDatabaseUserStatus struct {
 	GroupID         string    `json:"groupID,omitempty"`
 	Username        string    `json:"username,omitempty"`
+	DeleteAfterDate string    `json:"deleteAfterDate,omitempty"`
 	DatabaseName    string    `json:"databaseName,omitempty"`
 	Roles           []ma.Role `json:"roles,omitempty"`
 }
 
 // IsMongoDBAtlasDatabaseUserToBeUpdated is used to compare spec.MongoDBAtlasDatabaseUserRequestBody with status
 func IsMongoDBAtlasDatabaseUserToBeUpdated(m1 MongoDBAtlasDatabaseUserRequestBody, m2 MongoDBAtlasDatabaseUserStatus) bool {
-	if m1.DatabaseName != m2.DatabaseName {
-		if !util.IsZeroValue(m1.DatabaseName) {
+	if m1.DeleteAfterDate != m2.DeleteAfterDate {
+		if !util.IsZeroValue(m1.DeleteAfterDate) {
 			return true
+		}
+	}
+	for idx, role := range m1.Roles {
+		if role.DatabaseName != m2.Roles[idx].DatabaseName {
+			if !util.IsZeroValue(role.DatabaseName) {
+				return true
+			}
+		}
+		if role.CollectionName != m2.Roles[idx].CollectionName {
+			if !util.IsZeroValue(role.CollectionName) {
+				return true
+			}
+		}
+		if role.RoleName != m2.Roles[idx].RoleName {
+			if !util.IsZeroValue(role.RoleName) {
+				return true
+			}
 		}
 	}
 	return false
