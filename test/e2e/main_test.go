@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"flag"
+	"fmt"
 	"testing"
 	"time"
 
@@ -47,6 +48,7 @@ func TestMongoDBAtlas(t *testing.T) {
 
 	MongoDBAtlasProject(t, ctx, f, namespace)
 	MongoDBAtlasCluster(t, ctx, f, namespace)
+	fmt.Println("Cleanup resources...")
 }
 
 func registerTypes(t *testing.T) error {

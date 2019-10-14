@@ -31,7 +31,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 **Currently it supports**:
 
 * Create/Delete MongoDB Atlas Projects
-* Create/Delete MongoDB Atlas Clusters
+* Create/Update/Delete MongoDB Atlas Clusters
 
 ## Prerequisites
 
@@ -107,6 +107,7 @@ kubectl delete -f deploy/crds/
 
 You can specify the following environment variables in the Operator's [operator.yaml](./deploy/operator.yaml):
 
+
 | Name | Description | Default | Required |
 |------|-------------|---------|----------|
 | WATCH_NAMESPACE | The namespace which the operator should watch for MongoDBAtlas CRDs. | n/a | yes |
@@ -117,6 +118,8 @@ You can specify the following environment variables in the Operator's [operator.
 | RECONCILIATION_TIME | Time in seconds which should be used to periodically reconcile the actual status in MongoDB Atlas with the current status in the corresponding Kubernetes CRD. | `"120"` | no |
 
 ## Contributing
+
+I am working on this project in my spare time, hence feature development and release cycles could be improved ;). Contributors are welcome!
 
 Read through the [Contributing Guidelines and Code of Conduct](./CONTRIBUTING.md).
 

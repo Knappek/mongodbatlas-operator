@@ -2,7 +2,7 @@ package e2e
 
 import (
 	goctx "context"
-	"github.com/stretchr/testify/assert"
+	"fmt"
 	"testing"
 	"time"
 
@@ -29,21 +29,20 @@ func MongoDBAtlasProject(t *testing.T, ctx *framework.TestCtx, f *framework.Fram
 		t.Fatal(err)
 	}
 
+	fmt.Printf("wait for creating the project: %v\n", exampleMongoDBAtlasProject.ObjectMeta.Name)
 	err = waitForMongoDBAtlasProject(t, f, exampleMongoDBAtlasProject)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	assert.Equal(t, *organizationID, exampleMongoDBAtlasProject.Status.OrgID, "The Organization ID in the Status block is incorrect")
-	assert.Equal(t, "e2etest-project", exampleMongoDBAtlasProject.Status.Name, "The Project Name in the Status block is incorrect")
+	fmt.Printf("project %v successfully created\n", exampleMongoDBAtlasProject.ObjectMeta.Name)
 }
 
 func waitForMongoDBAtlasProject(t *testing.T, f *framework.Framework, p *knappekv1alpha1.MongoDBAtlasProject) error {
 	retryInterval := time.Second * 5
-	timeout := time.Second * 60
+	timeout := time.Second * 10
 	err := wait.Poll(retryInterval, timeout, func() (done bool, err error) {
 		err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: p.Name, Namespace: p.Namespace}, p)
-		return waitForManifestStatus(t, err, p.Name, p.Kind, p.Status, knappekv1alpha1.MongoDBAtlasProjectStatus{})
+		return isInDesiredState(t, err, p.Name, p.Kind, p.Status.Name, "e2etest-project")
 	})
 	if err != nil {
 		return err
