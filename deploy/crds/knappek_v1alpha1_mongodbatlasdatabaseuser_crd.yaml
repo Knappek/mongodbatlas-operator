@@ -65,9 +65,9 @@ spec:
           properties:
             databaseName:
               type: string
-            groupID:
+            deleteAfterDate:
               type: string
-            links:
+            groupID:
               type: string
             roles:
               items:

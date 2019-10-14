@@ -380,6 +380,12 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref common.
 							Format: "",
 						},
 					},
+					"deleteAfterDate": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
 					"databaseName": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
@@ -396,12 +402,6 @@ func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref common.
 									},
 								},
 							},
-						},
-					},
-					"links": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
 						},
 					},
 				},
