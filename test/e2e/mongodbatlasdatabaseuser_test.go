@@ -38,20 +38,20 @@ func MongoDBAtlasDatabaseUser(t *testing.T, ctx *framework.TestCtx, f *framework
 		t.Fatal(err)
 	}
 	fmt.Printf("wait for creating the databaseUser: %v\n", exampleMongoDBAtlasDatabaseUser.ObjectMeta.Name)
-	err = waitForMongoDBAtlasDatabaseUser(t, f, exampleMongoDBAtlasDatabaseUser, "2100-01-01T00:00:00Z")
+	err = waitForMongoDBAtlasDatabaseUser(t, f, exampleMongoDBAtlasDatabaseUser, "readWrite")
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("databaseUser %v successfully created\n", exampleMongoDBAtlasDatabaseUser.ObjectMeta.Name)
 
 	// update databaseUser
-	exampleMongoDBAtlasDatabaseUser.Spec.DeleteAfterDate = "2100-02-01T00:00:00Z"
+	exampleMongoDBAtlasDatabaseUser.Spec.Roles[0].RoleName = "read"
 	err = f.Client.Update(goctx.TODO(), exampleMongoDBAtlasDatabaseUser)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("wait for updating the databaseUser: %v\n", exampleMongoDBAtlasDatabaseUser.ObjectMeta.Name)
-	err = waitForMongoDBAtlasDatabaseUser(t, f, exampleMongoDBAtlasDatabaseUser, "2100-02-01T00:00:00Z")
+	err = waitForMongoDBAtlasDatabaseUser(t, f, exampleMongoDBAtlasDatabaseUser, "read")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func waitForMongoDBAtlasDatabaseUser(t *testing.T, f *framework.Framework, p *kn
 	timeout := time.Second * 10
 	err := wait.Poll(retryInterval, timeout, func() (done bool, err error) {
 		err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: p.Name, Namespace: p.Namespace}, p)
-		return isInDesiredState(t, err, p.Name, p.Kind, p.Status.DeleteAfterDate, desiredState)
+		return isInDesiredState(t, err, p.Name, p.Kind, p.Status.Roles[0].RoleName, desiredState)
 	})
 	if err != nil {
 		return err

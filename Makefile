@@ -81,7 +81,7 @@ cleanup:
 test:
 	go test $(TEST_DIR) $(VERBOSE) -coverprofile=coverage.out -covermode=atomic
 
-e2etest: cleanup fmt lint
+e2etest: cleanup fmt
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
 		echo "ERROR: Export ATLAS_PRIVATE_KEY variable and then run init again. For example:"; \
 		echo "  export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \

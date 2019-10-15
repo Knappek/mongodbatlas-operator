@@ -125,7 +125,7 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 			return reconcile.Result{}, err
 		}
 		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
-		return reconcile.Result{}, nil
+		return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 	}
 
 	// Create a new MongoDBAtlasDatabaseUser

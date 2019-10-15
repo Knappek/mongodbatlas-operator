@@ -27,7 +27,7 @@ import (
 
 var (
 	projectName    = "unittest-project"
-	groupID      = "5a0a1e7e0f2912c554080ae6"
+	groupID        = "5a0a1e7e0f2912c554080ae6"
 	namespace      = "mongodbatlas"
 	organizationID = "testOrgID"
 	created        = "2016-07-14T14:19:33Z"

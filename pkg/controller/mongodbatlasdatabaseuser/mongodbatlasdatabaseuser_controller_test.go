@@ -28,7 +28,7 @@ var (
 	namespace       = "mongodbatlas"
 	organizationID  = "testOrgID"
 	projectName     = "unittest-project"
-	groupID       = "5a0a1e7e0f2912c554080ae6"
+	groupID         = "5a0a1e7e0f2912c554080ae6"
 	resourceName    = "testuser"
 	password        = "testpassword"
 	databaseName    = "testdb"
@@ -81,6 +81,7 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	// Post request for MongoDBAtlasDatabaseUser
 	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/databaseUsers", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
+		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
 			"groupId":"`+groupID+`",

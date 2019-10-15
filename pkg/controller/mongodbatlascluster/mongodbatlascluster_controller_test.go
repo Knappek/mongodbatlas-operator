@@ -29,7 +29,7 @@ var (
 	namespace             = "mongodbatlas"
 	organizationID        = "testOrgID"
 	projectName           = "unittest-project"
-	groupID             = "5a0a1e7e0f2912c554080ae6"
+	groupID               = "5a0a1e7e0f2912c554080ae6"
 	clusterName           = "unittest-cluster"
 	clusterID             = "testClusterId"
 	mongoDBVersion        = "3.4"
