@@ -3,5 +3,10 @@ kind: MongoDBAtlasDatabaseUser
 metadata:
   name: example-mongodbatlasdatabaseuser
 spec:
-  # Add fields here
-  size: 3
+  projectName: "example-project"
+  password: "$up€rsecurep@s$word"
+  roles:
+  - databaseName: "testdb"
+    collectionName: "testcollection"
+    roleName: "readWrite"
+  
