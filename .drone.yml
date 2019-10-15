@@ -18,7 +18,6 @@ steps:
     - apk add --update alpine-sdk
     - make build
     - make fmt
-    - make lint
     - make test
   when:
     event:
