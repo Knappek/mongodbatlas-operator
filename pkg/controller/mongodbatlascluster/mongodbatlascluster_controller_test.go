@@ -13,6 +13,7 @@ import (
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
+	"github.com/Knappek/mongodbatlas-operator/pkg/config"
 	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,7 +29,7 @@ var (
 	namespace             = "mongodbatlas"
 	organizationID        = "testOrgID"
 	projectName           = "unittest-project"
-	projectID             = "5a0a1e7e0f2912c554080ae6"
+	groupID               = "5a0a1e7e0f2912c554080ae6"
 	clusterName           = "unittest-cluster"
 	clusterID             = "testClusterId"
 	mongoDBVersion        = "3.4"
@@ -63,22 +64,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 0,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec.
 	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
@@ -120,43 +106,16 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	atlasClient := ma.NewClient(httpClient)
 
 	// Post
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
-		expectedBody := map[string]interface{}{
-			"autoScaling": map[string]interface{}{
-				"diskGBEnabled": autoscaling.DiskGBEnabled,
-			},
-			"backupEnabled":         backupEnabled,
-			"diskSizeGB":            diskSizeGB,
-			"name":                  clusterName,
-			"mongoDBMajorVersion":   mongoDBMajorVersion,
-			"numShards":             float64(numShards),
-			"paused":                paused,
-			"providerBackupEnabled": providerBackupEnabled,
-			"providerSettings": map[string]interface{}{
-				"providerName":     providerSettings.ProviderName,
-				"regionName":       providerSettings.RegionName,
-				"instanceSizeName": providerSettings.InstanceSizeName,
-				"encryptEBSVolume": providerSettings.EncryptEBSVolume,
-			},
-			"replicationSpec": map[string]interface{}{
-				"US_EAST_1": map[string]interface{}{
-					"priority":       float64(7),
-					"electableNodes": float64(2),
-					"readOnlyNodes":  float64(1),
-					"analyticsNodes": float64(1),
-				},
-			},
-		}
-		testutil.AssertReqJSON(t, expectedBody, r)
 		fmt.Fprintf(w, `{
 			"autoScaling":{
 				"diskGBEnabled":`+strconv.FormatBool(autoscaling.DiskGBEnabled)+`
 			},
 			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
@@ -183,7 +142,12 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	})
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -197,7 +161,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
@@ -208,7 +172,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	assert.Equal(t, "CREATING", cr.Status.StateName, "stateName not as expected")
 
 	// GET: Simulate a new reconcile where stateName changed from CREATING to IDLE
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
 		fmt.Fprintf(w, `{
 			"autoScaling":{
@@ -216,7 +180,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 			},
 			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
@@ -258,7 +222,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	assert.Equal(t, "finalizer.knappek.com", cr.ObjectMeta.GetFinalizers()[0], "Finalizer not as expected")
 	assert.Equal(t, clusterID, cr.Status.ID, "clusterID not as expected")
 	assert.Equal(t, clusterName, cr.Status.Name, "clusterName not as expected")
-	assert.Equal(t, projectID, cr.Status.GroupID, "projectID not as expected")
+	assert.Equal(t, groupID, cr.Status.GroupID, "groupID not as expected")
 	assert.Equal(t, mongoDBVersion, cr.Status.MongoDBVersion, "mongoDBVersion not as expected")
 	assert.Equal(t, mongoDBMajorVersion, cr.Status.MongoDBMajorVersion, "mongoDBMajorVersion not as expected")
 	assert.Equal(t, diskSizeGB, cr.Status.DiskSizeGB, "diskSizeGB not as expected")
@@ -277,22 +241,7 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 0,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec.
 	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
@@ -316,7 +265,7 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
-			GroupID:   projectID,
+			GroupID:   groupID,
 			Name:      clusterName,
 			StateName: "IDLE",
 		},
@@ -341,13 +290,18 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	atlasClient := ma.NewClient(httpClient)
 
 	// Delete
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "DELETE", r)
 		fmt.Fprintf(w, `{}`)
 	})
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -376,13 +330,18 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	defer server2.Close()
 	atlasClient2 := ma.NewClient(httpClient2)
 	// GET: Simulate a new reconcile where cluster has been deleted successfully
-	mux2.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux2.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	})
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r2 := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient2}
+	r2 := &ReconcileMongoDBAtlasCluster{
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient2,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	res2, err := r2.Reconcile(req)
 	if err != nil {
@@ -403,22 +362,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 1,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// updates
 	updatedDiskSizeGB := diskSizeGB + 10
@@ -450,7 +394,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
-			GroupID:        projectID,
+			GroupID:        groupID,
 			Name:           clusterName,
 			StateName:      "IDLE",
 			ID:             clusterID,
@@ -487,7 +431,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	defer server.Close()
 	atlasClient := ma.NewClient(httpClient)
 	// Construct Update API call
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "PATCH", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
@@ -496,7 +440,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 			"backupEnabled":`+strconv.FormatBool(!backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(updatedDiskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
@@ -522,7 +466,12 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 		}`)
 	})
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -536,7 +485,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappekv1alpha1.MongoDBAtlasCluster{}
@@ -556,22 +505,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := &knappekv1alpha1.MongoDBAtlasProject{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      projectName,
-			Namespace: namespace,
-		},
-		Spec: knappekv1alpha1.MongoDBAtlasProjectSpec{
-			OrgID: organizationID,
-		},
-		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
-			Name:         projectName,
-			OrgID:        organizationID,
-			Created:      "2016-07-14T14:19:33Z",
-			ClusterCount: 1,
-		},
-	}
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec. This Spec contains only the bare minimum, other values
 	// will be filled with default values
@@ -588,7 +522,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
-			GroupID:        projectID,
+			GroupID:        groupID,
 			Name:           clusterName,
 			StateName:      "IDLE",
 			ID:             clusterID,
@@ -625,7 +559,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	defer server.Close()
 	atlasClient := ma.NewClient(httpClient)
 	// Construct Update API call
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
@@ -634,7 +568,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
@@ -660,7 +594,12 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 		}`)
 	})
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
-	r := &ReconcileMongoDBAtlasCluster{client: k8sClient, scheme: s, atlasClient: atlasClient}
+	r := &ReconcileMongoDBAtlasCluster{
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 
 	// Mock request to simulate Reconcile() being called on an event for a
 	// watched resource .
@@ -674,7 +613,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	if err != nil {
 		t.Fatalf("reconcile: (%v)", err)
 	}
-	assert.Equal(t, time.Second*30, res.RequeueAfter)
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
 	// Check if the CR has been created and has the correct status.
 	cr := &knappekv1alpha1.MongoDBAtlasCluster{}

@@ -76,4 +76,6 @@ tags
 .history
 ### Code coverage
 coverage.txt
+# intelliJ
+.idea
 # End of https://www.gitignore.io/api/go,vim,emacs,visualstudiocode

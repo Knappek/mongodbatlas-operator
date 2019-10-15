@@ -1,0 +1,12 @@
+apiVersion: knappek.com/v1alpha1
+kind: MongoDBAtlasDatabaseUser
+metadata:
+  name: example-mongodbatlasdatabaseuser
+spec:
+  projectName: "example-project"
+  password: "$up€rsecurep@s$word"
+  roles:
+  - databaseName: "testdb"
+    collectionName: "testcollection"
+    roleName: "readWrite"
+  

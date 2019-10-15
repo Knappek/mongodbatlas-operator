@@ -39,7 +39,12 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileMongoDBAtlasCluster{client: mgr.GetClient(), scheme: mgr.GetScheme(), atlasClient: config.GetAtlasClient()}
+	return &ReconcileMongoDBAtlasCluster{
+		client:               mgr.GetClient(),
+		scheme:               mgr.GetScheme(),
+		atlasClient:          config.GetAtlasClient(),
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -65,9 +70,10 @@ var _ reconcile.Reconciler = &ReconcileMongoDBAtlasCluster{}
 type ReconcileMongoDBAtlasCluster struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client      client.Client
-	scheme      *runtime.Scheme
-	atlasClient *ma.Client
+	client               client.Client
+	scheme               *runtime.Scheme
+	atlasClient          *ma.Client
+	reconciliationConfig *config.ReconciliationConfig
 }
 
 // Reconcile reads that state of the cluster for a MongoDBAtlasCluster object and makes changes based on the state read
@@ -122,7 +128,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-			reqLogger.Info("Wait until Cluster has been deleted.", "MongoDBAtlasCluster.GroupID", groupID)
+			reqLogger.Info("Wait until Cluster has been deleted.")
 			// Requeue after 20 seconds and check again for the status until CR can be deleted
 			return reconcile.Result{RequeueAfter: time.Second * 20}, nil
 		}
@@ -131,7 +137,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 		_, resp, err := r.atlasClient.Clusters.Get(groupID, atlasCluster.Name)
 		if err != nil {
 			if resp.StatusCode == 404 {
-				reqLogger.Info("Cluster deleted.", "MongoDBAtlasCluster.GroupID", groupID)
+				reqLogger.Info("Cluster deleted.")
 				// Update finalizer to allow delete CR
 				atlasCluster.SetFinalizers(nil)
 				// Update CR
@@ -166,8 +172,8 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err := r.addFinalizer(reqLogger, atlasCluster); err != nil {
 				return reconcile.Result{}, err
 			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+			// Requeue to periodically reconcile the CR MongoDBAtlasCluster in order to recreate a manually deleted Atlas cluster
+			return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 		}
 	}
 
@@ -185,8 +191,8 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 			if err != nil {
 				return reconcile.Result{}, err
 			}
-			// Requeue after 30 seconds and check again for the status until CR can be deleted
-			return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+			// Requeue to periodically reconcile the CR MongoDBAtlasCluster in order to recreate a manually deleted Atlas cluster
+			return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 		}
 	}
 
@@ -206,7 +212,7 @@ func (r *ReconcileMongoDBAtlasCluster) Reconcile(request reconcile.Request) (rec
 	}
 
 	// Requeue to periodically reconcile the CR MongoDBAtlasCluster in order to recreate a manually deleted Atlas cluster
-	return reconcile.Result{RequeueAfter: time.Second * 30}, nil
+	return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
 }
 
 func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasCluster, ap *knappekv1alpha1.MongoDBAtlasProject) error {
@@ -217,19 +223,18 @@ func createMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	if err != nil {
 		return fmt.Errorf("Error creating Cluster %v: %s", cr.Name, err)
 	}
-	reqLogger.Info("Sent request to create Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+	reqLogger.Info("Sent request to create Cluster.")
 	return updateCRStatus(reqLogger, cr, c)
 }
 
 func updateMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasCluster, ap *knappekv1alpha1.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
 	params := getClusterParams(cr)
-
 	c, _, err := atlasClient.Clusters.Update(groupID, cr.Name, &params)
 	if err != nil {
 		return fmt.Errorf("Error updating Cluster %v: %s", cr.Name, err)
 	}
-	reqLogger.Info("Sent request to update Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+	reqLogger.Info("Sent request to update Cluster.")
 	return updateCRStatus(reqLogger, cr, c)
 }
 
@@ -240,13 +245,13 @@ func deleteMongoDBAtlasCluster(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	resp, err := atlasClient.Clusters.Delete(groupID, clusterName)
 	if err != nil {
 		if resp.StatusCode == http.StatusNotFound {
-			reqLogger.Info("Cluster does not exist in Atlas. Deleting CR.", "MongoDBAtlasCluster.GroupID", groupID)
+			reqLogger.Info("Cluster does not exist in Atlas. Deleting CR.")
 			// CR can be deleted - Requeue
 			return nil
 		}
 		return fmt.Errorf("(%v) Error deleting Cluster %s: %s", resp.StatusCode, clusterName, err)
 	}
-	reqLogger.Info("Sent request to delete Cluster.", "MongoDBAtlasCluster.GroupID", groupID)
+	reqLogger.Info("Sent request to delete Cluster.")
 	return nil
 }
 
@@ -290,10 +295,10 @@ func updateCRStatus(reqLogger logr.Logger, cr *knappekv1alpha1.MongoDBAtlasClust
 	newStateName := cr.Status.StateName
 	if oldStateName != newStateName {
 		if oldStateName == "CREATING" && newStateName == "IDLE" {
-			reqLogger.Info("Cluster created.", "MongoDBAtlasCluster.GroupID", cr.Status.ID)
+			reqLogger.Info("Cluster created.")
 		}
 		if oldStateName == "UPDATING" && newStateName == "IDLE" {
-			reqLogger.Info("Cluster updated successfully.", "MongoDBAtlasCluster.GroupID", cr.Status.ID)
+			reqLogger.Info("Cluster updated successfully.")
 		}
 	}
 	return nil

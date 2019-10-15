@@ -3,6 +3,8 @@ package config
 import (
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
 	dac "github.com/akshaykarle/go-http-digest-auth-client"
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
@@ -38,4 +40,28 @@ func GetAtlasClient() *ma.Client {
 		AtlasPrivateKey: privateKey,
 	}
 	return atlasConfig.newMongoDBAtlasClient()
+}
+
+// ReconciliationConfig let us customize reconcilitation
+type ReconciliationConfig struct {
+	Time time.Duration
+}
+
+// GetReconcilitationConfig gives us default values
+func GetReconcilitationConfig() *ReconciliationConfig {
+	// default reconciliation loop time is 2 minutes
+	timeString := getenv("RECONCILIATION_TIME", "120")
+	timeInt, _ := strconv.Atoi(timeString)
+	reconciliationTime := time.Second * time.Duration(timeInt)
+	return &ReconciliationConfig{
+		Time: reconciliationTime,
+	}
+}
+
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
 }

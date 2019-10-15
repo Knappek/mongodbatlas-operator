@@ -17,20 +17,12 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 * [Scope](#scope)
 * [Prerequisites](#prerequisites)
 * [Getting Started](#getting-started)
-  * [Init](#init)
+  * [Deploy Operator](#deploy-operator)
   * [Create a MongoDB Atlas Project](#create-a-mongodb-atlas-project)
   * [Create a Cluster](#create-a-cluster)
   * [List all MongoDB Atlas resources](#list-all-mongodb-atlas-resources)
 * [Cleanup](#cleanup)
-* [Developers Build Guide](#developers-build-guide)
-* [Testing](#testing)
-  * [Unit Tests](#unit-tests)
-  * [E2E Tests](#e2e-tests)
 * [Contributing](#contributing)
-  * [Create new API](#create-new-api)
-  * [Create new Controller for the API](#create-new-controller-for-the-api)
-  * [Create CRDs](#create-crds)
-  * [Create a new Release](#create-a-new-release)
 
 <!-- vim-markdown-toc -->
 
@@ -40,6 +32,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 * Create/Delete MongoDB Atlas Projects
 * Create/Update/Delete MongoDB Atlas Clusters
+* Create/Update/Delete MongoDB Atlas Database Users
 
 ## Prerequisites
 
@@ -51,7 +44,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 This example creates a MongoDB Atlas project and a cluster inside this project.
 
-### Init
+### Deploy Operator
 
 First, create the MongoDB Atlas project CRD and some RBAC:
 
@@ -111,68 +104,19 @@ kubectl delete -f deploy/
 kubectl delete -f deploy/crds/
 ```
 
-## Developers Build Guide
+## Environment Variables
 
-Connect to a Kubernetes cluster
+You can specify the following environment variables in the Operator's [operator.yaml](./deploy/operator.yaml):
 
-```shell
-export KUBECONFIG=/path/to/config
-```
 
-**Create all CRDs that are managed by the operator**
-
-Run this once:
-
-```shell
-make init
-```
-
-**Run Operator locally**
-
-```shell
-export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
-export ATLAS_PUBLIC_KEY=yyyyy
-make dev
-```
-
-**Create MongoDB Atlas Project**
-
-```shell
-make deploy-project
-```
-
-**Create MongoDB Atlas Cluster**
-
-```shell
-make deploy-cluster
-```
-
-**Delete MongoDB Atlas Project and Cluster**
-
-```shell
-make delete-cluster
-make delete-project
-```
-
-## Testing
-
-### Unit Tests
-
-The following executes unit tests for the controllers in `./pkg/controller/`
-
-```shell
-make test
-```
-
-### E2E Tests
-
-Export the Programmatic API key pair and run the end-to-end tests with
-
-```shell
-export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
-export ATLAS_PUBLIC_KEY=yyyyy
-make e2etest ORGANIZATION_ID=123456789
-```
+| Name | Description | Default | Required |
+|------|-------------|---------|----------|
+| WATCH_NAMESPACE | The namespace which the operator should watch for MongoDBAtlas CRDs. | `metadata.namespace` | yes |
+| POD_NAME | Operator pod name. | `metadata.name` | no |
+| OPERATOR_NAME | Operator name. | n/a | no |
+| ATLAS_PRIVATE_KEY | The private key of the Atlas API. | n/a | yes |
+| ATLAS_PUBLIC_KEY | The private key of the Atlas API. | n/a | yes |
+| RECONCILIATION_TIME | Time in seconds which should be used to periodically reconcile the actual status in MongoDB Atlas with the current status in the corresponding Kubernetes CRD. | `"120"` | no |
 
 ## Contributing
 
@@ -180,45 +124,4 @@ I am working on this project in my spare time, hence feature development and rel
 
 Read through the [Contributing Guidelines and Code of Conduct](./CONTRIBUTING.md).
 
-### Create new API
-
-This example creates a new MongoDBAtlasCluster API:
-
-```shell
-make api KIND=MongoDBAtlasCluster
-```
-
-### Create new Controller for the API
-
-To create a controller for the recently created API, run:
-
-```shell
-make controller KIND=MongoDBAtlasCluster
-```
-
-### Create CRDs
-
-```shell
-make generate-openapi
-```
-
-### Create a new Release
-
-> You need to have Collaborator permissions to perform this step
-
-A new release will
-
-* create a new release on the Github [release page](https://github.com/Knappek/mongodbatlas-operator/releases) 
-* push a new tagged Docker image to [Dockerhub](https://cloud.docker.com/repository/docker/knappek/mongodbatlas-operator/tags)
-
-In order to do this, follow these steps:
-
-1. Change the version in [.drone.yml](./.drone.yml) and in [operator.yaml](./deploy/operator.yaml) according to [Semantic Versioning](http://semver.org/)
-2. Commit your changes (don't push)
-3. Create a new release using [SemVer](http://semver.org/)
-
-    ```shell
-    make release VERSION=<major.minor.patch>
-    ```
-
-This will kick the CI pipeline and create a new Github Release with the version tag `v<major.minor.patch>`.
+More information how to contribute/develop can be found in the [docs](./docs/CONTRIBUTING.md).

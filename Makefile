@@ -5,6 +5,8 @@ BUILD_DATE=$(shell date +%FT%T%z)
 CRDS=$(shell echo deploy/crds/*_crd.yaml | sed 's/ / -f /g')
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
 GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
+TEST_DIR?=./pkg/controller/...
+VERBOSE?=
 
 ORGANIZATION_ID?=5c4a2a55553855344780cf5f
 
@@ -36,7 +38,7 @@ api:
 	operator-sdk add api --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
 
 controller:
-	operator-sdk add controller --api-version=knappek.com/$(API_VERSION) --kind=$(KIND)
+	./code-generation/controller-gen.sh --api-version v1alpha1 -k $(KIND) && gofmt -w $(GOFMT_FILES)
 
 .PHONY: build 
 build:
@@ -77,9 +79,9 @@ cleanup:
 
 .PHONY: test
 test:
-	go test ./pkg/controller/... -v -coverprofile=coverage.out -covermode=atomic
+	go test $(TEST_DIR) $(VERBOSE) -coverprofile=coverage.out -covermode=atomic
 
-e2etest: cleanup fmt lint
+e2etest: cleanup fmt
 	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
 		echo "ERROR: Export ATLAS_PRIVATE_KEY variable and then run init again. For example:"; \
 		echo "  export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \

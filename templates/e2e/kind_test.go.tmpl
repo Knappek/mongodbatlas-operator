@@ -1,0 +1,71 @@
+
+package e2e
+
+import (
+	goctx "context"
+	"fmt"
+	"testing"
+	"time"
+
+	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
+	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
+
+	framework "github.com/operator-framework/operator-sdk/pkg/test"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/wait"
+)
+
+func _KIND_(t *testing.T, ctx *framework.TestCtx, f *framework.Framework, namespace string) {
+	resourceName := "e2etest-test_KIND_SHORT_"
+	example_KIND_ := &knappek_API_VERSION_._KIND_{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      resourceName,
+			Namespace: namespace,
+		},
+		Spec: knappek_API_VERSION_._KIND_Spec{
+			ProjectName: atlasProjectName,
+			_KIND_RequestBody: knappek_API_VERSION_._KIND_RequestBody{
+				//
+				// TODO
+				//
+			},
+		},
+	}
+	err := f.Client.Create(goctx.TODO(), example_KIND_, &framework.CleanupOptions{TestContext: ctx, Timeout: time.Second * 5, RetryInterval: time.Second * 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("wait for creating _KIND_SHORT_: %v\n", example_KIND_.ObjectMeta.Name)
+	err = waitFor_KIND_(t, f, example_KIND_, "2100-01-01T00:00:00Z")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("_KIND_SHORT_ %v successfully created\n", example_KIND_.ObjectMeta.Name)
+
+	// update resource
+	example_KIND_.Spec.DeleteAfterDate = "2100-02-01T00:00:00Z"
+	err = f.Client.Update(goctx.TODO(), example_KIND_)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("wait for updating _KIND_SHORT_: %v\n", example_KIND_.ObjectMeta.Name)
+	err = waitFor_KIND_(t, f, example_KIND_, "2100-02-01T00:00:00Z")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("_KIND_SHORT_ %v successfully updated\n", example_KIND_.ObjectMeta.Name)
+}
+
+func waitFor_KIND_(t *testing.T, f *framework.Framework, p *knappek_API_VERSION_._KIND_, desiredState string) error {
+	retryInterval := time.Second * 5
+	timeout := time.Second * 10
+	err := wait.Poll(retryInterval, timeout, func() (done bool, err error) {
+		err = f.Client.Get(goctx.TODO(), types.NamespacedName{Name: p.Name, Namespace: p.Namespace}, p)
+		return isInDesiredState(t, err, p.Name, p.Kind, p.Status.DeleteAfterDate, desiredState)
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

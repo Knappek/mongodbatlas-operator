@@ -215,6 +215,8 @@ spec:
                 - readOnlyNodes
                 - analyticsNodes
                 type: object
+              description: 'TODO: ReplicationSpec is deprecated, update to ReplicationSpecs.
+                This needs to be done in the Go clinet library first: https://github.com/akshaykarle/go-mongodbatlas'
               type: object
             srvAddress:
               type: string
