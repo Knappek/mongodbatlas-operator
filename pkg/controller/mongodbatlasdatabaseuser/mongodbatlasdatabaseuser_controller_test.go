@@ -242,8 +242,8 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 	// A mongodbatlasdatabaseuser resource with metadata and spec.
 	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:              resourceName,
-			Namespace:         namespace,
+			Name:      resourceName,
+			Namespace: namespace,
 		},
 		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName: projectName,

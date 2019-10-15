@@ -40,9 +40,9 @@ func Add(mgr manager.Manager) error {
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
 	return &ReconcileMongoDBAtlasCluster{
-		client: mgr.GetClient(), 
-		scheme: mgr.GetScheme(), 
-		atlasClient: config.GetAtlasClient(),
+		client:               mgr.GetClient(),
+		scheme:               mgr.GetScheme(),
+		atlasClient:          config.GetAtlasClient(),
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 }

@@ -13,8 +13,8 @@ import (
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
-	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
 	"github.com/Knappek/mongodbatlas-operator/pkg/config"
+	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -78,9 +78,9 @@ func TestNonExistingMongoDBAtlasProjectCR(t *testing.T) {
 
 	// Create a ReconcileMongoDBAtlasProject object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasProject{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 
@@ -143,9 +143,9 @@ func TestCreateMongoDBAtlasProject(t *testing.T) {
 
 	// Create a ReconcileMongoDBAtlasProject object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasProject{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 
@@ -231,9 +231,9 @@ func TestDeleteMongoDBAtlasProject(t *testing.T) {
 
 	// Create a ReconcileMongoDBAtlasProject object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasProject{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 

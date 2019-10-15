@@ -13,8 +13,8 @@ import (
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 
 	knappekv1alpha1 "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1"
-	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
 	"github.com/Knappek/mongodbatlas-operator/pkg/config"
+	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -143,9 +143,9 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasCluster{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 
@@ -297,9 +297,9 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasCluster{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 
@@ -337,9 +337,9 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
 	r2 := &ReconcileMongoDBAtlasCluster{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient2, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient2,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 
@@ -467,9 +467,9 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	})
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasCluster{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 
@@ -595,9 +595,9 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	})
 	// Create a ReconcileMongoDBAtlasCluster object with the scheme and fake client.
 	r := &ReconcileMongoDBAtlasCluster{
-		client: k8sClient, 
-		scheme: s, 
-		atlasClient: atlasClient, 
+		client:               k8sClient,
+		scheme:               s,
+		atlasClient:          atlasClient,
 		reconciliationConfig: config.GetReconcilitationConfig(),
 	}
 
