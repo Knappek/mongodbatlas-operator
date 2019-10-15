@@ -111,8 +111,8 @@ You can specify the following environment variables in the Operator's [operator.
 
 | Name | Description | Default | Required |
 |------|-------------|---------|----------|
-| WATCH_NAMESPACE | The namespace which the operator should watch for MongoDBAtlas CRDs. | n/a | yes |
-| POD_NAME | Operator pod name. | n/a | no |
+| WATCH_NAMESPACE | The namespace which the operator should watch for MongoDBAtlas CRDs. | `metadata.namespace` | yes |
+| POD_NAME | Operator pod name. | `metadata.name` | no |
 | OPERATOR_NAME | Operator name. | n/a | no |
 | ATLAS_PRIVATE_KEY | The private key of the Atlas API. | n/a | yes |
 | ATLAS_PUBLIC_KEY | The private key of the Atlas API. | n/a | yes |
