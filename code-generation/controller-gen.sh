@@ -34,12 +34,26 @@ check_input_vars() {
     fi
 }
 
+check_if_already_substitued() {
+    file=$1
+    replace=y
+    # handle add_kind.gp.tmpl
+    if [[ -f ${file} ]]; then
+        read -p "[warn] file ${file} already exists. Do you want to replace it? (Y/n) " replace
+    else
+        replace=y
+    fi
+    case $replace in
+        [Yy]* ) echo "y";;
+        [Nn]* ) echo "n";;
+        * ) echo "n";;
+    esac
+}
+
 substitute_values() {
     input="./templates/${1}.go.tmpl"
     while IFS= read -r line
     do
-    KIND_LOWERCASE=$(echo $KIND | tr '[:upper:]' '[:lower:]')
-    KIND_SHORT=$(echo $KIND | sed 's/MongoDBAtlas//g')
     sed 's/_KIND_LOWERCASE_/'${KIND_LOWERCASE}'/g' $line > kind_lower_replaced_line.tmp
     sed 's/_KIND_SHORT_/'${KIND_SHORT}'/g' kind_lower_replaced_line.tmp > kind_short_replaced_line.tmp
     sed 's/_KIND_/'${KIND}'/g' kind_short_replaced_line.tmp > kind_replaced_line.tmp
@@ -52,13 +66,31 @@ substitute_values() {
 
 pushd "${SCRIPT_DIR}/../" > /dev/null
 check_input_vars
-# handle add_kind.gp.tmpl
-substitute_values add_kind
-mv substitued_values.go pkg/controller/add_${KIND_LOWERCASE}.go
-# handle kind_controller.gp.tmpl
-substitute_values kind_controller
-mv substitued_values.go pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller.go
-# handle kind_controller_test.gp.tmpl
-substitute_values kind_controller_test
-mv substitued_values.go pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller_test.go
+KIND_LOWERCASE=$(echo $KIND | tr '[:upper:]' '[:lower:]')
+KIND_SHORT=$(echo $KIND | sed 's/MongoDBAtlas//g')
+
+# handle add_kind.go.tmpl
+return_add_kind=$(check_if_already_substitued pkg/controller/add_${KIND_LOWERCASE}.go)
+if [[ ${return_add_kind} == "y" ]];then 
+    substitute_values add_kind 
+    mv substitued_values.go pkg/controller/add_${KIND_LOWERCASE}.go
+fi
+# handle kind_controller.go.tmpl
+return_kind_controller=$(check_if_already_substitued pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller.go)
+if [[ ${return_kind_controller} == "y" ]];then 
+    substitute_values kind_controller
+    mv substitued_values.go pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller.go
+fi
+# handle kind_controller_test.go.tmpl
+return_kind_controller_test=$(check_if_already_substitued pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller_test.go)
+if [[ ${return_kind_controller_test} == "y" ]];then 
+    substitute_values kind_controller_test
+    mv substitued_values.go pkg/controller/${KIND_LOWERCASE}/${KIND_LOWERCASE}_controller_test.go
+fi
+# handle e2e/kind_test.go.tmpl
+return_kind_controller_test=$(check_if_already_substitued test/e2e/${KIND_LOWERCASE}_test.go)
+if [[ ${return_kind_controller_test} == "y" ]];then 
+    substitute_values e2e/kind_test
+    mv substitued_values.go test/e2e/${KIND_LOWERCASE}_test.go
+fi
 popd > /dev/null
