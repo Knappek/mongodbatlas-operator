@@ -27,7 +27,7 @@ import (
 
 var (
 	projectName    = "unittest-project"
-	projectID      = "5a0a1e7e0f2912c554080ae6"
+	groupID      = "5a0a1e7e0f2912c554080ae6"
 	namespace      = "mongodbatlas"
 	organizationID = "testOrgID"
 	created        = "2016-07-14T14:19:33Z"
@@ -72,7 +72,7 @@ func TestNonExistingMongoDBAtlasProjectCR(t *testing.T) {
 	mux.HandleFunc("/api/atlas/v1.0/groups/", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, `{"clusterCount": `+strconv.Itoa(clusterCount)+`, "created":"`+created+`", "id":"`+projectID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
+		fmt.Fprintf(w, `{"clusterCount": `+strconv.Itoa(clusterCount)+`, "created":"`+created+`", "id":"`+groupID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
 	})
 	atlasClient := ma.NewClient(httpClient)
 
@@ -137,7 +137,7 @@ func TestCreateMongoDBAtlasProject(t *testing.T) {
 	mux.HandleFunc("/api/atlas/v1.0/groups/", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, `{"clusterCount": `+strconv.Itoa(clusterCount)+`, "created":"`+created+`", "id":"`+projectID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
+		fmt.Fprintf(w, `{"clusterCount": `+strconv.Itoa(clusterCount)+`, "created":"`+created+`", "id":"`+groupID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
 	})
 	atlasClient := ma.NewClient(httpClient)
 
@@ -171,7 +171,7 @@ func TestCreateMongoDBAtlasProject(t *testing.T) {
 	}
 	assert.Equal(t, "finalizer.knappek.com", cr.ObjectMeta.GetFinalizers()[0], "The finalizer in the CR is not as expected")
 	assert.Equal(t, organizationID, cr.Spec.OrgID, "The orgID in the Spec block is not as expected")
-	assert.Equal(t, projectID, cr.Status.ID, "The id in the Status block is not as expected")
+	assert.Equal(t, groupID, cr.Status.ID, "The id in the Status block is not as expected")
 	assert.Equal(t, projectName, cr.Status.Name, "The name in the Status block is not as expected")
 	assert.Equal(t, organizationID, cr.Status.OrgID, "The orgId in the Status block is not as expected")
 	assert.Equal(t, created, cr.Status.Created, "The create in the Status block is not as expected")
@@ -194,7 +194,7 @@ func TestDeleteMongoDBAtlasProject(t *testing.T) {
 			OrgID: organizationID,
 		},
 		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
+			ID:           groupID,
 			OrgID:        organizationID,
 			Name:         projectName,
 			Created:      created,
@@ -220,10 +220,10 @@ func TestDeleteMongoDBAtlasProject(t *testing.T) {
 	// getByName: assert that there is no existing project
 	mux.HandleFunc("/api/atlas/v1.0/groups/byName/"+projectName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
-		fmt.Fprintf(w, `{"clusterCount": 0, "created":"`+created+`", "id":"`+projectID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
+		fmt.Fprintf(w, `{"clusterCount": 0, "created":"`+created+`", "id":"`+groupID+`", "links":[], "name":"`+projectName+`", "orgId":"`+organizationID+`"}`)
 	})
 	// delete
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "DELETE", r)
 		fmt.Fprintf(w, `{}`)
 	})

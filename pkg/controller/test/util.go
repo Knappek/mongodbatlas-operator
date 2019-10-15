@@ -60,7 +60,7 @@ func AssertReqJSON(t *testing.T, expected map[string]interface{}, req *http.Requ
 }
 
 // CreateAtlasProject returns a standard atlas project
-func CreateAtlasProject(projectName string, projectID string, namespace string, organizationID string) *knappekv1alpha1.MongoDBAtlasProject {
+func CreateAtlasProject(projectName string, groupID string, namespace string, organizationID string) *knappekv1alpha1.MongoDBAtlasProject {
 	return &knappekv1alpha1.MongoDBAtlasProject{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      projectName,
@@ -70,7 +70,7 @@ func CreateAtlasProject(projectName string, projectID string, namespace string, 
 			OrgID: organizationID,
 		},
 		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
+			ID:           groupID,
 			Name:         projectName,
 			OrgID:        organizationID,
 			Created:      "2016-07-14T14:19:33Z",

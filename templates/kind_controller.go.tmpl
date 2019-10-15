@@ -121,7 +121,7 @@ func (r *Reconcile_KIND_) Reconcile(request reconcile.Request) (reconcile.Result
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		err = r.client.Status().Update(context.TODO(), atlas_KIND_SHORT_)
+		err = r.client.Update(context.TODO(), atlas_KIND_SHORT_)
 		if err != nil {
 			return reconcile.Result{}, err
 		}

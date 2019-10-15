@@ -120,12 +120,12 @@ func (r *ReconcileMongoDBAtlasDatabaseUser) Reconcile(request reconcile.Request)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		err = r.client.Status().Update(context.TODO(), atlasDatabaseUser)
+		err = r.client.Update(context.TODO(), atlasDatabaseUser)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
 		// Requeue to periodically reconcile the CR MongoDBAtlasDatabaseUser in order to recreate a manually deleted Atlas DatabaseUser
-		return reconcile.Result{RequeueAfter: r.reconciliationConfig.Time}, nil
+		return reconcile.Result{}, nil
 	}
 
 	// Create a new MongoDBAtlasDatabaseUser
@@ -184,7 +184,7 @@ func createMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Clien
 	if err != nil {
 		return fmt.Errorf("(%v) Error creating DatabaseUser %v: %s", resp.StatusCode, name, err)
 	}
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusCreated {
 		reqLogger.Info("DatabaseUser created.")
 		return updateCRStatus(reqLogger, cr, c)
 	}
@@ -221,13 +221,10 @@ func deleteMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Clien
 		}
 		return fmt.Errorf("(%v) Error deleting DatabaseUser %s: %s", resp.StatusCode, name, err)
 	}
-	if resp.StatusCode == http.StatusOK {
-		// Update finalizer to allow delete CR
-		cr.SetFinalizers(nil)
-		reqLogger.Info("DatabaseUser deleted.")
-		return nil
-	}
-	return fmt.Errorf("(%v) Error deleting DatabaseUser %s: %s", resp.StatusCode, name, err)
+	// Update finalizer to allow delete CR
+	cr.SetFinalizers(nil)
+	reqLogger.Info("DatabaseUser deleted.")
+	return nil
 }
 
 func getMongoDBAtlasDatabaseUser(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasDatabaseUser) error {

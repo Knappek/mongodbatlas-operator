@@ -162,14 +162,14 @@ func deleteMongoDBAtlasProject(reqLogger logr.Logger, atlasClient *ma.Client, cr
 	}
 
 	// project exists and can be deleted
-	atlasProjectID := p.ID
-	resp, err = atlasClient.Projects.Delete(atlasProjectID)
+	atlasGroupID := p.ID
+	resp, err = atlasClient.Projects.Delete(atlasGroupID)
 	if err != nil {
-		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, atlasProjectID, err)
+		return fmt.Errorf("(%v) Error deleting MongoDB Project %s: %s", resp.StatusCode, atlasGroupID, err)
 	}
 	// Update finalizer to allow delete CR
 	cr.SetFinalizers(nil)
-	reqLogger.Info("Project deleted.", "MongoDBAtlasProject.ID", atlasProjectID)
+	reqLogger.Info("Project deleted.", "MongoDBAtlasProject.ID", atlasGroupID)
 	return nil
 }
 

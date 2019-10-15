@@ -29,7 +29,7 @@ var (
 	namespace             = "mongodbatlas"
 	organizationID        = "testOrgID"
 	projectName           = "unittest-project"
-	projectID             = "5a0a1e7e0f2912c554080ae6"
+	groupID             = "5a0a1e7e0f2912c554080ae6"
 	resourceName 		  = "<TODO: Name>"
 )
 
@@ -38,7 +38,7 @@ func TestCreate_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A _KIND_LOWERCASE_ resource with metadata and spec.
 	_KIND_LOWERCASE_ := &knappek_API_VERSION_._KIND_{
@@ -129,7 +129,7 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A _KIND_LOWERCASE_ resource with metadata and spec.
 	_KIND_LOWERCASE_ := &knappek_API_VERSION_._KIND_{
@@ -248,7 +248,7 @@ func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// updates
 	//
@@ -346,7 +346,7 @@ func TestNoUpdate_KIND_LOWERCASE_(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A _KIND_LOWERCASE_ resource with metadata and spec. This Spec contains only the bare minimum, other values
 	// will be filled with default values

@@ -29,7 +29,7 @@ var (
 	namespace             = "mongodbatlas"
 	organizationID        = "testOrgID"
 	projectName           = "unittest-project"
-	projectID             = "5a0a1e7e0f2912c554080ae6"
+	groupID             = "5a0a1e7e0f2912c554080ae6"
 	clusterName           = "unittest-cluster"
 	clusterID             = "testClusterId"
 	mongoDBVersion        = "3.4"
@@ -64,7 +64,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec.
 	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
@@ -106,7 +106,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	atlasClient := ma.NewClient(httpClient)
 
 	// Post
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
@@ -115,7 +115,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 			},
 			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
@@ -172,7 +172,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	assert.Equal(t, "CREATING", cr.Status.StateName, "stateName not as expected")
 
 	// GET: Simulate a new reconcile where stateName changed from CREATING to IDLE
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
 		fmt.Fprintf(w, `{
 			"autoScaling":{
@@ -180,7 +180,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 			},
 			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
@@ -222,7 +222,7 @@ func TestCreateMongoDBAtlasCluster(t *testing.T) {
 	assert.Equal(t, "finalizer.knappek.com", cr.ObjectMeta.GetFinalizers()[0], "Finalizer not as expected")
 	assert.Equal(t, clusterID, cr.Status.ID, "clusterID not as expected")
 	assert.Equal(t, clusterName, cr.Status.Name, "clusterName not as expected")
-	assert.Equal(t, projectID, cr.Status.GroupID, "projectID not as expected")
+	assert.Equal(t, groupID, cr.Status.GroupID, "groupID not as expected")
 	assert.Equal(t, mongoDBVersion, cr.Status.MongoDBVersion, "mongoDBVersion not as expected")
 	assert.Equal(t, mongoDBMajorVersion, cr.Status.MongoDBMajorVersion, "mongoDBMajorVersion not as expected")
 	assert.Equal(t, diskSizeGB, cr.Status.DiskSizeGB, "diskSizeGB not as expected")
@@ -241,7 +241,7 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec.
 	mongodbatlascluster := &knappekv1alpha1.MongoDBAtlasCluster{
@@ -265,7 +265,7 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
-			GroupID:   projectID,
+			GroupID:   groupID,
 			Name:      clusterName,
 			StateName: "IDLE",
 		},
@@ -290,7 +290,7 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	atlasClient := ma.NewClient(httpClient)
 
 	// Delete
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "DELETE", r)
 		fmt.Fprintf(w, `{}`)
 	})
@@ -330,7 +330,7 @@ func TestDeleteMongoDBAtlasCluster(t *testing.T) {
 	defer server2.Close()
 	atlasClient2 := ma.NewClient(httpClient2)
 	// GET: Simulate a new reconcile where cluster has been deleted successfully
-	mux2.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux2.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 	})
@@ -362,7 +362,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// updates
 	updatedDiskSizeGB := diskSizeGB + 10
@@ -394,7 +394,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
-			GroupID:        projectID,
+			GroupID:        groupID,
 			Name:           clusterName,
 			StateName:      "IDLE",
 			ID:             clusterID,
@@ -431,7 +431,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 	defer server.Close()
 	atlasClient := ma.NewClient(httpClient)
 	// Construct Update API call
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "PATCH", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
@@ -440,7 +440,7 @@ func TestUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 			"backupEnabled":`+strconv.FormatBool(!backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(updatedDiskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",
@@ -505,7 +505,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A MongoDBAtlasCluster resource with metadata and spec. This Spec contains only the bare minimum, other values
 	// will be filled with default values
@@ -522,7 +522,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasClusterStatus{
-			GroupID:        projectID,
+			GroupID:        groupID,
 			Name:           clusterName,
 			StateName:      "IDLE",
 			ID:             clusterID,
@@ -559,7 +559,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 	defer server.Close()
 	atlasClient := ma.NewClient(httpClient)
 	// Construct Update API call
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "GET", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
@@ -568,7 +568,7 @@ func TestNoUpdateMongoDBAtlasCluster(t *testing.T) {
 			},
 			"backupEnabled":`+strconv.FormatBool(backupEnabled)+`,
 			"diskSizeGB":`+strconv.FormatFloat(diskSizeGB, 'f', 6, 64)+`,
-			"groupId": "`+projectID+`",
+			"groupId": "`+groupID+`",
 			"id": "`+clusterID+`",
 			"mongoDBVersion":"`+mongoDBVersion+`",
 			"mongoDBMajorVersion":"`+mongoDBMajorVersion+`",

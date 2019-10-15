@@ -22,10 +22,10 @@ type MongoDBAtlasProjectList struct {
 
 // MongoDBAtlasProject is the Schema for the mongodbatlasprojects API
 // +k8s:openapi-gen=true
-// +kubebuilder:printcolumn:name="OrgID",type="string",JSONPath=".spec.orgID",description="The MongoDB Atlas Organization ID"
+// +kubebuilder:printcolumn:name="GroupID",type="string",JSONPath=".status.id",description="The ID of the Project"
 // +kubebuilder:printcolumn:name="ClusterCount",type="integer",JSONPath=".status.clusterCount",description="The number of Clusters in the Project"
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:printcolumn:name="ProjectID",type="string",JSONPath=".status.id",description="The ID of the Project",priority="1"
+// +kubebuilder:printcolumn:name="OrgID",type="string",JSONPath=".spec.orgID",description="The MongoDB Atlas Organization ID",priority="1"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=mongodbatlasprojects,shortName=map
 // +kubebuilder:categories=all,mongodbatlas

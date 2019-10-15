@@ -4,9 +4,9 @@ metadata:
   name: mongodbatlasprojects.knappek.com
 spec:
   additionalPrinterColumns:
-  - JSONPath: .spec.orgID
-    description: The MongoDB Atlas Organization ID
-    name: OrgID
+  - JSONPath: .status.id
+    description: The ID of the Project
+    name: GroupID
     type: string
   - JSONPath: .status.clusterCount
     description: The number of Clusters in the Project
@@ -15,9 +15,9 @@ spec:
   - JSONPath: .metadata.creationTimestamp
     name: Age
     type: date
-  - JSONPath: .status.id
-    description: The ID of the Project
-    name: ProjectID
+  - JSONPath: .spec.orgID
+    description: The MongoDB Atlas Organization ID
+    name: OrgID
     priority: 1
     type: string
   group: knappek.com

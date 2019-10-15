@@ -28,7 +28,7 @@ var (
 	namespace       = "mongodbatlas"
 	organizationID  = "testOrgID"
 	projectName     = "unittest-project"
-	projectID       = "5a0a1e7e0f2912c554080ae6"
+	groupID       = "5a0a1e7e0f2912c554080ae6"
 	resourceName    = "testuser"
 	password        = "testpassword"
 	databaseName    = "testdb"
@@ -41,7 +41,7 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A mongodbatlasdatabaseuser resource with metadata and spec.
 	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
@@ -79,11 +79,11 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	atlasClient := ma.NewClient(httpClient)
 
 	// Post request for MongoDBAtlasDatabaseUser
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/databaseUsers", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/databaseUsers", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
-			"groupId":"`+projectID+`",
+			"groupId":"`+groupID+`",
 			"databaseName":"admin",
 			"username":"`+resourceName+`",
 			"deleteAfterDate":"`+deleteAfterDate+`",
@@ -118,7 +118,7 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)
 	}
-	assert.Equal(t, projectID, cr.Status.GroupID)
+	assert.Equal(t, groupID, cr.Status.GroupID)
 	assert.Equal(t, resourceName, cr.Status.Username)
 	assert.Equal(t, "admin", cr.Status.DatabaseName)
 	assert.Equal(t, deleteAfterDate, cr.Status.DeleteAfterDate)
@@ -130,7 +130,7 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 	logf.SetLogger(logf.ZapLogger(true))
 
 	// A MongoDBAtlasProject resource with metadata and spec.
-	mongodbatlasproject := testutil.CreateAtlasProject(projectName, projectID, namespace, organizationID)
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
 
 	// A mongodbatlasdatabaseuser resource with metadata and spec.
 	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
@@ -150,7 +150,7 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
-			GroupID:         projectID,
+			GroupID:         groupID,
 			Username:        resourceName,
 			DeleteAfterDate: deleteAfterDate,
 			DatabaseName:    "admin",
@@ -177,7 +177,7 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 	atlasClient := ma.NewClient(httpClient)
 
 	// Delete
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/databaseUsers/admin/"+resourceName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/databaseUsers/admin/"+resourceName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "DELETE", r)
 		fmt.Fprintf(w, `{}`)
 	})
@@ -225,7 +225,7 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 			OrgID: organizationID,
 		},
 		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-			ID:           projectID,
+			ID:           groupID,
 			Name:         projectName,
 			OrgID:        organizationID,
 			Created:      "2016-07-14T14:19:33Z",
@@ -255,7 +255,7 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
-			GroupID:         projectID,
+			GroupID:         groupID,
 			Username:        resourceName,
 			DeleteAfterDate: updatedDeleteAfterDate,
 			DatabaseName:    "admin",
@@ -281,11 +281,11 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 	defer server.Close()
 	atlasClient := ma.NewClient(httpClient)
 	// Construct Update API call
-	mux.HandleFunc("/api/atlas/v1.0/groups/"+projectID+"/databaseUsers/admin/"+resourceName, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/databaseUsers/admin/"+resourceName, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "PATCH", r)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
-			"groupId":"`+projectID+`",
+			"groupId":"`+groupID+`",
 			"databaseName":"admin",
 			"deleteAfterDate":"`+updatedDeleteAfterDate+`",
 			"username":"`+resourceName+`",
@@ -340,7 +340,7 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 // 			OrgID: organizationID,
 // 		},
 // 		Status: knappekv1alpha1.MongoDBAtlasProjectStatus{
-// 			ID:           projectID,
+// 			ID:           groupID,
 // 			Name:         projectName,
 // 			OrgID:        organizationID,
 // 			Created:      "2016-07-14T14:19:33Z",
