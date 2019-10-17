@@ -11,15 +11,190 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasCluster":            schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasCluster(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterSpec":        schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterStatus":      schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUser":       schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUser(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserSpec":   schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserStatus": schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProject":            schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProject(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectSpec":        schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectSpec(ref),
-		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectStatus":      schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectStatus(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasAlertConfiguration":       schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasAlertConfiguration(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasAlertConfigurationSpec":   schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasAlertConfigurationSpec(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasAlertConfigurationStatus": schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasAlertConfigurationStatus(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasCluster":                  schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasCluster(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterSpec":              schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterSpec(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasClusterStatus":            schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasClusterStatus(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUser":             schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUser(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserSpec":         schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserSpec(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasDatabaseUserStatus":       schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasDatabaseUserStatus(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProject":                  schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProject(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectSpec":              schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectSpec(ref),
+		"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasProjectStatus":            schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasProjectStatus(ref),
+	}
+}
+
+func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasAlertConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MongoDBAtlasAlertConfiguration is the Schema for the mongodbatlasalertconfigurations API",
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasAlertConfigurationSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasAlertConfigurationStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasAlertConfigurationSpec", "github.com/Knappek/mongodbatlas-operator/pkg/apis/knappek/v1alpha1.MongoDBAtlasAlertConfigurationStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasAlertConfigurationSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MongoDBAtlasAlertConfigurationSpec defines the desired state of MongoDBAtlasAlertConfiguration",
+				Properties: map[string]spec.Schema{
+					"projectName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"eventTypeName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"enabled": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"notifications": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Notification"),
+									},
+								},
+							},
+						},
+					},
+					"metricThreshold": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.MetricThreshold"),
+						},
+					},
+					"matchers": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Matcher"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"projectName"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Matcher", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.MetricThreshold", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Notification"},
+	}
+}
+
+func schema_pkg_apis_knappek_v1alpha1_MongoDBAtlasAlertConfigurationStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MongoDBAtlasAlertConfigurationStatus defines the observed state of MongoDBAtlasAlertConfiguration",
+				Properties: map[string]spec.Schema{
+					"id": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"groupID": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"eventTypeName": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"enabled": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"notifications": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Notification"),
+									},
+								},
+							},
+						},
+					},
+					"metricThreshold": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.MetricThreshold"),
+						},
+					},
+					"matchers": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Matcher"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Matcher", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.MetricThreshold", "github.com/akshaykarle/go-mongodbatlas/mongodbatlas.Notification"},
 	}
 }
 

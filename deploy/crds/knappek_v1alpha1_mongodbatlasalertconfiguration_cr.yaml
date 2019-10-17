@@ -1,0 +1,7 @@
+apiVersion: knappek.com/v1alpha1
+kind: MongoDBAtlasAlertConfiguration
+metadata:
+  name: example-mongodbatlasalertconfiguration
+spec:
+  # Add fields here
+  size: 3

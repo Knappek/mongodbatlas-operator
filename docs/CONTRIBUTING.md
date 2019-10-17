@@ -95,6 +95,14 @@ This example creates a new MongoDBAtlasCluster API:
 make api KIND=MongoDBAtlasCluster
 ```
 
+Afterwards adapt the corresponding `./pkg/apis/knappek/v1alpha1/mongodbatlascluster_types.go`. 
+Then create the CRD and the generated OpenAPI Spec with
+
+```shell
+make generate-openapi
+make generate-k8s
+```
+
 ## Create new Controller for the API
 
 To create a controller for the recently created API, run:
