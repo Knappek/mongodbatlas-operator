@@ -69,6 +69,9 @@ check_input_vars
 KIND_LOWERCASE=$(echo $KIND | tr '[:upper:]' '[:lower:]')
 KIND_SHORT=$(echo $KIND | sed 's/MongoDBAtlas//g')
 
+# create controller dir
+[[ ! -d pkg/controller/${KIND_LOWERCASE} ]] && mkdir pkg/controller/${KIND_LOWERCASE}
+
 # handle add_kind.go.tmpl
 return_add_kind=$(check_if_already_substitued pkg/controller/add_${KIND_LOWERCASE}.go)
 if [[ ${return_add_kind} == "y" ]];then 
