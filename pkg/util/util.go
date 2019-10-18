@@ -1,5 +1,19 @@
 package util
 
+
+// IsNotEqual does not purely compare equality like reflect.DeepEqual does
+// It returns false if a and b are equal
+// It returns false if a and b are not equal but a is nil
+// It returns true if a and b are not equal and a is not nil
+func IsNotEqual(a, b interface{}) bool {
+	if a != b {
+		if !IsZeroValue(a) {
+			return true
+		}
+	}
+	return false
+}
+
 // IsZeroValue returns true if input interface is the corresponding zero value
 func IsZeroValue(i interface{}) bool {
 	if i == nil {
