@@ -205,7 +205,7 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 	}
 	assert.Equal(t, time.Second*120, res.RequeueAfter)
 
-	// Check if the CR has been created and has the correct status.
+	// Check if the CR has been deleted
 	cr := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
 	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
 	assert.Nil(t, err)

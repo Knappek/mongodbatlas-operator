@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"github.com/Knappek/mongodbatlas-operator/pkg/util"
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -29,6 +30,94 @@ type MongoDBAtlasAlertConfigurationStatus struct {
 	ID                                        string `json:"id,omitempty"`
 	GroupID                                   string `json:"groupID,omitempty"`
 	MongoDBAtlasAlertConfigurationRequestBody `json:",inline"`
+}
+
+// IsMongoDBAtlasAlertConfigurationToBeUpdated is used to compare spec.MongoDBAtlasDatabaseUserRequestBody with status.MongoDBAtlasDatabaseUserRequestBody
+func IsMongoDBAtlasAlertConfigurationToBeUpdated(m1 MongoDBAtlasAlertConfigurationRequestBody, m2 MongoDBAtlasAlertConfigurationRequestBody) bool {
+	if ok := util.IsNotEqual(m1.EventTypeName, m2.EventTypeName); ok {
+		return true
+	}
+	if ok := util.IsNotEqual(m1.Enabled, m2.Enabled); ok {
+		return true
+	}
+	if ok := util.IsNotEqual(m1.MetricThreshold, m2.MetricThreshold); ok {
+		return true
+	}
+
+	for idx, notification := range m1.Notifications {
+		if ok := util.IsNotEqual(notification.TypeName, m2.Notifications[idx].TypeName); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.IntervalMin, m2.Notifications[idx].IntervalMin); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.DelayMin, m2.Notifications[idx].DelayMin); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.EmailEnabled, m2.Notifications[idx].EmailEnabled); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.SMSEnabled, m2.Notifications[idx].SMSEnabled); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.Username, m2.Notifications[idx].Username); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.TeamID, m2.Notifications[idx].TeamID); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.EmailAddress, m2.Notifications[idx].EmailAddress); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.MobileNumber, m2.Notifications[idx].MobileNumber); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.NotificationToken, m2.Notifications[idx].NotificationToken); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.RoomName, m2.Notifications[idx].RoomName); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.ChannelName, m2.Notifications[idx].ChannelName); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.APIToken, m2.Notifications[idx].APIToken); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.OrgName, m2.Notifications[idx].OrgName); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.FlowName, m2.Notifications[idx].FlowName); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.FlowdockAPIToken, m2.Notifications[idx].FlowdockAPIToken); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.ServiceKey, m2.Notifications[idx].ServiceKey); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.VictorOpsAPIKey, m2.Notifications[idx].VictorOpsAPIKey); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.VictorOpsRoutingKey, m2.Notifications[idx].VictorOpsRoutingKey); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(notification.OpsGenieAPIKey, m2.Notifications[idx].OpsGenieAPIKey); ok {
+			return true
+		}
+	}
+	for idx, matcher := range m1.Matchers {
+		if ok := util.IsNotEqual(matcher.FieldName, m2.Matchers[idx].FieldName); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(matcher.Operator, m2.Matchers[idx].Operator); ok {
+			return true
+		}
+		if ok := util.IsNotEqual(matcher.Value, m2.Matchers[idx].Value); ok {
+			return true
+		}
+	}
+	return false
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
