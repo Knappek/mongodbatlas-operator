@@ -50,7 +50,7 @@ var (
 	}
 )
 
-func TestCreatemongodbatlasalertconfiguration(t *testing.T) {
+func TestCreateMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -155,7 +155,7 @@ func TestCreatemongodbatlasalertconfiguration(t *testing.T) {
 	assert.Empty(t, cr.Status.Matchers)
 }
 
-func TestDeletemongodbatlasalertconfiguration(t *testing.T) {
+func TestDeleteMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -244,7 +244,7 @@ func TestDeletemongodbatlasalertconfiguration(t *testing.T) {
 	assert.Nil(t, cr.ObjectMeta.GetFinalizers())
 }
 
-func TestUpdatemongodbatlasalertconfiguration(t *testing.T) {
+func TestUpdateMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -361,7 +361,9 @@ func TestUpdatemongodbatlasalertconfiguration(t *testing.T) {
 	assert.Equal(t, updatedMetricThreshold, cr.Status.MetricThreshold)
 }
 
-func TestNoUpdatemongodbatlasalertconfiguration(t *testing.T) {
+// tests a scenario where the spec has only a bare minimum (default values are used) and 
+// the status contains information about the default values 
+func TestNoUpdateMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 

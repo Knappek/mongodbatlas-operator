@@ -33,7 +33,7 @@ var (
 	resourceName 		  = "<TODO: Name>"
 )
 
-func TestCreate_KIND_LOWERCASE_(t *testing.T) {
+func TestCreate_KIND_(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -118,7 +118,7 @@ func TestCreate_KIND_LOWERCASE_(t *testing.T) {
 	//
 }
 
-func TestDelete_KIND_LOWERCASE_(t *testing.T) {
+func TestDelete_KIND_(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -206,7 +206,7 @@ func TestDelete_KIND_LOWERCASE_(t *testing.T) {
 	assert.Nil(t, cr.ObjectMeta.GetFinalizers())
 }
 
-func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
+func TestUpdate_KIND_(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -304,7 +304,9 @@ func TestUpdate_KIND_LOWERCASE_(t *testing.T) {
 	//
 }
 
-func TestNoUpdate_KIND_LOWERCASE_(t *testing.T) {
+// tests a scenario where the spec has only a bare minimum (default values are used) and 
+// the status contains information about the default values 
+func TestNoUpdate_KIND_(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 

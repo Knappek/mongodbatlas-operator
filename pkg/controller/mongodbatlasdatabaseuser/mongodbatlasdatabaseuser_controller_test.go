@@ -36,7 +36,7 @@ var (
 	roles           = []ma.Role{ma.Role{DatabaseName: databaseName, RoleName: "readWrite"}}
 )
 
-func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
+func TestCreateMongoDBAtlasDatabaseUser(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -126,7 +126,7 @@ func TestCreatemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Equal(t, roles, cr.Status.Roles)
 }
 
-func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
+func TestDeleteMongoDBAtlasDatabaseUser(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -212,7 +212,7 @@ func TestDeletemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Nil(t, cr.ObjectMeta.GetFinalizers())
 }
 
-func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
+func TestUpdateMongoDBAtlasDatabaseUser(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
@@ -327,7 +327,9 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Equal(t, updatedDeleteAfterDate, cr.Status.DeleteAfterDate)
 }
 
-func TestNoUpdateMongodbAtlasDatabaseUser(t *testing.T) {
+// tests a scenario where the spec has only a bare minimum (default values are used) and 
+// the status contains information about the default values 
+func TestNoUpdateMongoDBAtlasDatabaseUser(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
 
