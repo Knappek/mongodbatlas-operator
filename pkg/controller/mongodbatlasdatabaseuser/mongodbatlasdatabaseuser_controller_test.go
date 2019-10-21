@@ -326,3 +326,97 @@ func TestUpdatemongodbatlasdatabaseuser(t *testing.T) {
 	assert.Equal(t, updatedRoles, cr.Status.Roles)
 	assert.Equal(t, updatedDeleteAfterDate, cr.Status.DeleteAfterDate)
 }
+
+func TestNoUpdateMongodbAtlasDatabaseUser(t *testing.T) {
+	// Set the logger to development mode for verbose logs.
+	logf.SetLogger(logf.ZapLogger(true))
+
+	// A MongoDBAtlasProject resource with metadata and spec.
+	mongodbatlasproject := testutil.CreateAtlasProject(projectName, groupID, namespace, organizationID)
+
+	// A mongodbatlasalertconfiguration resource with metadata and spec. This Spec contains only the bare minimum, other values
+	// will be filled with default values
+	mongodbatlasdatabaseuser := &knappekv1alpha1.MongoDBAtlasDatabaseUser{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      resourceName,
+			Namespace: namespace,
+		},
+		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
+			ProjectName: projectName,
+			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
+				Password:        password,
+				DatabaseName:    "admin",
+				Roles:           roles,
+			},
+		},
+		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{
+			GroupID:         groupID,
+			Username:        resourceName,
+			DeleteAfterDate: deleteAfterDate,
+			DatabaseName:    "admin",
+			Roles:           roles,
+		},
+	}
+
+	// Objects to track in the fake client.
+	objs := []runtime.Object{
+		mongodbatlasdatabaseuser,
+		mongodbatlasproject,
+	}
+
+	// Register operator types with the runtime scheme.
+	s := scheme.Scheme
+	s.AddKnownTypes(knappekv1alpha1.SchemeGroupVersion, mongodbatlasdatabaseuser, mongodbatlasproject)
+
+	// Create a fake k8s client to mock API calls.
+	k8sClient := fake.NewFakeClient(objs...)
+	// Create a fake atlas client to mock API calls.
+	// atlasClient, server := test.NewAtlasFakeClient(t)
+	httpClient, mux, server := testutil.Server()
+	defer server.Close()
+	atlasClient := ma.NewClient(httpClient)
+	// Construct Update API call
+	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/databaseUsers/admin/"+resourceName, func(w http.ResponseWriter, r *http.Request) {
+		testutil.AssertMethod(t, "GET", r)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{
+			"groupId":"`+groupID+`",
+			"databaseName":"admin",
+			"username":"`+resourceName+`",
+			"deleteAfterDate":"`+deleteAfterDate+`",
+			"roles":[{"databaseName":"`+roles[0].DatabaseName+`","roleName":"`+roles[0].RoleName+`"}]
+		}`)
+	})
+	// Create a ReconcileMongoDBAtlasDatabaseUser object with the scheme and fake client.
+	r := &ReconcileMongoDBAtlasDatabaseUser{
+		client: k8sClient,
+		scheme: s, atlasClient: atlasClient,
+		reconciliationConfig: config.GetReconcilitationConfig(),
+	}
+
+	// Mock request to simulate Reconcile() being called on an event for a
+	// watched resource .
+	req := reconcile.Request{
+		NamespacedName: types.NamespacedName{
+			Name:      resourceName,
+			Namespace: namespace,
+		},
+	}
+	res, err := r.Reconcile(req)
+	if err != nil {
+		t.Fatalf("reconcile: (%v)", err)
+	}
+	assert.Equal(t, time.Second*120, res.RequeueAfter)
+
+	// Check if the CR has been created and has the correct status.
+	cr := &knappekv1alpha1.MongoDBAtlasDatabaseUser{}
+	err = k8sClient.Get(context.TODO(), req.NamespacedName, cr)
+	if err != nil {
+		t.Fatalf("get mongodbatlasdatabaseuser: (%v)", err)
+	}
+	assert.Equal(t, groupID, cr.Status.GroupID)
+	assert.Equal(t, resourceName, cr.Status.Username)
+	assert.Equal(t, "admin", cr.Status.DatabaseName)
+	assert.Equal(t, deleteAfterDate, cr.Status.DeleteAfterDate)
+	assert.Equal(t, roles, cr.Status.Roles)
+}
