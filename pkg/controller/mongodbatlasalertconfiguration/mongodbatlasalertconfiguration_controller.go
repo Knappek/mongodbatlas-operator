@@ -191,9 +191,10 @@ func createMongoDBAtlasAlertConfiguration(reqLogger logr.Logger, atlasClient *ma
 
 func updateMongoDBAtlasAlertConfiguration(reqLogger logr.Logger, atlasClient *ma.Client, cr *knappekv1alpha1.MongoDBAtlasAlertConfiguration, ap *knappekv1alpha1.MongoDBAtlasProject) error {
 	groupID := ap.Status.ID
+	id := cr.Status.ID
 	name := cr.Name
 	params := getAlertConfigurationParams(cr)
-	c, resp, err := atlasClient.AlertConfigurations.Update(groupID, name, &params)
+	c, resp, err := atlasClient.AlertConfigurations.Update(groupID, id, &params)
 	if err != nil {
 		return fmt.Errorf("(%v) Error updating AlertConfiguration %v: %s", resp.StatusCode, name, err)
 	}

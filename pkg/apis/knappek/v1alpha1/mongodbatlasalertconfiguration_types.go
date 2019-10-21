@@ -40,10 +40,21 @@ func IsMongoDBAtlasAlertConfigurationToBeUpdated(m1 MongoDBAtlasAlertConfigurati
 	if ok := util.IsNotEqual(m1.Enabled, m2.Enabled); ok {
 		return true
 	}
-	if ok := util.IsNotEqual(m1.MetricThreshold, m2.MetricThreshold); ok {
+	if ok := util.IsNotEqual(m1.MetricThreshold.MetricName, m2.MetricThreshold.MetricName); ok {
 		return true
 	}
-
+	if ok := util.IsNotEqual(m1.MetricThreshold.Operator, m2.MetricThreshold.Operator); ok {
+		return true
+	}
+	if ok := util.IsNotEqual(m1.MetricThreshold.Threshold, m2.MetricThreshold.Threshold); ok {
+		return true
+	}
+	if ok := util.IsNotEqual(m1.MetricThreshold.Units, m2.MetricThreshold.Units); ok {
+		return true
+	}
+	if ok := util.IsNotEqual(m1.MetricThreshold.Mode, m2.MetricThreshold.Mode); ok {
+		return true
+	}
 	for idx, notification := range m1.Notifications {
 		if ok := util.IsNotEqual(notification.TypeName, m2.Notifications[idx].TypeName); ok {
 			return true

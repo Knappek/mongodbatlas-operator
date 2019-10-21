@@ -7,9 +7,7 @@ package util
 // It returns true if a and b are not equal and a is not nil
 func IsNotEqual(a, b interface{}) bool {
 	if a != b {
-		if !IsZeroValue(a) {
-			return true
-		}
+		return !IsZeroValue(a)
 	}
 	return false
 }
