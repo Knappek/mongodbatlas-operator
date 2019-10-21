@@ -1,6 +1,5 @@
 package util
 
-
 // IsNotEqual does not purely compare equality like reflect.DeepEqual does
 // It returns false if a and b are equal
 // It returns false if a and b are not equal but a is nil

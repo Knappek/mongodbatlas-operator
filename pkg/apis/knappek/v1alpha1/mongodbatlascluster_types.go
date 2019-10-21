@@ -109,8 +109,6 @@ func IsMongoDBAtlasClusterToBeUpdated(m1 MongoDBAtlasClusterRequestBody, m2 Mong
 	return false
 }
 
-
-
 // MongoDBAtlasClusterSpec defines the desired state of MongoDBAtlasCluster
 // +k8s:openapi-gen=true
 type MongoDBAtlasClusterSpec struct {

@@ -138,6 +138,7 @@ func IsMongoDBAtlasAlertConfigurationToBeUpdated(m1 MongoDBAtlasAlertConfigurati
 // +kubebuilder:printcolumn:name="ID",type="string",JSONPath=".status.id",description="The ID of the Alert Configuration"
 // +kubebuilder:printcolumn:name="Project Name",type="string",JSONPath=".spec.projectName",description="The MongoDB Atlas Project to which the Alert Configuration is applied"
 // +kubebuilder:printcolumn:name="Enabled",type="string",JSONPath=".status.enabled",description="Whether the Alert Configuration is enabled or disabled"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=mongodbatlasalertconfigurations,shortName=maalertconfig
 // +kubebuilder:categories=all,mongodbatlas

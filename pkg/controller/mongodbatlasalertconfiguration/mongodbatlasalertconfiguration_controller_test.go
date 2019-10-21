@@ -31,22 +31,22 @@ var (
 	projectName    = "unittest-project"
 	groupID        = "5a0a1e7e0f2912c554080ae6"
 	resourceName   = "testalert"
-	id = "57b76ddc96e8215c017ceafb"
-	eventTypeName = "OUTSIDE_METRIC_THRESHOLD"
-	enabled = true
-	notifications = []ma.Notification{ma.Notification{
-		TypeName: "GROUP",
-		IntervalMin: 5,
-		DelayMin: 0,
-		SMSEnabled: false,
+	id             = "57b76ddc96e8215c017ceafb"
+	eventTypeName  = "OUTSIDE_METRIC_THRESHOLD"
+	enabled        = true
+	notifications  = []ma.Notification{ma.Notification{
+		TypeName:     "GROUP",
+		IntervalMin:  5,
+		DelayMin:     0,
+		SMSEnabled:   false,
 		EmailEnabled: true,
 	}}
 	metricThreshold = ma.MetricThreshold{
 		MetricName: "QUERY_TARGETING_SCANNED_OBJECTS_PER_RETURNED",
-		Mode: "AVERAGE",
-		Operator: "GREATER_THAN",
-		Threshold: 500.0,
-		Units: "RAW",
+		Mode:       "AVERAGE",
+		Operator:   "GREATER_THAN",
+		Threshold:  500.0,
+		Units:      "RAW",
 	}
 )
 
@@ -66,9 +66,9 @@ func TestCreateMongoDBAtlasAlertConfiguration(t *testing.T) {
 		Spec: knappekv1alpha1.MongoDBAtlasAlertConfigurationSpec{
 			ProjectName: projectName,
 			MongoDBAtlasAlertConfigurationRequestBody: knappekv1alpha1.MongoDBAtlasAlertConfigurationRequestBody{
-				EventTypeName: eventTypeName,
-				Enabled: enabled,
-				Notifications: notifications,
+				EventTypeName:   eventTypeName,
+				Enabled:         enabled,
+				Notifications:   notifications,
 				MetricThreshold: metricThreshold,
 			},
 		},
@@ -95,6 +95,7 @@ func TestCreateMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// Post request for MongoDBAtlasAlertConfiguration
 	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/alertConfigs", func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "POST", r)
+		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{
 			"id" : "`+id+`",
@@ -173,19 +174,19 @@ func TestDeleteMongoDBAtlasAlertConfiguration(t *testing.T) {
 		Spec: knappekv1alpha1.MongoDBAtlasAlertConfigurationSpec{
 			ProjectName: projectName,
 			MongoDBAtlasAlertConfigurationRequestBody: knappekv1alpha1.MongoDBAtlasAlertConfigurationRequestBody{
-				EventTypeName: eventTypeName,
-				Enabled: enabled,
-				Notifications: notifications,
+				EventTypeName:   eventTypeName,
+				Enabled:         enabled,
+				Notifications:   notifications,
 				MetricThreshold: metricThreshold,
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasAlertConfigurationStatus{
-			ID: id,
+			ID:      id,
 			GroupID: groupID,
 			MongoDBAtlasAlertConfigurationRequestBody: knappekv1alpha1.MongoDBAtlasAlertConfigurationRequestBody{
-				EventTypeName: eventTypeName,
-				Enabled: enabled,
-				Notifications: notifications,
+				EventTypeName:   eventTypeName,
+				Enabled:         enabled,
+				Notifications:   notifications,
 				MetricThreshold: metricThreshold,
 			},
 		},
@@ -212,6 +213,7 @@ func TestDeleteMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// Delete
 	mux.HandleFunc("/api/atlas/v1.0/groups/"+groupID+"/alertConfigs/"+id, func(w http.ResponseWriter, r *http.Request) {
 		testutil.AssertMethod(t, "DELETE", r)
+		w.WriteHeader(http.StatusNoContent)
 		fmt.Fprintf(w, `{}`)
 	})
 
@@ -254,10 +256,10 @@ func TestUpdateMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// updates
 	updatedMetricThreshold := ma.MetricThreshold{
 		MetricName: "QUERY_TARGETING_SCANNED_OBJECTS_PER_RETURNED",
-		Mode: "AVERAGE",
-		Operator: "LOWER_THAN",
-		Threshold: 100.0,
-		Units: "RAW",
+		Mode:       "AVERAGE",
+		Operator:   "LOWER_THAN",
+		Threshold:  100.0,
+		Units:      "RAW",
 	}
 
 	// A mongodbatlasalertconfiguration resource with metadata and spec.
@@ -269,19 +271,19 @@ func TestUpdateMongoDBAtlasAlertConfiguration(t *testing.T) {
 		Spec: knappekv1alpha1.MongoDBAtlasAlertConfigurationSpec{
 			ProjectName: projectName,
 			MongoDBAtlasAlertConfigurationRequestBody: knappekv1alpha1.MongoDBAtlasAlertConfigurationRequestBody{
-				EventTypeName: eventTypeName,
-				Enabled: enabled,
-				Notifications: notifications,
+				EventTypeName:   eventTypeName,
+				Enabled:         enabled,
+				Notifications:   notifications,
 				MetricThreshold: updatedMetricThreshold,
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasAlertConfigurationStatus{
-			ID: id,
+			ID:      id,
 			GroupID: groupID,
 			MongoDBAtlasAlertConfigurationRequestBody: knappekv1alpha1.MongoDBAtlasAlertConfigurationRequestBody{
-				EventTypeName: eventTypeName,
-				Enabled: enabled,
-				Notifications: notifications,
+				EventTypeName:   eventTypeName,
+				Enabled:         enabled,
+				Notifications:   notifications,
 				MetricThreshold: metricThreshold,
 			},
 		},
@@ -361,8 +363,8 @@ func TestUpdateMongoDBAtlasAlertConfiguration(t *testing.T) {
 	assert.Equal(t, updatedMetricThreshold, cr.Status.MetricThreshold)
 }
 
-// tests a scenario where the spec has only a bare minimum (default values are used) and 
-// the status contains information about the default values 
+// tests a scenario where the spec has only a bare minimum (default values are used) and
+// the status contains information about the default values
 func TestNoUpdateMongoDBAtlasAlertConfiguration(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
@@ -385,12 +387,12 @@ func TestNoUpdateMongoDBAtlasAlertConfiguration(t *testing.T) {
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasAlertConfigurationStatus{
-			ID: id,
+			ID:      id,
 			GroupID: groupID,
 			MongoDBAtlasAlertConfigurationRequestBody: knappekv1alpha1.MongoDBAtlasAlertConfigurationRequestBody{
-				EventTypeName: eventTypeName,
-				Enabled: enabled,
-				Notifications: notifications,
+				EventTypeName:   eventTypeName,
+				Enabled:         enabled,
+				Notifications:   notifications,
 				MetricThreshold: metricThreshold,
 			},
 		},

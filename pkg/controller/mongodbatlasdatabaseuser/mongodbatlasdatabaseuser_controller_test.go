@@ -327,8 +327,8 @@ func TestUpdateMongoDBAtlasDatabaseUser(t *testing.T) {
 	assert.Equal(t, updatedDeleteAfterDate, cr.Status.DeleteAfterDate)
 }
 
-// tests a scenario where the spec has only a bare minimum (default values are used) and 
-// the status contains information about the default values 
+// tests a scenario where the spec has only a bare minimum (default values are used) and
+// the status contains information about the default values
 func TestNoUpdateMongoDBAtlasDatabaseUser(t *testing.T) {
 	// Set the logger to development mode for verbose logs.
 	logf.SetLogger(logf.ZapLogger(true))
@@ -346,9 +346,9 @@ func TestNoUpdateMongoDBAtlasDatabaseUser(t *testing.T) {
 		Spec: knappekv1alpha1.MongoDBAtlasDatabaseUserSpec{
 			ProjectName: projectName,
 			MongoDBAtlasDatabaseUserRequestBody: knappekv1alpha1.MongoDBAtlasDatabaseUserRequestBody{
-				Password:        password,
-				DatabaseName:    "admin",
-				Roles:           roles,
+				Password:     password,
+				DatabaseName: "admin",
+				Roles:        roles,
 			},
 		},
 		Status: knappekv1alpha1.MongoDBAtlasDatabaseUserStatus{

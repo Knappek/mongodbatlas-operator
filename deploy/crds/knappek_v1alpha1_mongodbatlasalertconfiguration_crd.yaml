@@ -16,6 +16,9 @@ spec:
     description: Whether the Alert Configuration is enabled or disabled
     name: Enabled
     type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
   group: knappek.com
   names:
     categories:

@@ -182,7 +182,7 @@ func createMongoDBAtlasAlertConfiguration(reqLogger logr.Logger, atlasClient *ma
 	if err != nil {
 		return fmt.Errorf("Error creating AlertConfiguration %v: %s", name, err)
 	}
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusCreated {
 		reqLogger.Info("AlertConfiguration created.")
 		return updateCRStatus(reqLogger, cr, c)
 	}
@@ -221,7 +221,7 @@ func deleteMongoDBAtlasAlertConfiguration(reqLogger logr.Logger, atlasClient *ma
 		}
 		return fmt.Errorf("(%v) Error deleting AlertConfiguration %s: %s", resp.StatusCode, name, err)
 	}
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusNoContent {
 		// Update finalizer to allow delete CR
 		cr.SetFinalizers(nil)
 		reqLogger.Info("AlertConfiguration deleted.")

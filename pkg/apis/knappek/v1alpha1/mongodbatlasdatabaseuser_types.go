@@ -57,6 +57,7 @@ func IsMongoDBAtlasDatabaseUserToBeUpdated(m1 MongoDBAtlasDatabaseUserRequestBod
 // MongoDBAtlasDatabaseUser is the Schema for the mongodbatlasdatabaseusers API
 // +k8s:openapi-gen=true
 // +kubebuilder:printcolumn:name="Project Name",type="string",JSONPath=".spec.projectName",description="The MongoDB Atlas Project to which the database user has access to"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=mongodbatlasdatabaseusers,shortName=madbuser
 // +kubebuilder:categories=all,mongodbatlas

@@ -47,8 +47,9 @@ func TestMongoDBAtlas(t *testing.T) {
 	}
 
 	MongoDBAtlasProject(t, ctx, f, namespace)
-	MongoDBAtlasCluster(t, ctx, f, namespace)
-	MongoDBAtlasDatabaseUser(t, ctx, f, namespace)
+	// MongoDBAtlasCluster(t, ctx, f, namespace)
+	// MongoDBAtlasDatabaseUser(t, ctx, f, namespace)
+	MongoDBAtlasAlertConfiguration(t, ctx, f, namespace)
 	fmt.Println("Cleanup resources...")
 }
 
