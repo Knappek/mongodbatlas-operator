@@ -1,6 +1,5 @@
 # Contributing
 
-
 <!-- vim-markdown-toc GFM -->
 
 * [Develop Locally](#develop-locally)
@@ -9,7 +8,6 @@
   * [E2E Tests](#e2e-tests)
 * [Create new API](#create-new-api)
 * [Create new Controller for the API](#create-new-controller-for-the-api)
-* [Create CRDs](#create-crds)
 * [Create a new Release](#create-a-new-release)
 
 <!-- vim-markdown-toc -->
@@ -95,7 +93,7 @@ This example creates a new MongoDBAtlasCluster API:
 make api KIND=MongoDBAtlasCluster
 ```
 
-Afterwards adapt the corresponding `./pkg/apis/knappek/v1alpha1/mongodbatlascluster_types.go`. 
+Afterwards adapt the corresponding `./pkg/apis/knappek/v1alpha1/mongodbatlascluster_types.go`.
 Then create the CRD and the generated OpenAPI Spec with
 
 ```shell
@@ -111,19 +109,13 @@ To create a controller for the recently created API, run:
 make controller KIND=MongoDBAtlasCluster
 ```
 
-## Create CRDs
-
-```shell
-make generate-openapi
-```
-
 ## Create a new Release
 
 > You need to have Collaborator permissions to perform this step
 
 A new release will
 
-* create a new release on the Github [release page](https://github.com/Knappek/mongodbatlas-operator/releases) 
+* create a new release on the Github [release page](https://github.com/Knappek/mongodbatlas-operator/releases)
 * push a new tagged Docker image to [Dockerhub](https://cloud.docker.com/repository/docker/knappek/mongodbatlas-operator/tags)
 
 In order to do this, follow these steps:
@@ -137,4 +129,3 @@ In order to do this, follow these steps:
     ```
 
 This will kick the CI pipeline and create a new Github Release with the version tag `v<major.minor.patch>`.
-
