@@ -8,6 +8,9 @@ spec:
     description: The MongoDB Atlas Project to which the database user has access to
     name: Project Name
     type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
   group: knappek.com
   names:
     categories:

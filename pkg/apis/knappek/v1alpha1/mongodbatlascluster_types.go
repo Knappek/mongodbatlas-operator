@@ -61,80 +61,50 @@ type MongoDBAtlasClusterRequestBody struct {
 // IsMongoDBAtlasClusterToBeUpdated is used to compare spec.MongoDBAtlasClusterRequestBody with status.MongoDBAtlasClusterRequestBody
 func IsMongoDBAtlasClusterToBeUpdated(m1 MongoDBAtlasClusterRequestBody, m2 MongoDBAtlasClusterRequestBody) bool {
 	region := m1.ProviderSettings.RegionName
-	if m1.MongoDBMajorVersion != m2.MongoDBMajorVersion {
-		if !util.IsZeroValue(m1.MongoDBMajorVersion) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.MongoDBMajorVersion, m2.MongoDBMajorVersion); ok {
+		return true
 	}
-	if m1.DiskSizeGB != m2.DiskSizeGB {
-		if !util.IsZeroValue(m1.DiskSizeGB) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.DiskSizeGB, m2.DiskSizeGB); ok {
+		return true
 	}
-	if m1.BackupEnabled != m2.BackupEnabled {
-		if !util.IsZeroValue(m1.BackupEnabled) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.BackupEnabled, m2.BackupEnabled); ok {
+		return true
 	}
-	if m1.ReplicationSpec[region].Priority != m2.ReplicationSpec[region].Priority {
-		if !util.IsZeroValue(m1.ReplicationSpec[region].Priority) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ReplicationSpec[region].Priority, m2.ReplicationSpec[region].Priority); ok {
+		return true
 	}
-	if m1.ReplicationSpec[region].ElectableNodes != m2.ReplicationSpec[region].ElectableNodes {
-		if !util.IsZeroValue(m1.ReplicationSpec[region].ElectableNodes) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ReplicationSpec[region].ElectableNodes, m2.ReplicationSpec[region].ElectableNodes); ok {
+		return true
 	}
-	if m1.ReplicationSpec[region].ReadOnlyNodes != m2.ReplicationSpec[region].ReadOnlyNodes {
-		if !util.IsZeroValue(m1.ReplicationSpec[region].ReadOnlyNodes) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ReplicationSpec[region].ReadOnlyNodes, m2.ReplicationSpec[region].ReadOnlyNodes); ok {
+		return true
 	}
-	if m1.ReplicationSpec[region].AnalyticsNodes != m2.ReplicationSpec[region].AnalyticsNodes {
-		if !util.IsZeroValue(m1.ReplicationSpec[region].AnalyticsNodes) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ReplicationSpec[region].AnalyticsNodes, m2.ReplicationSpec[region].AnalyticsNodes); ok {
+		return true
 	}
-	if m1.NumShards != m2.NumShards {
-		if !util.IsZeroValue(m1.NumShards) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.NumShards, m2.NumShards); ok {
+		return true
 	}
-	if m1.AutoScaling.DiskGBEnabled != m2.AutoScaling.DiskGBEnabled {
-		if !util.IsZeroValue(m1.AutoScaling.DiskGBEnabled) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.AutoScaling.DiskGBEnabled, m2.AutoScaling.DiskGBEnabled); ok {
+		return true
 	}
-	if m1.ProviderSettings.ProviderName != m2.ProviderSettings.ProviderName {
-		if !util.IsZeroValue(m1.ProviderSettings.ProviderName) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ProviderSettings.ProviderName, m2.ProviderSettings.ProviderName); ok {
+		return true
 	}
-	if m1.ProviderSettings.BackingProviderName != m2.ProviderSettings.BackingProviderName {
-		if !util.IsZeroValue(m1.ProviderSettings.BackingProviderName) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ProviderSettings.BackingProviderName, m2.ProviderSettings.BackingProviderName); ok {
+		return true
 	}
-	if m1.ProviderSettings.RegionName != m2.ProviderSettings.RegionName {
-		if !util.IsZeroValue(m1.ProviderSettings.RegionName) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ProviderSettings.RegionName, m2.ProviderSettings.RegionName); ok {
+		return true
 	}
-	if m1.ProviderSettings.InstanceSizeName != m2.ProviderSettings.InstanceSizeName {
-		if !util.IsZeroValue(m1.ProviderSettings.InstanceSizeName) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ProviderSettings.InstanceSizeName, m2.ProviderSettings.InstanceSizeName); ok {
+		return true
 	}
-	if m1.ProviderSettings.DiskIOPS != m2.ProviderSettings.DiskIOPS {
-		if !util.IsZeroValue(m1.ProviderSettings.DiskIOPS) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ProviderSettings.DiskIOPS, m2.ProviderSettings.DiskIOPS); ok {
+		return true
 	}
-	if m1.ProviderSettings.EncryptEBSVolume != m2.ProviderSettings.EncryptEBSVolume {
-		if !util.IsZeroValue(m1.ProviderSettings.EncryptEBSVolume) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.ProviderSettings.EncryptEBSVolume, m2.ProviderSettings.EncryptEBSVolume); ok {
+		return true
 	}
 	return false
 }

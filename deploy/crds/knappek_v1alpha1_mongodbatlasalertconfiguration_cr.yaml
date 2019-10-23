@@ -1,0 +1,21 @@
+apiVersion: knappek.com/v1alpha1
+kind: MongoDBAtlasAlertConfiguration
+metadata:
+  name: example-mongodbatlasalertconfiguration
+spec:
+  # Add fields here
+  projectName: "example-project"
+  eventTypeName: "OUTSIDE_METRIC_THRESHOLD"
+  enabled: true
+  notifications:
+    - typeName: "GROUP"
+      intervalMin: 5
+      delayMin: 0
+      smsEnabled: false
+      emailEnabled: true
+  metricThreshold: 
+    metricName: "QUERY_TARGETING_SCANNED_OBJECTS_PER_RETURNED"
+    mode: "AVERAGE"
+    operator: "GREATER_THAN"
+    threshold: 500.0
+    units: "RAW"

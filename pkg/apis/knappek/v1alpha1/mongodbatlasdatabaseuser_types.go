@@ -35,26 +35,18 @@ type MongoDBAtlasDatabaseUserStatus struct {
 
 // IsMongoDBAtlasDatabaseUserToBeUpdated is used to compare spec.MongoDBAtlasDatabaseUserRequestBody with status
 func IsMongoDBAtlasDatabaseUserToBeUpdated(m1 MongoDBAtlasDatabaseUserRequestBody, m2 MongoDBAtlasDatabaseUserStatus) bool {
-	if m1.DeleteAfterDate != m2.DeleteAfterDate {
-		if !util.IsZeroValue(m1.DeleteAfterDate) {
-			return true
-		}
+	if ok := util.IsNotEqual(m1.DeleteAfterDate, m2.DeleteAfterDate); ok {
+		return true
 	}
 	for idx, role := range m1.Roles {
-		if role.DatabaseName != m2.Roles[idx].DatabaseName {
-			if !util.IsZeroValue(role.DatabaseName) {
-				return true
-			}
+		if ok := util.IsNotEqual(role.DatabaseName, m2.Roles[idx].DatabaseName); ok {
+			return true
 		}
-		if role.CollectionName != m2.Roles[idx].CollectionName {
-			if !util.IsZeroValue(role.CollectionName) {
-				return true
-			}
+		if ok := util.IsNotEqual(role.CollectionName, m2.Roles[idx].CollectionName); ok {
+			return true
 		}
-		if role.RoleName != m2.Roles[idx].RoleName {
-			if !util.IsZeroValue(role.RoleName) {
-				return true
-			}
+		if ok := util.IsNotEqual(role.RoleName, m2.Roles[idx].RoleName); ok {
+			return true
 		}
 	}
 	return false
@@ -65,6 +57,7 @@ func IsMongoDBAtlasDatabaseUserToBeUpdated(m1 MongoDBAtlasDatabaseUserRequestBod
 // MongoDBAtlasDatabaseUser is the Schema for the mongodbatlasdatabaseusers API
 // +k8s:openapi-gen=true
 // +kubebuilder:printcolumn:name="Project Name",type="string",JSONPath=".spec.projectName",description="The MongoDB Atlas Project to which the database user has access to"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=mongodbatlasdatabaseusers,shortName=madbuser
 // +kubebuilder:categories=all,mongodbatlas
