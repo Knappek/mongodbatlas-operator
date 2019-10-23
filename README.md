@@ -33,6 +33,7 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 * Create/Delete MongoDB Atlas Projects
 * Create/Update/Delete MongoDB Atlas Clusters
 * Create/Update/Delete MongoDB Atlas Database Users
+* Create/Update/Delete MongoDB Atlas Alert Configurations
 
 ## Prerequisites
 
