@@ -14,15 +14,18 @@ This project was inspired from the [MongoDB Atlas Terraform Provider](https://gi
 
 <!-- vim-markdown-toc GFM -->
 
-* [Scope](#scope)
-* [Prerequisites](#prerequisites)
-* [Getting Started](#getting-started)
-  * [Deploy Operator](#deploy-operator)
-  * [Create a MongoDB Atlas Project](#create-a-mongodb-atlas-project)
-  * [Create a Cluster](#create-a-cluster)
-  * [List all MongoDB Atlas resources](#list-all-mongodb-atlas-resources)
-* [Cleanup](#cleanup)
-* [Contributing](#contributing)
+* [MongoDB Atlas Kubernetes Operator](#mongodb-atlas-kubernetes-operator)
+  * [Overview](#overview)
+  * [Scope](#scope)
+  * [Prerequisites](#prerequisites)
+  * [Getting Started](#getting-started)
+    * [Deploy Operator](#deploy-operator)
+    * [Create a MongoDB Atlas Project](#create-a-mongodb-atlas-project)
+    * [Create a Cluster](#create-a-cluster)
+    * [List all MongoDB Atlas resources](#list-all-mongodb-atlas-resources)
+  * [Cleanup](#cleanup)
+  * [Environment Variables](#environment-variables)
+  * [Contributing](#contributing)
 
 <!-- vim-markdown-toc -->
 
@@ -47,29 +50,19 @@ This example creates a MongoDB Atlas project and a cluster inside this project.
 
 ### Deploy Operator
 
-First, create the MongoDB Atlas project CRD and some RBAC:
+Create a Kubernetes secret containing the [MongoDB Atlas Programmatic API Keys](https://docs.atlas.mongodb.com/configure-api-access/#programmatic-api-keys)
 
 ```shell
-kubectl create -f deploy/service_account.yaml
-kubectl create -f deploy/role.yaml
-kubectl create -f deploy/role_binding.yaml
-kubectl create -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_crd.yaml
-kubectl create -f deploy/crds/knappek_v1alpha1_mongodbatlascluster_crd.yaml
+kubectl -n mongodblatlas-operator-system \
+  create secret generic example-monogdb-atlas-project \
+  --from-literal=publicKey=yyyyyyy \
+  --from-literal=privateKey=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx
 ```
 
-Create a Kubernetes secret containing the Private Key of the [MongoDB Atlas Programmatic API Key](https://docs.atlas.mongodb.com/configure-api-access/#programmatic-api-keys)
+Deploy the MongoDB Atlas Project Operator (to the current namespace that is currently configured with your kubernetes context):
 
 ```shell
-kubectl create secret generic example-monogdb-atlas-project \
-    --from-literal=privateKey=xxxxxxxxx
-```
-
-Adapt the environment variable `ATLAS_PUBLIC_KEY` in [operator.yaml](./deploy/operator.yaml) to your public key.
-
-Deploy the MongoDB Atlas Project Operator:
-
-```shell
-kubectl apply -f deploy/operator.yaml
+make deploy
 ```
 
 ### Create a MongoDB Atlas Project

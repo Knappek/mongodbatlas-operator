@@ -1,0 +1,7 @@
+apiVersion: mongodbatlas.knappek.com/v1alpha1
+kind: MongoDBAtlasProject
+metadata:
+  name: mongodbatlasproject-sample
+spec:
+  orgID: "5c4a2a55553855344780cf5f"
+

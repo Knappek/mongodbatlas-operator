@@ -2,13 +2,14 @@
 
 <!-- vim-markdown-toc GFM -->
 
-* [Develop Locally](#develop-locally)
-* [Testing](#testing)
-  * [Unit Tests](#unit-tests)
-  * [E2E Tests](#e2e-tests)
-* [Create new API](#create-new-api)
-* [Create new Controller for the API](#create-new-controller-for-the-api)
-* [Create a new Release](#create-a-new-release)
+* [Contributing](#contributing)
+  * [Develop Locally](#develop-locally)
+  * [Testing](#testing)
+    * [Unit Tests](#unit-tests)
+    * [E2E Tests](#e2e-tests)
+  * [Create new API](#create-new-api)
+  * [Create new Controller for the API](#create-new-controller-for-the-api)
+  * [Create a new Release](#create-a-new-release)
 
 <!-- vim-markdown-toc -->
 
@@ -20,10 +21,10 @@ Connect to a Kubernetes cluster
 export KUBECONFIG=/path/to/config
 ```
 
-Create all CRDs that are managed by the operator:
+Create and install all CRDs that are managed by the operator:
 
 ```shell
-make init
+make manifests && make install
 ```
 
 Run Operator locally:
@@ -31,7 +32,7 @@ Run Operator locally:
 ```shell
 export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx
 export ATLAS_PUBLIC_KEY=yyyyy
-make
+make run
 ```
 
 Create MongoDB Atlas Project
@@ -97,8 +98,7 @@ Afterwards adapt the corresponding `./pkg/apis/knappek/v1alpha1/mongodbatlasclus
 Then create the CRD and the generated OpenAPI Spec with
 
 ```shell
-make generate-openapi
-make generate-k8s
+make generate
 ```
 
 ## Create new Controller for the API

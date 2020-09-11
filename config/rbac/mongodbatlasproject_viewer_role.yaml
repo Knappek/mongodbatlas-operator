@@ -1,0 +1,20 @@
+# permissions for end users to view mongodbatlasprojects.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: mongodbatlasproject-viewer-role
+rules:
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasprojects
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasprojects/status
+  verbs:
+  - get
