@@ -17,11 +17,16 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
+	"fmt"
 	"path/filepath"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -40,6 +45,27 @@ import (
 var cfg *rest.Config
 var k8sClient client.Client
 var testEnv *envtest.Environment
+
+var (
+	e2eAtlasProjectName = "e2etest-project"
+	// e2eOrganizationID   = flag.String("organizationID", "", "MongoDB Atlas Organization ID")
+	e2eOrganizationID = "5c4a2a55553855344780cf5f"
+
+	k8sNamespace = &v1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namespace,
+		},
+	}
+	exampleMongoDBAtlasProject = &mongodbatlasv1alpha1.MongoDBAtlasProject{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      e2eAtlasProjectName,
+			Namespace: namespace,
+		},
+		Spec: mongodbatlasv1alpha1.MongoDBAtlasProjectSpec{
+			OrgID: e2eOrganizationID,
+		},
+	}
+)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -71,11 +97,38 @@ var _ = BeforeSuite(func(done Done) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(k8sClient).ToNot(BeNil())
 
+	// start operator
+
+	By("creating a MongoDB Atlas project")
+	err = k8sClient.Create(context.TODO(), k8sNamespace)
+	Expect(err).ToNot(HaveOccurred())
+	err = k8sClient.Create(context.TODO(), exampleMongoDBAtlasProject)
+	Expect(err).ToNot(HaveOccurred())
+
+	By("verifying the MongoDB Atlas project")
+	objkey := types.NamespacedName{
+		Name:      e2eAtlasProjectName,
+		Namespace: namespace,
+	}
+	result := &mongodbatlasv1alpha1.MongoDBAtlasProject{}
+	err = k8sClient.Get(context.TODO(), objkey, result)
+	Expect(err).NotTo(HaveOccurred())
+	
+	// wait for status to come up and assert the value
+	// p.Status.Name, "e2etest-project
+
+
 	close(done)
 }, 60)
 
 var _ = AfterSuite(func() {
+	By("deleting MongoDB Atlas project")
+	err := k8sClient.Delete(context.TODO(), exampleMongoDBAtlasProject)
+	Expect(err).ToNot(HaveOccurred())
+	err = k8sClient.Delete(context.TODO(), k8sNamespace)
+	Expect(err).ToNot(HaveOccurred())
+
 	By("tearing down the test environment")
-	err := testEnv.Stop()
+	err = testEnv.Stop()
 	Expect(err).ToNot(HaveOccurred())
 })
