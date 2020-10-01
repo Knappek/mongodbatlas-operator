@@ -12,8 +12,8 @@ import (
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 
-	testutil "github.com/Knappek/mongodbatlas-operator/pkg/controller/test"
 	mongodbatlasv1alpha1 "github.com/knappek/mongodbatlas-operator/api/v1alpha1"
+	testutil "github.com/knappek/mongodbatlas-operator/controllers/test"
 	"github.com/knappek/mongodbatlas-operator/util"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

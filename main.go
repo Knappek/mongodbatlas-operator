@@ -78,6 +78,16 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "MongoDBAtlasProject")
 		os.Exit(1)
 	}
+	if err = (&controllers.MongoDBAtlasClusterReconciler{
+		Client:               mgr.GetClient(),
+		Log:                  ctrl.Log.WithName("controllers").WithName("MongoDBAtlasCluster"),
+		Scheme:               mgr.GetScheme(),
+		AtlasClient:          util.GetAtlasClient(),
+		ReconciliationConfig: util.GetReconcilitationConfig(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MongoDBAtlasCluster")
+		os.Exit(1)
+	}
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")
