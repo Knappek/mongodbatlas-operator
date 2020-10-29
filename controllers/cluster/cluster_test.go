@@ -1,4 +1,4 @@
-package controllers
+package cluster
 
 import (
 	"context"
@@ -26,8 +26,12 @@ import (
 )
 
 var (
+	projectName           = "unittest-project"
 	clusterName           = "unittest-cluster"
 	clusterID             = "testClusterId"
+	groupID               = "5a0a1e7e0f2912c554080ae6"
+	namespace             = "mongodbatlas"
+	organizationID        = "testOrgID"
 	mongoDBVersion        = "3.4"
 	mongoDBMajorVersion   = "3.4"
 	diskSizeGB            = "10.500000"

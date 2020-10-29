@@ -28,7 +28,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	mongodbatlasv1alpha1 "github.com/knappek/mongodbatlas-operator/api/v1alpha1"
-	"github.com/knappek/mongodbatlas-operator/controllers"
+	"github.com/knappek/mongodbatlas-operator/controllers/cluster"
+	"github.com/knappek/mongodbatlas-operator/controllers/project"
 	"github.com/knappek/mongodbatlas-operator/util"
 	// +kubebuilder:scaffold:imports
 )
@@ -68,7 +69,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.MongoDBAtlasProjectReconciler{
+	if err = (&project.MongoDBAtlasProjectReconciler{
 		Client:               mgr.GetClient(),
 		Log:                  ctrl.Log.WithName("controllers").WithName("MongoDBAtlasProject"),
 		Scheme:               mgr.GetScheme(),
@@ -78,7 +79,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "MongoDBAtlasProject")
 		os.Exit(1)
 	}
-	if err = (&controllers.MongoDBAtlasClusterReconciler{
+	if err = (&cluster.MongoDBAtlasClusterReconciler{
 		Client:               mgr.GetClient(),
 		Log:                  ctrl.Log.WithName("controllers").WithName("MongoDBAtlasCluster"),
 		Scheme:               mgr.GetScheme(),

@@ -1,4 +1,4 @@
-package controllers
+package project
 
 import (
 	"context"

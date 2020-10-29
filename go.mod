@@ -7,8 +7,8 @@ require (
 	github.com/akshaykarle/go-http-digest-auth-client v0.3.1
 	github.com/akshaykarle/go-mongodbatlas v0.0.0-20190711204052-1debad05408f
 	github.com/go-logr/logr v0.1.0
-	github.com/onsi/ginkgo v1.12.1
-	github.com/onsi/gomega v1.10.1
+	github.com/onsi/ginkgo v1.14.2
+	github.com/onsi/gomega v1.10.3
 	github.com/operator-framework/operator-sdk v1.0.1
 	github.com/stretchr/testify v1.5.1
 	k8s.io/api v0.18.6
