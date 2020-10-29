@@ -1,0 +1,247 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: mongodbatlasclusters.mongodbatlas.knappek.com
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.projectName
+    description: The MongoDB Atlas Project where the cluster has been deployed
+    name: Project Name
+    type: string
+  - JSONPath: .status.mongoDBVersion
+    description: The MongoDB version of the cluster
+    name: MongoDB_Version
+    type: string
+  - JSONPath: .status.stateName
+    description: The status of the cluster
+    name: Status
+    type: string
+  - JSONPath: .status.providerSettings.regionName
+    description: Physical location of your MongoDB cluster
+    name: Region
+    type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
+  - JSONPath: .status.providerSettings.providerName
+    description: Cloud service provider on which the servers are provisioned
+    name: Provider
+    priority: 1
+    type: string
+  - JSONPath: .status.backupEnabled
+    description: Set to true to enable Atlas continuous backups for the cluster
+    name: ContinuousBackups
+    priority: 1
+    type: boolean
+  - JSONPath: .status.providerBackupEnabled
+    description: Flag indicating if the cluster uses Cloud Provider Snapshots for
+      backups
+    name: ProviderBackups
+    priority: 1
+    type: boolean
+  - JSONPath: .status.srvAddress
+    description: Connection string (DNS SRV Record) for connecting to the Atlas cluster
+    name: SRV_Address
+    priority: 1
+    type: string
+  group: mongodbatlas.knappek.com
+  names:
+    kind: MongoDBAtlasCluster
+    listKind: MongoDBAtlasClusterList
+    plural: mongodbatlasclusters
+    shortNames:
+    - mac
+    singular: mongodbatlascluster
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: MongoDBAtlasCluster is the Schema for the mongodbatlasclusters
+        API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: MongoDBAtlasClusterSpec defines the desired state of MongoDBAtlasCluster
+          properties:
+            autoScaling:
+              description: AutoScaling has the information on whether disk auto-scaling
+                is enabled.
+              properties:
+                diskGBEnabled:
+                  type: boolean
+              required:
+              - diskGBEnabled
+              type: object
+            backupEnabled:
+              type: boolean
+            diskSizeGB:
+              type: string
+            mongoDBMajorVersion:
+              type: string
+            numShards:
+              type: integer
+            projectName:
+              type: string
+            providerBackupEnabled:
+              type: boolean
+            providerSettings:
+              description: ProviderSettings is the configuration for the provisioned
+                servers on which MongoDB runs. The available options are specific
+                to the cloud service provider.
+              properties:
+                backingProviderName:
+                  type: string
+                diskIOPS:
+                  type: integer
+                encryptEBSVolume:
+                  type: boolean
+                instanceSizeName:
+                  type: string
+                providerName:
+                  type: string
+                regionName:
+                  type: string
+              type: object
+            replicationSpec:
+              additionalProperties:
+                description: ReplicationSpec describes a region’s priority in elections,
+                  and the number and type of MongoDB nodes Atlas deploys to the region.
+                properties:
+                  analyticsNodes:
+                    type: integer
+                  electableNodes:
+                    type: integer
+                  priority:
+                    type: integer
+                  readOnlyNodes:
+                    type: integer
+                required:
+                - analyticsNodes
+                - electableNodes
+                - priority
+                - readOnlyNodes
+                type: object
+              description: 'TODO: ReplicationSpec is deprecated, update to ReplicationSpecs.
+                This needs to be done in the Go clinet library first: https://github.com/akshaykarle/go-mongodbatlas'
+              type: object
+          required:
+          - backupEnabled
+          - projectName
+          - providerBackupEnabled
+          type: object
+        status:
+          description: MongoDBAtlasClusterStatus defines the observed state of MongoDBAtlasCluster
+          properties:
+            autoScaling:
+              description: AutoScaling has the information on whether disk auto-scaling
+                is enabled.
+              properties:
+                diskGBEnabled:
+                  type: boolean
+              required:
+              - diskGBEnabled
+              type: object
+            backupEnabled:
+              type: boolean
+            diskSizeGB:
+              type: string
+            groupID:
+              type: string
+            id:
+              type: string
+            mongoDBMajorVersion:
+              type: string
+            mongoDBVersion:
+              type: string
+            mongoURI:
+              type: string
+            mongoURIUpdated:
+              type: string
+            mongoURIWithOptions:
+              type: string
+            name:
+              type: string
+            numShards:
+              type: integer
+            paused:
+              type: boolean
+            providerBackupEnabled:
+              type: boolean
+            providerSettings:
+              description: ProviderSettings is the configuration for the provisioned
+                servers on which MongoDB runs. The available options are specific
+                to the cloud service provider.
+              properties:
+                backingProviderName:
+                  type: string
+                diskIOPS:
+                  type: integer
+                encryptEBSVolume:
+                  type: boolean
+                instanceSizeName:
+                  type: string
+                providerName:
+                  type: string
+                regionName:
+                  type: string
+              type: object
+            replicationSpec:
+              additionalProperties:
+                description: ReplicationSpec describes a region’s priority in elections,
+                  and the number and type of MongoDB nodes Atlas deploys to the region.
+                properties:
+                  analyticsNodes:
+                    type: integer
+                  electableNodes:
+                    type: integer
+                  priority:
+                    type: integer
+                  readOnlyNodes:
+                    type: integer
+                required:
+                - analyticsNodes
+                - electableNodes
+                - priority
+                - readOnlyNodes
+                type: object
+              description: 'TODO: ReplicationSpec is deprecated, update to ReplicationSpecs.
+                This needs to be done in the Go clinet library first: https://github.com/akshaykarle/go-mongodbatlas'
+              type: object
+            srvAddress:
+              type: string
+            stateName:
+              type: string
+          required:
+          - backupEnabled
+          - paused
+          - providerBackupEnabled
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

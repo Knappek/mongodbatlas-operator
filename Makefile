@@ -1,110 +1,126 @@
-BINARY = mongodbatlas-operator
-COMMIT=$shell git rev-parse --short HEAD()
-BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
-BUILD_DATE=$(shell date +%FT%T%z)
-CRDS=$(shell echo deploy/crds/*_crd.yaml | sed 's/ / -f /g')
-GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
-GO := GOARCH=amd64 CGO_ENABLED=0 GOOS=linux go
-TEST_DIR?=./pkg/controller/...
-VERBOSE?=
+# Current Operator version
+VERSION ?= 0.0.1
+# Default bundle image tag
+BUNDLE_IMG ?= controller-bundle:$(VERSION)
+# Options for 'bundle-build'
+ifneq ($(origin CHANNELS), undefined)
+BUNDLE_CHANNELS := --channels=$(CHANNELS)
+endif
+ifneq ($(origin DEFAULT_CHANNEL), undefined)
+BUNDLE_DEFAULT_CHANNEL := --default-channel=$(DEFAULT_CHANNEL)
+endif
+BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 
-ORGANIZATION_ID?=5c4a2a55553855344780cf5f
+# Image URL to use all building/pushing image targets
+IMG ?= knappek/mongodbatlas-operator:latest
+# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
+CRD_OPTIONS ?= "crd:trivialVersions=true"
 
-VERSION?=latest
-API_VERSION?=v1alpha1
-KIND=
+# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
+endif
 
-GITHUB_USERNAME=Knappek
-DOCKERHUB_USERNAME=knappek
+all: manager
 
-default: cleanup init dev
+# Run tests
+test: generate fmt vet manifests
+	go test ./... -coverprofile cover.out -v
 
-init:
-	kubectl apply -f deploy/service_account.yaml
-	kubectl apply -f deploy/role.yaml
-	kubectl apply -f deploy/role_binding.yaml
-	kubectl apply -f $(CRDS)
+# Build manager binary
+manager: generate fmt vet
+	go build -o bin/manager main.go
 
-dev: generate-k8s
-	operator-sdk up local
-	
-generate-k8s:
-	operator-sdk generate k8s
+# Run against the configured Kubernetes cluster in ~/.kube/config
+run: generate fmt vet manifests
+	go run ./main.go
 
-generate-openapi:
-	operator-sdk generate openapi
+# Install CRDs into a cluster
+install: manifests kustomize
+	$(KUSTOMIZE) build config/crd | kubectl apply -f -
 
-api:
-	operator-sdk add api --api-version knappek.com/$(API_VERSION) --kind $(KIND)
+# Uninstall CRDs from a cluster
+uninstall: manifests kustomize
+	$(KUSTOMIZE) build config/crd | kubectl delete -f -
 
-controller:
-	./code-generation/controller-gen.sh --api-version v1alpha1 -k $(KIND) && gofmt -w $(GOFMT_FILES)
+# Deploy controller in the configured Kubernetes cluster in ~/.kube/config
+deploy: manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
-.PHONY: build 
-build:
-	$(GO) build -o $(PWD)/build/_output/bin/$(BINARY) -gcflags all=-trimpath=${GOPATH} -asmflags all=-trimpath=${GOPATH} github.com/$(GITHUB_USERNAME)/$(BINARY)/cmd/manager
+# Generate manifests e.g. CRD, RBAC etc.
+manifests: controller-gen
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
-docker-build:
-	docker build -f build/Dockerfile -t $(DOCKERHUB_USERNAME)/$(BINARY) .
+# Run go fmt against code
+fmt:
+	go fmt ./...
 
-docker-push: docker-build
-	docker push $(DOCKERHUB_USERNAME)/$(BINARY):$(VERSION)
+# Run go vet against code
+vet:
+	go vet ./...
 
-release:
-	git tag v${VERSION}
-	git push && git push --tags
+# Generate code
+generate: controller-gen
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
-operator-build:
-	operator-sdk build $(DOCKERHUB_USERNAME)/$(BINARY)
+# Build the docker image
+docker-build: test
+	docker build . -t ${IMG}
 
-deploy-operator: docker-push
-	kubectl delete deployment mongodbatlas-operator || true
-	kubectl apply -f deploy/operator.yaml
+# Push the docker image
+docker-push:
+	docker push ${IMG}
+
+# find or download controller-gen
+# download controller-gen if necessary
+controller-gen:
+ifeq (, $(shell which controller-gen))
+	@{ \
+	set -e ;\
+	CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
+	cd $$CONTROLLER_GEN_TMP_DIR ;\
+	go mod init tmp ;\
+	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.3.0 ;\
+	rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
+	}
+CONTROLLER_GEN=$(GOBIN)/controller-gen
+else
+CONTROLLER_GEN=$(shell which controller-gen)
+endif
+
+kustomize:
+ifeq (, $(shell which kustomize))
+	@{ \
+	set -e ;\
+	KUSTOMIZE_GEN_TMP_DIR=$$(mktemp -d) ;\
+	cd $$KUSTOMIZE_GEN_TMP_DIR ;\
+	go mod init tmp ;\
+	go get sigs.k8s.io/kustomize/kustomize/v3@v3.5.4 ;\
+	rm -rf $$KUSTOMIZE_GEN_TMP_DIR ;\
+	}
+KUSTOMIZE=$(GOBIN)/kustomize
+else
+KUSTOMIZE=$(shell which kustomize)
+endif
+
+# Generate bundle manifests and metadata, then validate generated files.
+.PHONY: bundle
+bundle: manifests
+	operator-sdk generate kustomize manifests -q
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMG)
+	$(KUSTOMIZE) build config/manifests | operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
+	operator-sdk bundle validate ./bundle
+
+# Build the bundle image.
+.PHONY: bundle-build
+bundle-build:
+	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
 
 deploy-project:
-	kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
+	kubectl apply -f config/samples/mongodbatlas_v1alpha1_mongodbatlasproject.yaml
 
 delete-project:
-	kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlasproject_cr.yaml
-
-deploy-cluster:
-	kubectl apply -f deploy/crds/knappek_v1alpha1_mongodbatlascluster_cr.yaml
-
-delete-cluster:
-	kubectl delete -f deploy/crds/knappek_v1alpha1_mongodbatlascluster_cr.yaml
-
-cleanup:
-	kubectl delete -f deploy/ >/dev/null 2>&1 || true
-	kubectl delete -f deploy/crds/ >/dev/null 2>&1 || true
-
-.PHONY: test
-test:
-	go test $(TEST_DIR) $(VERBOSE) -coverprofile=coverage.out -covermode=atomic
-
-e2etest: cleanup fmt
-	@if [ "$(ATLAS_PRIVATE_KEY)" = "" ]; then \
-		echo "ERROR: Export ATLAS_PRIVATE_KEY variable and then run init again. For example:"; \
-		echo "  export ATLAS_PRIVATE_KEY=xxxx-xxxx-xxxx-xxxx"; \
-		echo "  make inite2etest"; \
-		exit 1; \
-	fi
-	@if [ "$(ATLAS_PUBLIC_KEY)" = "" ]; then \
-		echo "ERROR: Export ATLAS_PUBLIC_KEY variable. For example:"; \
-		echo "  export ATLAS_PUBLIC_KEY=yyyyyy"; \
-		exit 1; \
-	fi
-	kubectl create ns e2etest || true
-	operator-sdk test local ./test/e2e \
-		--namespace e2etest \
-		--up-local \
-		--go-test-flags "-v --organizationID=$(ORGANIZATION_ID) -timeout 30m"
-	kubectl delete ns e2etest
-
-fmt:
-	gofmt -w $(GOFMT_FILES)
-
-lint:
-	@which golint > /dev/null; if [ $$? -ne 0 ]; then \
-		$(GO) get -u golang.org/x/lint/golint; \
-	fi
-	 $(GO) list ./... | grep -v /vendor/ | xargs golint -set_exit_status
+	kubectl delete -f config/samples/mongodbatlas_v1alpha1_mongodbatlasproject.yaml

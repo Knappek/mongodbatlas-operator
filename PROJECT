@@ -1,0 +1,14 @@
+domain: knappek.com
+layout: go.kubebuilder.io/v2
+projectName: mongodblatlas-operator
+repo: github.com/knappek/mongodbatlas-operator
+resources:
+- group: mongodbatlas
+  kind: MongoDBAtlasProject
+  version: v1alpha1
+- group: mongodbatlas
+  kind: MongoDBAtlasCluster
+  version: v1alpha1
+version: 3-alpha
+plugins:
+  go.sdk.operatorframework.io/v2-alpha: {}

@@ -1,0 +1,24 @@
+# permissions for end users to edit mongodbatlasprojects.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: mongodbatlasproject-editor-role
+rules:
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasprojects
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasprojects/status
+  verbs:
+  - get

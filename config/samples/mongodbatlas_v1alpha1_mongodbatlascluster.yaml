@@ -1,0 +1,16 @@
+apiVersion: mongodbatlas.knappek.com/v1alpha1
+kind: MongoDBAtlasCluster
+metadata:
+  name: mongodbatlascluster-sample
+spec:
+  projectName: mongodbatlasproject-sample
+  providerSettings:
+    providerName: "AWS"
+    regionName: "EU_CENTRAL_1"
+    instanceSizeName: "M10"
+    encryptEBSVolume: false
+  numShards: 1
+  autoscaling:
+    diskGBEnabled: false
+  backupEnabled: false
+  providerBackupEnabled: false

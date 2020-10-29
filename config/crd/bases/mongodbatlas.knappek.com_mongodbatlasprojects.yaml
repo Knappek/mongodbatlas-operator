@@ -1,0 +1,97 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: mongodbatlasprojects.mongodbatlas.knappek.com
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.id
+    description: The ID of the Project
+    name: GroupID
+    type: string
+  - JSONPath: .status.clusterCount
+    description: The number of Clusters in the Project
+    name: ClusterCount
+    type: integer
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
+  - JSONPath: .spec.orgID
+    description: The MongoDB Atlas Organization ID
+    name: OrgID
+    priority: 1
+    type: string
+  group: mongodbatlas.knappek.com
+  names:
+    kind: MongoDBAtlasProject
+    listKind: MongoDBAtlasProjectList
+    plural: mongodbatlasprojects
+    shortNames:
+    - map
+    singular: mongodbatlasproject
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: MongoDBAtlasProject is the Schema for the mongodbatlasprojects
+        API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: MongoDBAtlasProjectSpec defines the desired state of MongoDBAtlasProject
+          properties:
+            orgID:
+              description: 'OrgID is the MongoDB Atlas Organization ID. More info:
+                https://docs.atlas.mongodb.com/organizations-projects/#organizations'
+              type: string
+          required:
+          - orgID
+          type: object
+        status:
+          description: MongoDBAtlasProjectStatus defines the observed state of MongoDBAtlasProject
+          properties:
+            clusterCount:
+              type: integer
+            created:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+            orgID:
+              type: string
+          required:
+          - clusterCount
+          - created
+          - id
+          - name
+          - orgID
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -1,0 +1,48 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasclusters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasclusters/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasprojects
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - mongodbatlas.knappek.com
+  resources:
+  - mongodbatlasprojects/status
+  verbs:
+  - get
+  - patch
+  - update
